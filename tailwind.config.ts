@@ -19,6 +19,12 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        wellness: {
+          beige: "hsl(var(--wellness-beige))",
+          taupe: "hsl(var(--wellness-taupe))",
+          pink: "hsl(var(--wellness-soft-pink))",
+          warm: "hsl(var(--wellness-warm))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
