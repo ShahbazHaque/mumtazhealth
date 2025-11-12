@@ -15,6 +15,7 @@ const usernameSchema = z.string().trim().min(3, { message: "Username must be at 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [isResetPassword, setIsResetPassword] = useState(false);
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -99,14 +100,16 @@ export default function Auth() {
       <Card className="w-full max-w-md border-wellness-taupe/20 shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-bold text-wellness-taupe">
-            {isResetPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Create Account"}
+            {isResetPassword ? "Reset Password" : isAdminLogin ? "Admin Access" : isLogin ? "Welcome Back" : "Create Account"}
           </CardTitle>
           <CardDescription>
             {isResetPassword 
               ? "Enter your email to receive a password reset link"
-              : isLogin 
-                ? "Enter your credentials to access your wellness tracker" 
-                : "Join us to start your holistic wellness journey"
+              : isAdminLogin
+                ? "Administrator login - access all user data and settings"
+                : isLogin 
+                  ? "Enter your credentials to access your wellness tracker" 
+                  : "Join us to start your holistic wellness journey"
             }
           </CardDescription>
         </CardHeader>
@@ -156,25 +159,27 @@ export default function Auth() {
           <CardFooter className="flex flex-col space-y-4">
             <Button 
               type="submit" 
-              className="w-full bg-wellness-taupe hover:bg-wellness-taupe/90"
+              className={`w-full ${isAdminLogin ? 'bg-destructive hover:bg-destructive/90' : 'bg-wellness-taupe hover:bg-wellness-taupe/90'}`}
               disabled={loading}
             >
-              {loading ? "Please wait..." : isResetPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
+              {loading ? "Please wait..." : isResetPassword ? "Send Reset Link" : isAdminLogin ? "Admin Sign In" : isLogin ? "Sign In" : "Sign Up"}
             </Button>
             
             {!isResetPassword && (
               <>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full"
-                  onClick={() => setIsLogin(!isLogin)}
-                  disabled={loading}
-                >
-                  {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-                </Button>
+                {!isAdminLogin && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => setIsLogin(!isLogin)}
+                    disabled={loading}
+                  >
+                    {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                  </Button>
+                )}
                 
-                {isLogin && (
+                {isLogin && !isAdminLogin && (
                   <Button
                     type="button"
                     variant="link"
@@ -185,6 +190,30 @@ export default function Auth() {
                     Forgot password?
                   </Button>
                 )}
+                
+                <div className="relative w-full">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-wellness-taupe/20" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      {isAdminLogin ? "or" : "admin"}
+                    </span>
+                  </div>
+                </div>
+                
+                <Button
+                  type="button"
+                  variant={isAdminLogin ? "outline" : "secondary"}
+                  className="w-full"
+                  onClick={() => {
+                    setIsAdminLogin(!isAdminLogin);
+                    setIsLogin(true);
+                  }}
+                  disabled={loading}
+                >
+                  {isAdminLogin ? "Back to User Login" : "Admin Login"}
+                </Button>
               </>
             )}
             
