@@ -93,9 +93,30 @@ export default function Tracker() {
   useEffect(() => {
     if (user) {
       checkAdminRole();
+      checkOnboarding();
       loadData();
     }
   }, [user, selectedDate]);
+
+  const checkOnboarding = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('user_wellness_profiles')
+      .select('onboarding_completed')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (error) {
+      console.error('Error checking onboarding:', error);
+      return;
+    }
+    
+    // If no profile exists or onboarding not completed, redirect to onboarding
+    if (!data || !data.onboarding_completed) {
+      navigate('/onboarding');
+    }
+  };
 
   useEffect(() => {
     setIsMenstrual(cyclePhase === 'Menstrual');
