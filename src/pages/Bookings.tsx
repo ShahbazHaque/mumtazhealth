@@ -136,6 +136,34 @@ export default function Bookings() {
       return;
     }
 
+    // Send admin notification email
+    try {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('user_id', user.id)
+        .single();
+
+      await supabase.functions.invoke('send-booking-email', {
+        body: {
+          type: 'admin_notification',
+          bookingId: data[0].id,
+          userEmail: user.email,
+          userName: profileData?.username || user.email?.split('@')[0] || 'User',
+          serviceTitle: selectedService.title,
+          bookingDate: new Date(bookingDate).toLocaleString(),
+          duration: selectedService.duration_days 
+            ? `${selectedService.duration_days} days` 
+            : `${selectedService.duration_hours} hours`,
+          price: `${selectedService.currency} ${selectedService.price}`,
+          notes: bookingNotes || undefined,
+          adminEmail: 'admin@holistic-wellness.com',
+        },
+      });
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+    }
+
     toast.success('Booking request submitted! We will confirm shortly.');
     setIsDialogOpen(false);
     loadMyBookings();
@@ -143,6 +171,10 @@ export default function Bookings() {
 
   const cancelBooking = async (bookingId: string) => {
     if (!confirm('Are you sure you want to cancel this booking?')) return;
+
+    // Get booking details for email
+    const booking = myBookings.find(b => b.id === bookingId);
+    if (!booking) return;
 
     const { error } = await supabase
       .from('bookings')
@@ -153,6 +185,30 @@ export default function Bookings() {
       console.error('Error cancelling booking:', error);
       toast.error('Failed to cancel booking');
       return;
+    }
+
+    // Send cancellation email
+    if (user) {
+      try {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('user_id', user.id)
+          .single();
+
+        await supabase.functions.invoke('send-booking-email', {
+          body: {
+            type: 'cancelled',
+            bookingId: booking.id,
+            userEmail: user.email,
+            userName: profileData?.username || user.email?.split('@')[0] || 'User',
+            serviceTitle: booking.services.title,
+            bookingDate: new Date(booking.booking_date).toLocaleString(),
+          },
+        });
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+      }
     }
 
     toast.success('Booking cancelled');
