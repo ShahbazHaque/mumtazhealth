@@ -65,6 +65,23 @@ export default function Tracker() {
   // Daily practices state
   const [practices, setPractices] = useState<Record<string, any>>({});
   
+  // Yoga practice fields
+  const [yogaStyle, setYogaStyle] = useState('');
+  const [yogaDuration, setYogaDuration] = useState('');
+  const [yogaPoses, setYogaPoses] = useState('');
+  
+  // Nutrition fields
+  const [meals, setMeals] = useState<Array<{name: string, time: string, doshaNotes: string}>>([]);
+  
+  // Spiritual practice fields
+  const [fajr, setFajr] = useState(false);
+  const [dhuhr, setDhuhr] = useState(false);
+  const [asr, setAsr] = useState(false);
+  const [maghrib, setMaghrib] = useState(false);
+  const [isha, setIsha] = useState(false);
+  const [mantras, setMantras] = useState('');
+  const [meditationMinutes, setMeditationMinutes] = useState('');
+  
   const navigate = useNavigate();
 
   useEffect(() => {

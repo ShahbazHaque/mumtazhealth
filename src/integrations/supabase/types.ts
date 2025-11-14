@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_recommendations: {
+        Row: {
+          content_ids: string[]
+          created_at: string | null
+          cycle_phase: string | null
+          id: string
+          pregnancy_status: string | null
+          recommendation_date: string
+          user_id: string
+        }
+        Insert: {
+          content_ids: string[]
+          created_at?: string | null
+          cycle_phase?: string | null
+          id?: string
+          pregnancy_status?: string | null
+          recommendation_date: string
+          user_id: string
+        }
+        Update: {
+          content_ids?: string[]
+          created_at?: string | null
+          cycle_phase?: string | null
+          id?: string
+          pregnancy_status?: string | null
+          recommendation_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -59,6 +89,161 @@ export type Database = {
         }
         Relationships: []
       }
+      user_saved_content: {
+        Row: {
+          content_id: string
+          id: string
+          notes: string | null
+          saved_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          id?: string
+          notes?: string | null
+          saved_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          id?: string
+          notes?: string | null
+          saved_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_saved_content_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "wellness_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_wellness_profiles: {
+        Row: {
+          conception_date: string | null
+          created_at: string | null
+          current_trimester: number | null
+          dietary_restrictions: Json | null
+          dosha_assessment_date: string | null
+          due_date: string | null
+          id: string
+          onboarding_completed: boolean | null
+          preferred_yoga_style: string | null
+          pregnancy_status: string | null
+          primary_dosha: string | null
+          secondary_dosha: string | null
+          spiritual_preference: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          conception_date?: string | null
+          created_at?: string | null
+          current_trimester?: number | null
+          dietary_restrictions?: Json | null
+          dosha_assessment_date?: string | null
+          due_date?: string | null
+          id?: string
+          onboarding_completed?: boolean | null
+          preferred_yoga_style?: string | null
+          pregnancy_status?: string | null
+          primary_dosha?: string | null
+          secondary_dosha?: string | null
+          spiritual_preference?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          conception_date?: string | null
+          created_at?: string | null
+          current_trimester?: number | null
+          dietary_restrictions?: Json | null
+          dosha_assessment_date?: string | null
+          due_date?: string | null
+          id?: string
+          onboarding_completed?: boolean | null
+          preferred_yoga_style?: string | null
+          pregnancy_status?: string | null
+          primary_dosha?: string | null
+          secondary_dosha?: string | null
+          spiritual_preference?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wellness_content: {
+        Row: {
+          audio_url: string | null
+          benefits: string[] | null
+          content_type: string
+          created_at: string | null
+          cycle_phases: string[] | null
+          description: string | null
+          detailed_guidance: string | null
+          difficulty_level: string | null
+          doshas: string[] | null
+          duration_minutes: number | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          pregnancy_statuses: string[] | null
+          pregnancy_trimesters: number[] | null
+          spiritual_path: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          video_url: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          benefits?: string[] | null
+          content_type: string
+          created_at?: string | null
+          cycle_phases?: string[] | null
+          description?: string | null
+          detailed_guidance?: string | null
+          difficulty_level?: string | null
+          doshas?: string[] | null
+          duration_minutes?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          pregnancy_statuses?: string[] | null
+          pregnancy_trimesters?: number[] | null
+          spiritual_path?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          benefits?: string[] | null
+          content_type?: string
+          created_at?: string | null
+          cycle_phases?: string[] | null
+          description?: string | null
+          detailed_guidance?: string | null
+          difficulty_level?: string | null
+          doshas?: string[] | null
+          duration_minutes?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          pregnancy_statuses?: string[] | null
+          pregnancy_trimesters?: number[] | null
+          spiritual_path?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       wellness_entries: {
         Row: {
           created_at: string
@@ -69,13 +254,16 @@ export type Database = {
           entry_date: string
           id: string
           monthly_reflection: string | null
+          nutrition_log: Json | null
           pain_level: number | null
           physical_symptoms: string | null
           spiritual_anchor: string | null
+          spiritual_practices: Json | null
           tweak_plan: string | null
           updated_at: string
           user_id: string
           vata_crash: string | null
+          yoga_practice: Json | null
         }
         Insert: {
           created_at?: string
@@ -86,13 +274,16 @@ export type Database = {
           entry_date: string
           id?: string
           monthly_reflection?: string | null
+          nutrition_log?: Json | null
           pain_level?: number | null
           physical_symptoms?: string | null
           spiritual_anchor?: string | null
+          spiritual_practices?: Json | null
           tweak_plan?: string | null
           updated_at?: string
           user_id: string
           vata_crash?: string | null
+          yoga_practice?: Json | null
         }
         Update: {
           created_at?: string
@@ -103,13 +294,16 @@ export type Database = {
           entry_date?: string
           id?: string
           monthly_reflection?: string | null
+          nutrition_log?: Json | null
           pain_level?: number | null
           physical_symptoms?: string | null
           spiritual_anchor?: string | null
+          spiritual_practices?: Json | null
           tweak_plan?: string | null
           updated_at?: string
           user_id?: string
           vata_crash?: string | null
+          yoga_practice?: Json | null
         }
         Relationships: []
       }
