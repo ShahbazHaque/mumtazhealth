@@ -120,7 +120,7 @@ export default function Bookings() {
       return;
     }
 
-    const { error } = await supabase
+    const { data: bookingData, error } = await supabase
       .from('bookings')
       .insert({
         user_id: user.id,
@@ -128,7 +128,9 @@ export default function Bookings() {
         booking_date: new Date(bookingDate).toISOString(),
         notes: bookingNotes || null,
         status: 'pending',
-      });
+      })
+      .select()
+      .single();
 
     if (error) {
       console.error('Error creating booking:', error);
@@ -147,7 +149,7 @@ export default function Bookings() {
       await supabase.functions.invoke('send-booking-email', {
         body: {
           type: 'admin_notification',
-          bookingId: data[0].id,
+          bookingId: bookingData?.id,
           userEmail: user.email,
           userName: profileData?.username || user.email?.split('@')[0] || 'User',
           serviceTitle: selectedService.title,

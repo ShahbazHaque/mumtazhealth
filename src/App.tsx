@@ -10,6 +10,7 @@ import Admin from "./pages/Admin";
 import Onboarding from "./pages/Onboarding";
 import MonthlySummary from "./pages/MonthlySummary";
 import Bookings from "./pages/Bookings";
+import ContentLibrary from "./pages/ContentLibrary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/summary" element={<MonthlySummary />} />
           <Route path="/bookings" element={<Bookings />} />
+          <Route path="/content" element={<ContentLibrary />} />
           <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

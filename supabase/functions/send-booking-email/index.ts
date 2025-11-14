@@ -1,8 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
-import { Resend } from "npm:resend@2.0.0";
-import React from "npm:react@18.3.1";
-import { render } from "npm:@react-email/render@0.0.12";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+import React from "https://esm.sh/react@18.3.1";
+import { render } from "https://esm.sh/@react-email/render@1.0.0";
 import { BookingConfirmedEmail } from "./_templates/booking-confirmed.tsx";
 import { BookingCancelledEmail } from "./_templates/booking-cancelled.tsx";
 import { AdminNotificationEmail } from "./_templates/admin-notification.tsx";
@@ -53,7 +53,7 @@ const handler = async (req: Request): Promise<Response> => {
     let to: string;
 
     if (type === "confirmed") {
-      html = render(
+      html = await render(
         React.createElement(BookingConfirmedEmail, {
           userName,
           serviceTitle,
@@ -66,7 +66,7 @@ const handler = async (req: Request): Promise<Response> => {
       subject = `Booking Confirmed: ${serviceTitle}`;
       to = userEmail;
     } else if (type === "cancelled") {
-      html = render(
+      html = await render(
         React.createElement(BookingCancelledEmail, {
           userName,
           serviceTitle,
@@ -76,7 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
       subject = `Booking Cancelled: ${serviceTitle}`;
       to = userEmail;
     } else if (type === "admin_notification") {
-      html = render(
+      html = await render(
         React.createElement(AdminNotificationEmail, {
           userName,
           userEmail,

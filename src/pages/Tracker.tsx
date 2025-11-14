@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { LogOut, Save, Trash2, UserCog, BarChart3, Plus, X, Calendar } from "lucide-react";
+import { LogOut, Save, Trash2, UserCog, BarChart3, Plus, X, Calendar, BookOpen } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface DailyPractice {
@@ -319,6 +320,15 @@ export default function Tracker() {
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 Book Services
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/content")}
+                className="border-wellness-taupe/30"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Library
               </Button>
               <Button
                 variant="outline"
