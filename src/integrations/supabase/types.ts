@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          booking_date: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          service_id: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          booking_date: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          service_id: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          booking_date?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          service_id?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_recommendations: {
         Row: {
           content_ids: string[]
@@ -65,6 +106,51 @@ export type Database = {
           updated_at?: string
           user_id?: string
           username?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          category: string
+          created_at: string | null
+          currency: string | null
+          description: string
+          duration_days: number | null
+          duration_hours: number | null
+          id: string
+          is_active: boolean | null
+          max_capacity: number | null
+          price: number
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          currency?: string | null
+          description: string
+          duration_days?: number | null
+          duration_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          max_capacity?: number | null
+          price: number
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          currency?: string | null
+          description?: string
+          duration_days?: number | null
+          duration_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          max_capacity?: number | null
+          price?: number
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
