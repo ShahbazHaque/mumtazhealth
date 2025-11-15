@@ -123,6 +123,62 @@ export default function Admin() {
     }
   };
 
+  const handleResetUser = async (userId: string) => {
+    if (!userId) {
+      toast.error("Please select a user first");
+      return;
+    }
+
+    const selectedProfile = profiles.find(p => p.user_id === userId);
+    if (!selectedProfile) return;
+
+    const confirmed = window.confirm(
+      `Reset all data for ${selectedProfile.username}?\n\nThis will:\n- Reset onboarding status\n- Clear wellness profile\n- Delete all wellness entries\n- Clear saved content\n\nThis action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      // Delete wellness entries
+      const { error: entriesError } = await supabase
+        .from('wellness_entries')
+        .delete()
+        .eq('user_id', userId);
+
+      if (entriesError) throw entriesError;
+
+      // Delete saved content
+      const { error: savedContentError } = await supabase
+        .from('user_saved_content')
+        .delete()
+        .eq('user_id', userId);
+
+      if (savedContentError) throw savedContentError;
+
+      // Delete daily recommendations
+      const { error: recsError } = await supabase
+        .from('daily_recommendations')
+        .delete()
+        .eq('user_id', userId);
+
+      if (recsError) throw recsError;
+
+      // Reset wellness profile
+      const { error: profileError } = await supabase
+        .from('user_wellness_profiles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (profileError) throw profileError;
+
+      toast.success(`User ${selectedProfile.username} has been reset to first-time state`);
+      setEntries([]);
+    } catch (error) {
+      console.error('Error resetting user:', error);
+      toast.error('Failed to reset user data');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-wellness-beige">
@@ -159,23 +215,46 @@ export default function Admin() {
           </CardHeader>
         </Card>
 
-        <Card className="mb-6">
+        <Card className="mb-6 border-wellness-taupe/20 shadow-lg">
           <CardHeader>
-            <CardTitle>Select User</CardTitle>
+            <CardTitle className="text-2xl text-wellness-taupe">User Management</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Select value={selectedUserId} onValueChange={handleUserSelect}>
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a user to view their data" />
-              </SelectTrigger>
-              <SelectContent>
-                {profiles.map((profile) => (
-                  <SelectItem key={profile.id} value={profile.user_id}>
-                    {profile.username}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <CardContent className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-wellness-taupe mb-2">
+                Select User
+              </label>
+              <Select value={selectedUserId} onValueChange={handleUserSelect}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a user to view their data" />
+                </SelectTrigger>
+                <SelectContent>
+                  {profiles.map((profile) => (
+                    <SelectItem key={profile.id} value={profile.user_id}>
+                      {profile.username} ({profile.user_id.slice(0, 8)}...)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedUserId && (
+              <div className="flex items-center gap-3 p-4 bg-wellness-sage/10 rounded-lg border border-wellness-sage/20">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-wellness-taupe">Reset Test User</p>
+                  <p className="text-xs text-wellness-taupe/70 mt-1">
+                    Clear all data and return user to onboarding state
+                  </p>
+                </div>
+                <Button
+                  onClick={() => handleResetUser(selectedUserId)}
+                  variant="outline"
+                  className="border-wellness-sage text-wellness-sage hover:bg-wellness-sage/10"
+                >
+                  Reset User
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
