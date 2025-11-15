@@ -39,23 +39,36 @@ export default function Auth() {
         toast.success("Password reset email sent! Check your inbox.");
         setIsResetPassword(false);
       } else if (isLogin) {
-        passwordSchema.parse(password);
-        
-        const { error, data } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            throw new Error("Invalid email or password");
+        // Special passwordless flow for admin email
+        if (email.toLowerCase() === "mumtazhaque07@gmail.com") {
+          const { error } = await supabase.auth.signInWithOtp({
+            email,
+            options: {
+              emailRedirectTo: `${window.location.origin}/`,
+            },
+          });
+          
+          if (error) throw error;
+          toast.success("Magic link sent! Check your email to log in.");
+        } else {
+          passwordSchema.parse(password);
+          
+          const { error, data } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          
+          if (error) {
+            if (error.message.includes("Invalid login credentials")) {
+              throw new Error("Invalid email or password");
+            }
+            throw error;
           }
-          throw error;
-        }
-        
-        if (data.user) {
-          toast.success("Welcome back!");
-          navigate("/");
+          
+          if (data.user) {
+            toast.success("Welcome back!");
+            navigate("/");
+          }
         }
       } else {
         passwordSchema.parse(password);
@@ -141,7 +154,7 @@ export default function Auth() {
                 disabled={loading}
               />
             </div>
-            {!isResetPassword && (
+            {!isResetPassword && email.toLowerCase() !== "mumtazhaque07@gmail.com" && (
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <Input
@@ -153,6 +166,14 @@ export default function Auth() {
                   required
                   disabled={loading}
                 />
+              </div>
+            )}
+            
+            {isLogin && email.toLowerCase() === "mumtazhaque07@gmail.com" && (
+              <div className="p-3 bg-wellness-sage/10 border border-wellness-sage/20 rounded-md">
+                <p className="text-sm text-wellness-sage">
+                  🔓 Passwordless admin access - a magic link will be sent to your email
+                </p>
               </div>
             )}
           </CardContent>
