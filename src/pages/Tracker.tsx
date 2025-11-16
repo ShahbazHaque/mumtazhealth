@@ -104,6 +104,16 @@ export default function Tracker() {
   const [postpartumFeeding, setPostpartumFeeding] = useState('');
   const [postpartumNotes, setPostpartumNotes] = useState('');
   
+  // Menopause tracking fields
+  const [menopauseHotFlashes, setMenopauseHotFlashes] = useState('');
+  const [menopauseNightSweats, setMenopauseNightSweats] = useState('');
+  const [menopauseMood, setMenopauseMood] = useState('');
+  const [menopauseBrainFog, setMenopauseBrainFog] = useState('');
+  const [menopauseEnergy, setMenopauseEnergy] = useState('');
+  const [menopauseSleep, setMenopauseSleep] = useState('');
+  const [menopauseJointPain, setMenopauseJointPain] = useState('');
+  const [menopauseDigestion, setMenopauseDigestion] = useState('');
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -226,6 +236,17 @@ export default function Tracker() {
       setPostpartumPain(postpartumData.pain || '');
       setPostpartumFeeding(postpartumData.feeding || '');
       setPostpartumNotes(postpartumData.notes || '');
+      
+      // Load menopause tracking data
+      const menopauseData = typeof data.menopause_tracking === 'object' && data.menopause_tracking !== null ? data.menopause_tracking as Record<string, any> : {};
+      setMenopauseHotFlashes(menopauseData.hotFlashes || '');
+      setMenopauseNightSweats(menopauseData.nightSweats || '');
+      setMenopauseMood(menopauseData.mood || '');
+      setMenopauseBrainFog(menopauseData.brainFog || '');
+      setMenopauseEnergy(menopauseData.energy || '');
+      setMenopauseSleep(menopauseData.sleep || '');
+      setMenopauseJointPain(menopauseData.jointPain || '');
+      setMenopauseDigestion(menopauseData.digestion || '');
     } else {
       // Reset form for new date
       setCyclePhase('');
@@ -252,6 +273,14 @@ export default function Tracker() {
       setPostpartumPain('');
       setPostpartumFeeding('');
       setPostpartumNotes('');
+      setMenopauseHotFlashes('');
+      setMenopauseNightSweats('');
+      setMenopauseMood('');
+      setMenopauseBrainFog('');
+      setMenopauseEnergy('');
+      setMenopauseSleep('');
+      setMenopauseJointPain('');
+      setMenopauseDigestion('');
     }
   };
 
@@ -290,6 +319,16 @@ export default function Tracker() {
           pain: postpartumPain,
           feeding: postpartumFeeding,
           notes: postpartumNotes,
+        },
+        menopause_tracking: {
+          hotFlashes: menopauseHotFlashes,
+          nightSweats: menopauseNightSweats,
+          mood: menopauseMood,
+          brainFog: menopauseBrainFog,
+          energy: menopauseEnergy,
+          sleep: menopauseSleep,
+          jointPain: menopauseJointPain,
+          digestion: menopauseDigestion,
         },
       };
       
@@ -711,6 +750,142 @@ export default function Tracker() {
                   placeholder="Any other notes about your recovery, concerns, or how you're feeling today..."
                   className="mt-2 min-h-[100px]"
                 />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Menopause Tracking - Only show for perimenopause, menopause, and post-menopause */}
+        {(lifeStage === 'perimenopause' || lifeStage === 'menopause' || lifeStage === 'post_menopause') && (
+          <Card className="mb-6 bg-wellness-lilac/20 border-wellness-taupe/30">
+            <CardHeader>
+              <CardTitle className="text-xl">1. Menopause Symptom Tracking</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Track your symptoms and how you're managing this transition
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Hot Flashes:</Label>
+                <Select value={menopauseHotFlashes} onValueChange={setMenopauseHotFlashes}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Frequency today?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="mild">Mild - 1-2 times</SelectItem>
+                    <SelectItem value="moderate">Moderate - 3-5 times</SelectItem>
+                    <SelectItem value="severe">Severe - 6+ times</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Night Sweats:</Label>
+                <Select value={menopauseNightSweats} onValueChange={setMenopauseNightSweats}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Did you experience night sweats?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="mild">Mild - Slightly uncomfortable</SelectItem>
+                    <SelectItem value="moderate">Moderate - Woke up once</SelectItem>
+                    <SelectItem value="severe">Severe - Multiple times/changed sheets</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Mood:</Label>
+                <Select value={menopauseMood} onValueChange={setMenopauseMood}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How's your mood today?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="stable">Stable & Positive</SelectItem>
+                    <SelectItem value="content">Content & Calm</SelectItem>
+                    <SelectItem value="irritable">Irritable or Short-tempered</SelectItem>
+                    <SelectItem value="anxious">Anxious or Worried</SelectItem>
+                    <SelectItem value="low">Low or Down</SelectItem>
+                    <SelectItem value="fluctuating">Fluctuating throughout day</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Brain Fog:</Label>
+                <Select value={menopauseBrainFog} onValueChange={setMenopauseBrainFog}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Mental clarity level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="clear">Clear - Sharp focus</SelectItem>
+                    <SelectItem value="mild">Mild - Slight forgetfulness</SelectItem>
+                    <SelectItem value="moderate">Moderate - Difficulty concentrating</SelectItem>
+                    <SelectItem value="severe">Severe - Hard to focus/remember</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Energy Level:</Label>
+                <Select value={menopauseEnergy} onValueChange={setMenopauseEnergy}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How's your energy?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="high">High - Feeling energetic</SelectItem>
+                    <SelectItem value="moderate">Moderate - Steady energy</SelectItem>
+                    <SelectItem value="low">Low - Feeling tired</SelectItem>
+                    <SelectItem value="depleted">Depleted - Very fatigued</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Sleep Quality:</Label>
+                <Select value={menopauseSleep} onValueChange={setMenopauseSleep}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How did you sleep?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="excellent">Excellent - Restful sleep</SelectItem>
+                    <SelectItem value="good">Good - Slept well</SelectItem>
+                    <SelectItem value="fair">Fair - Some interruptions</SelectItem>
+                    <SelectItem value="poor">Poor - Restless/difficult</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Joint Pain:</Label>
+                <Select value={menopauseJointPain} onValueChange={setMenopauseJointPain}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Any joint pain?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="mild">Mild - Slight stiffness</SelectItem>
+                    <SelectItem value="moderate">Moderate - Noticeable discomfort</SelectItem>
+                    <SelectItem value="severe">Severe - Limiting movement</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Digestion/Bloating:</Label>
+                <Select value={menopauseDigestion} onValueChange={setMenopauseDigestion}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How's your digestion?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="good">Good - No issues</SelectItem>
+                    <SelectItem value="bloating">Bloating</SelectItem>
+                    <SelectItem value="constipation">Constipation</SelectItem>
+                    <SelectItem value="sensitive">Sensitive stomach</SelectItem>
+                    <SelectItem value="multiple">Multiple issues</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
