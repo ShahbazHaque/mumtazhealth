@@ -172,6 +172,25 @@ export default function Tracker() {
     }
   };
 
+  const getTrackerTitle = () => {
+    switch (lifeStage) {
+      case 'menstrual_cycle':
+        return 'Menstrual Cycle Tracker';
+      case 'pregnancy':
+        return trimester ? `Pregnancy Tracker (Trimester ${trimester})` : 'Pregnancy Tracker';
+      case 'postpartum':
+        return 'Postpartum Tracker';
+      case 'perimenopause':
+        return 'Perimenopause Tracker';
+      case 'menopause':
+        return 'Menopause Tracker';
+      case 'post_menopause':
+        return 'Post-Menopause Tracker';
+      default:
+        return 'Holistic Motherhood Tracker';
+    }
+  };
+
   useEffect(() => {
     setIsMenstrual(cyclePhase === 'Menstrual');
   }, [cyclePhase]);
@@ -399,7 +418,7 @@ export default function Tracker() {
         <Card className="mb-6 bg-wellness-warm border-wellness-taupe/20 shadow-lg">
           <CardHeader className="text-center space-y-2">
             <CardTitle className="text-3xl font-bold text-wellness-taupe">
-              Holistic Motherhood Tracker
+              {getTrackerTitle()}
             </CardTitle>
             <p className="text-sm text-muted-foreground">
               Vata-Pitta Balance for Fertility & Calm
@@ -942,7 +961,8 @@ export default function Tracker() {
           </Card>
         )}
 
-        {/* Daily Practices */}
+        {/* Daily Practices - Show for menstrual cycle tracking */}
+        {lifeStage === 'menstrual_cycle' && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-xl">2. Daily Dinacharya & Practices</CardTitle>
@@ -1017,8 +1037,10 @@ export default function Tracker() {
             </div>
           </CardContent>
         </Card>
+        )}
 
-        {/* Symptom & Tweak Log */}
+        {/* Symptom & Tweak Log - Show for menstrual cycle tracking */}
+        {lifeStage === 'menstrual_cycle' && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-xl">3. Symptom & Tweak Log</CardTitle>
@@ -1069,8 +1091,10 @@ export default function Tracker() {
             </div>
           </CardContent>
         </Card>
+        )}
 
-        {/* Monthly Reflection */}
+        {/* Monthly Reflection - Show for menstrual cycle tracking */}
+        {lifeStage === 'menstrual_cycle' && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-xl">4. Monthly Reflection</CardTitle>
@@ -1084,6 +1108,7 @@ export default function Tracker() {
             />
           </CardContent>
         </Card>
+        )}
 
         {/* Fixed Footer */}
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t shadow-2xl p-4">
