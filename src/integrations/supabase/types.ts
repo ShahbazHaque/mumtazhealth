@@ -342,6 +342,7 @@ export type Database = {
           emotional_state: string | null
           entry_date: string
           id: string
+          menopause_tracking: Json | null
           monthly_reflection: string | null
           nutrition_log: Json | null
           pain_level: number | null
@@ -365,6 +366,7 @@ export type Database = {
           emotional_state?: string | null
           entry_date: string
           id?: string
+          menopause_tracking?: Json | null
           monthly_reflection?: string | null
           nutrition_log?: Json | null
           pain_level?: number | null
@@ -388,6 +390,7 @@ export type Database = {
           emotional_state?: string | null
           entry_date?: string
           id?: string
+          menopause_tracking?: Json | null
           monthly_reflection?: string | null
           nutrition_log?: Json | null
           pain_level?: number | null
