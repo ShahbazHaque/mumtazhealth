@@ -68,7 +68,7 @@ export default function Onboarding() {
         preferred_yoga_style: yogaStyle,
         onboarding_completed: true,
         dosha_assessment_date: new Date().toISOString(),
-      });
+      }, { onConflict: 'user_id' });
 
       if (error) throw error;
 
