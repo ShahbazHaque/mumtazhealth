@@ -51,6 +51,7 @@ export default function Tracker() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [cyclePhase, setCyclePhase] = useState('');
   const [isMenstrual, setIsMenstrual] = useState(false);
+  const [lifeStage, setLifeStage] = useState<string>('');
   
   // Red Day Protocol fields
   const [painLevel, setPainLevel] = useState('');
@@ -122,13 +123,18 @@ export default function Tracker() {
     
     const { data, error } = await supabase
       .from('user_wellness_profiles')
-      .select('onboarding_completed')
+      .select('onboarding_completed, life_stage')
       .eq('user_id', user.id)
       .maybeSingle();
     
     if (error) {
       console.error('Error checking onboarding:', error);
       return;
+    }
+    
+    // Set life stage if available
+    if (data?.life_stage) {
+      setLifeStage(data.life_stage);
     }
     
     // If no profile exists or onboarding not completed, redirect to onboarding
@@ -361,29 +367,31 @@ export default function Tracker() {
           </CardHeader>
         </Card>
 
-        {/* Cycle Phase */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-xl">1. Cycle Phase Check</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Label>Current Cycle Phase:</Label>
-            <Select value={cyclePhase} onValueChange={setCyclePhase}>
-              <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Select Phase" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Menstrual">Menstrual (Days 1-5)</SelectItem>
-                <SelectItem value="Follicular">Follicular (Days 6-14)</SelectItem>
-                <SelectItem value="Ovulatory">Ovulatory (Days 14-16)</SelectItem>
-                <SelectItem value="Luteal">Luteal (Days 17-28)</SelectItem>
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
+        {/* Cycle Phase - Only show for menstrual cycle life stage */}
+        {lifeStage === 'menstrual_cycle' && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-xl">1. Cycle Phase Check</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Label>Current Cycle Phase:</Label>
+              <Select value={cyclePhase} onValueChange={setCyclePhase}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Select Phase" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Menstrual">Menstrual (Days 1-5)</SelectItem>
+                  <SelectItem value="Follicular">Follicular (Days 6-14)</SelectItem>
+                  <SelectItem value="Ovulatory">Ovulatory (Days 14-16)</SelectItem>
+                  <SelectItem value="Luteal">Luteal (Days 17-28)</SelectItem>
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Red Day Protocol */}
-        {isMenstrual && (
+        {isMenstrual && lifeStage === 'menstrual_cycle' && (
           <Card className="mb-6 bg-wellness-pink/30 border-wellness-taupe/30">
             <CardHeader>
               <CardTitle className="text-xl">Sacred Day 1 Protocol (Maximum Rest)</CardTitle>
