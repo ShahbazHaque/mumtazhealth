@@ -346,6 +346,7 @@ export type Database = {
           nutrition_log: Json | null
           pain_level: number | null
           physical_symptoms: string | null
+          postpartum_tracking: Json | null
           pregnancy_tracking: Json | null
           spiritual_anchor: string | null
           spiritual_practices: Json | null
@@ -368,6 +369,7 @@ export type Database = {
           nutrition_log?: Json | null
           pain_level?: number | null
           physical_symptoms?: string | null
+          postpartum_tracking?: Json | null
           pregnancy_tracking?: Json | null
           spiritual_anchor?: string | null
           spiritual_practices?: Json | null
@@ -390,6 +392,7 @@ export type Database = {
           nutrition_log?: Json | null
           pain_level?: number | null
           physical_symptoms?: string | null
+          postpartum_tracking?: Json | null
           pregnancy_tracking?: Json | null
           spiritual_anchor?: string | null
           spiritual_practices?: Json | null

@@ -96,6 +96,14 @@ export default function Tracker() {
   const [pregnancyBabyMovement, setPregnancyBabyMovement] = useState('');
   const [pregnancyNotes, setPregnancyNotes] = useState('');
   
+  // Postpartum tracking fields
+  const [postpartumSleep, setPostpartumSleep] = useState('');
+  const [postpartumMood, setPostpartumMood] = useState('');
+  const [postpartumEnergy, setPostpartumEnergy] = useState('');
+  const [postpartumPain, setPostpartumPain] = useState('');
+  const [postpartumFeeding, setPostpartumFeeding] = useState('');
+  const [postpartumNotes, setPostpartumNotes] = useState('');
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -209,6 +217,15 @@ export default function Tracker() {
       setPregnancyDigestion(pregnancyData.digestion || '');
       setPregnancyBabyMovement(pregnancyData.babyMovement || '');
       setPregnancyNotes(pregnancyData.notes || '');
+      
+      // Load postpartum tracking data
+      const postpartumData = typeof data.postpartum_tracking === 'object' && data.postpartum_tracking !== null ? data.postpartum_tracking as Record<string, any> : {};
+      setPostpartumSleep(postpartumData.sleep || '');
+      setPostpartumMood(postpartumData.mood || '');
+      setPostpartumEnergy(postpartumData.energy || '');
+      setPostpartumPain(postpartumData.pain || '');
+      setPostpartumFeeding(postpartumData.feeding || '');
+      setPostpartumNotes(postpartumData.notes || '');
     } else {
       // Reset form for new date
       setCyclePhase('');
@@ -229,6 +246,12 @@ export default function Tracker() {
       setPregnancyDigestion('');
       setPregnancyBabyMovement('');
       setPregnancyNotes('');
+      setPostpartumSleep('');
+      setPostpartumMood('');
+      setPostpartumEnergy('');
+      setPostpartumPain('');
+      setPostpartumFeeding('');
+      setPostpartumNotes('');
     }
   };
 
@@ -259,6 +282,14 @@ export default function Tracker() {
           digestion: pregnancyDigestion,
           babyMovement: pregnancyBabyMovement,
           notes: pregnancyNotes,
+        },
+        postpartum_tracking: {
+          sleep: postpartumSleep,
+          mood: postpartumMood,
+          energy: postpartumEnergy,
+          pain: postpartumPain,
+          feeding: postpartumFeeding,
+          notes: postpartumNotes,
         },
       };
       
@@ -578,6 +609,106 @@ export default function Tracker() {
                   value={pregnancyNotes}
                   onChange={(e) => setPregnancyNotes(e.target.value)}
                   placeholder="Any other symptoms, concerns, or notes about how you're feeling today..."
+                  className="mt-2 min-h-[100px]"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Postpartum Tracking - Only show for postpartum life stage */}
+        {lifeStage === 'postpartum' && (
+          <Card className="mb-6 bg-wellness-sage/20 border-wellness-taupe/30">
+            <CardHeader>
+              <CardTitle className="text-xl">1. Postpartum Tracking</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Track your recovery journey and daily well-being
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Sleep Quality:</Label>
+                <Select value={postpartumSleep} onValueChange={setPostpartumSleep}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How did you sleep?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="poor">Poor - Very interrupted</SelectItem>
+                    <SelectItem value="fair">Fair - Some sleep</SelectItem>
+                    <SelectItem value="good">Good - Decent rest</SelectItem>
+                    <SelectItem value="excellent">Excellent - Well rested</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Mood:</Label>
+                <Select value={postpartumMood} onValueChange={setPostpartumMood}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How are you feeling emotionally?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="positive">Positive & Happy</SelectItem>
+                    <SelectItem value="content">Content & Calm</SelectItem>
+                    <SelectItem value="overwhelmed">Overwhelmed</SelectItem>
+                    <SelectItem value="anxious">Anxious or Worried</SelectItem>
+                    <SelectItem value="tearful">Tearful or Sad</SelectItem>
+                    <SelectItem value="struggling">Really struggling</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Energy Level:</Label>
+                <Select value={postpartumEnergy} onValueChange={setPostpartumEnergy}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How's your energy?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="very_low">Very Low - Exhausted</SelectItem>
+                    <SelectItem value="low">Low - Need more rest</SelectItem>
+                    <SelectItem value="moderate">Moderate - Managing</SelectItem>
+                    <SelectItem value="good">Good - Feeling better</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Pain/Discomfort:</Label>
+                <Select value={postpartumPain} onValueChange={setPostpartumPain}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Any pain or discomfort?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="mild">Mild - Manageable</SelectItem>
+                    <SelectItem value="moderate">Moderate - Some concern</SelectItem>
+                    <SelectItem value="severe">Severe - Need support</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Feeding Method:</Label>
+                <Select value={postpartumFeeding} onValueChange={setPostpartumFeeding}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How are you feeding baby?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="breastfeeding">Breastfeeding</SelectItem>
+                    <SelectItem value="pumping">Pumping</SelectItem>
+                    <SelectItem value="formula">Formula feeding</SelectItem>
+                    <SelectItem value="combination">Combination</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Notes:</Label>
+                <Textarea
+                  value={postpartumNotes}
+                  onChange={(e) => setPostpartumNotes(e.target.value)}
+                  placeholder="Any other notes about your recovery, concerns, or how you're feeling today..."
                   className="mt-2 min-h-[100px]"
                 />
               </div>
