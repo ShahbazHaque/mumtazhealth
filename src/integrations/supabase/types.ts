@@ -348,6 +348,7 @@ export type Database = {
           physical_symptoms: string | null
           spiritual_anchor: string | null
           spiritual_practices: Json | null
+          trimester: number | null
           tweak_plan: string | null
           updated_at: string
           user_id: string
@@ -368,6 +369,7 @@ export type Database = {
           physical_symptoms?: string | null
           spiritual_anchor?: string | null
           spiritual_practices?: Json | null
+          trimester?: number | null
           tweak_plan?: string | null
           updated_at?: string
           user_id: string
@@ -388,6 +390,7 @@ export type Database = {
           physical_symptoms?: string | null
           spiritual_anchor?: string | null
           spiritual_practices?: Json | null
+          trimester?: number | null
           tweak_plan?: string | null
           updated_at?: string
           user_id?: string
