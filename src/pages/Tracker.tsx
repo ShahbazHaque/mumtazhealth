@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { LogOut, Save, Trash2, UserCog, BarChart3, Plus, X, Calendar, BookOpen } from "lucide-react";
+import { LogOut, Save, Trash2, UserCog, BarChart3, Plus, X, Calendar, BookOpen, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -329,6 +329,15 @@ export default function Tracker() {
               >
                 <BookOpen className="w-4 h-4 mr-2" />
                 Library
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/insights")}
+                className="border-wellness-taupe/30"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                AI Insights
               </Button>
               <Button
                 variant="outline"
