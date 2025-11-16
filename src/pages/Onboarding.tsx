@@ -481,9 +481,9 @@ export default function Onboarding() {
                 variant="outline" 
                 size="sm" 
                 className="w-full"
-                onClick={() => navigate("/bookings")}
+                onClick={() => window.location.href = 'mailto:mumtazhaque07@gmail.com?subject=Booking%20Request&body=Hi%2C%20I%20would%20like%20to%20book%20a%20consultation%20or%20class.'}
               >
-                Book a Consultation
+                Book Your Consultation
               </Button>
             </div>
 
