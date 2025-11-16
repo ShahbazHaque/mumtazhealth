@@ -109,19 +109,19 @@ const ContentLibrary = () => {
 
     if (selectedDosha !== "all") {
       filtered = filtered.filter(item => 
-        item.doshas.length === 0 || item.doshas.includes(selectedDosha)
+        !item.doshas || item.doshas.length === 0 || item.doshas.includes(selectedDosha)
       );
     }
 
     if (selectedCyclePhase !== "all") {
       filtered = filtered.filter(item => 
-        item.cycle_phases.length === 0 || item.cycle_phases.includes(selectedCyclePhase)
+        !item.cycle_phases || item.cycle_phases.length === 0 || item.cycle_phases.includes(selectedCyclePhase)
       );
     }
 
     if (selectedPregnancyStatus !== "all") {
       filtered = filtered.filter(item => 
-        item.pregnancy_statuses.length === 0 || item.pregnancy_statuses.includes(selectedPregnancyStatus)
+        !item.pregnancy_statuses || item.pregnancy_statuses.length === 0 || item.pregnancy_statuses.includes(selectedPregnancyStatus)
       );
     }
 
