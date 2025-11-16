@@ -266,6 +266,26 @@ export default function Tracker() {
       setMenopauseSleep(menopauseData.sleep || '');
       setMenopauseJointPain(menopauseData.jointPain || '');
       setMenopauseDigestion(menopauseData.digestion || '');
+      
+      // Load yoga practice data
+      const yogaData = typeof data.yoga_practice === 'object' && data.yoga_practice !== null ? data.yoga_practice as Record<string, any> : {};
+      setYogaStyle(yogaData.style || '');
+      setYogaDuration(yogaData.duration || '');
+      setYogaPoses(yogaData.poses || '');
+      
+      // Load nutrition data
+      const nutritionData = typeof data.nutrition_log === 'object' && data.nutrition_log !== null ? data.nutrition_log as Record<string, any> : {};
+      setMeals(Array.isArray(nutritionData.meals) ? nutritionData.meals : []);
+      
+      // Load spiritual practices data
+      const spiritualData = typeof data.spiritual_practices === 'object' && data.spiritual_practices !== null ? data.spiritual_practices as Record<string, any> : {};
+      setFajr(spiritualData.fajr || false);
+      setDhuhr(spiritualData.dhuhr || false);
+      setAsr(spiritualData.asr || false);
+      setMaghrib(spiritualData.maghrib || false);
+      setIsha(spiritualData.isha || false);
+      setMantras(spiritualData.mantras || '');
+      setMeditationMinutes(spiritualData.meditationMinutes || '');
     } else {
       // Reset form for new date
       setCyclePhase('');
@@ -300,6 +320,18 @@ export default function Tracker() {
       setMenopauseSleep('');
       setMenopauseJointPain('');
       setMenopauseDigestion('');
+      setYogaStyle('');
+      setYogaDuration('');
+      setYogaPoses('');
+      setMeals([]);
+      setFajr(false);
+      setDhuhr(false);
+      setAsr(false);
+      setMaghrib(false);
+      setIsha(false);
+      setMantras('');
+      setMeditationMinutes('');
+      setMonthlyReflection('');
     }
   };
 
@@ -348,6 +380,23 @@ export default function Tracker() {
           sleep: menopauseSleep,
           jointPain: menopauseJointPain,
           digestion: menopauseDigestion,
+        },
+        yoga_practice: {
+          style: yogaStyle,
+          duration: yogaDuration,
+          poses: yogaPoses,
+        },
+        nutrition_log: {
+          meals: meals,
+        },
+        spiritual_practices: {
+          fajr: fajr,
+          dhuhr: dhuhr,
+          asr: asr,
+          maghrib: maghrib,
+          isha: isha,
+          mantras: mantras,
+          meditationMinutes: meditationMinutes,
         },
       };
       
