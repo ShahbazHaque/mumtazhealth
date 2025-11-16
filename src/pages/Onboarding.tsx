@@ -72,8 +72,8 @@ export default function Onboarding() {
 
       if (error) throw error;
 
-      toast.success("Your wellness profile is complete!");
-      navigate("/");
+      toast.success("Your wellness profile is complete! Let's start tracking your journey.");
+      navigate("/tracker");
     } catch (error: any) {
       toast.error(error.message || "Failed to save profile");
     } finally {
