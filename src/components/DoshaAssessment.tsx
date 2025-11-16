@@ -183,10 +183,10 @@ export default function DoshaAssessment({ onComplete, onBack }: DoshaAssessmentP
           <Button
             onClick={handleNext}
             disabled={!currentAnswer}
-            className="bg-wellness-taupe hover:bg-wellness-taupe/90"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {currentQuestion === doshaQuestions.length - 1 ? "Complete Assessment" : "Next"}
-            {currentQuestion < doshaQuestions.length - 1 && <ChevronRight className="w-4 h-4 ml-2" />}
+            <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </CardContent>
