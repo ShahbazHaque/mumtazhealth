@@ -52,6 +52,7 @@ export default function Tracker() {
   const [cyclePhase, setCyclePhase] = useState('');
   const [isMenstrual, setIsMenstrual] = useState(false);
   const [lifeStage, setLifeStage] = useState<string>('');
+  const [trimester, setTrimester] = useState<string>('');
   
   // Red Day Protocol fields
   const [painLevel, setPainLevel] = useState('');
@@ -177,6 +178,7 @@ export default function Tracker() {
     
     if (data) {
       setCyclePhase(data.cycle_phase || '');
+      setTrimester(data.trimester?.toString() || '');
       setPainLevel(data.pain_level?.toString() || '');
       setEmotionalScore(data.emotional_score?.toString() || '');
       setSpiritualAnchor(data.spiritual_anchor || 'Istighfar');
@@ -189,6 +191,7 @@ export default function Tracker() {
     } else {
       // Reset form for new date
       setCyclePhase('');
+      setTrimester('');
       setPainLevel('');
       setEmotionalScore('');
       setSpiritualAnchor('Istighfar');
@@ -208,6 +211,7 @@ export default function Tracker() {
         user_id: user.id,
         entry_date: selectedDate,
         cycle_phase: cyclePhase,
+        trimester: trimester ? parseInt(trimester) : null,
         pain_level: painLevel ? parseInt(painLevel) : null,
         emotional_score: emotionalScore ? parseInt(emotionalScore) : null,
         spiritual_anchor: spiritualAnchor,
@@ -384,6 +388,28 @@ export default function Tracker() {
                   <SelectItem value="Follicular">Follicular (Days 6-14)</SelectItem>
                   <SelectItem value="Ovulatory">Ovulatory (Days 14-16)</SelectItem>
                   <SelectItem value="Luteal">Luteal (Days 17-28)</SelectItem>
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Trimester - Only show for pregnancy life stage */}
+        {lifeStage === 'pregnancy' && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-xl">1. Trimester</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Label>Current Trimester:</Label>
+              <Select value={trimester} onValueChange={setTrimester}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Select Trimester" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Trimester 1 (Weeks 1-13)</SelectItem>
+                  <SelectItem value="2">Trimester 2 (Weeks 14-27)</SelectItem>
+                  <SelectItem value="3">Trimester 3 (Weeks 28-40)</SelectItem>
                 </SelectContent>
               </Select>
             </CardContent>
