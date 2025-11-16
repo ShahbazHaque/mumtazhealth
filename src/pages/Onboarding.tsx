@@ -422,6 +422,104 @@ export default function Onboarding() {
       kapha: "You are stable, nurturing, and strong. Focus on energizing practices and light, warming foods.",
     };
 
+    const doshaRecommendations = {
+      vata: {
+        yoga: [
+          "Gentle Hatha Yoga - Focus on slow, grounding movements",
+          "Child's Pose (Balasana) - Calms the nervous system",
+          "Mountain Pose (Tadasana) - Builds stability and grounding",
+          "Seated Forward Bend (Paschimottanasana) - Soothes anxiety",
+          "Legs Up the Wall (Viparita Karani) - Promotes rest and restoration"
+        ],
+        foods: [
+          "Warm, cooked meals - Soups, stews, and porridges",
+          "Root vegetables - Sweet potatoes, carrots, beets",
+          "Warming spices - Ginger, cinnamon, cumin, cardamom",
+          "Healthy fats - Ghee, sesame oil, avocado",
+          "Sweet fruits - Bananas, dates, mangoes",
+          "Warm herbal teas - Ginger tea, chamomile, licorice root"
+        ],
+        spiritual: {
+          islamic: [
+            "Surah Al-Fatiha for grounding and peace",
+            "Dhikr: 'SubhanAllah wa bihamdihi' (100x daily) for calmness",
+            "Morning and evening adhkar for routine and stability",
+            "Slow, mindful prayer movements to reduce anxiety"
+          ],
+          universal: [
+            "Grounding meditation - Connect with earth energy",
+            "Body scan meditation - Build body awareness",
+            "Journaling practice - Release racing thoughts",
+            "Gentle breathwork - 4-7-8 breathing technique"
+          ]
+        }
+      },
+      pitta: {
+        yoga: [
+          "Cooling Yin Yoga - Release tension without overheating",
+          "Moon Salutations - Gentle, cooling alternative to Sun Salutations",
+          "Supported Bridge Pose - Opens heart without strain",
+          "Seated Twist (Ardha Matsyendrasana) - Cooling and detoxifying",
+          "Corpse Pose (Savasana) - Deep relaxation and surrender"
+        ],
+        foods: [
+          "Cooling foods - Cucumbers, coconut, mint, cilantro",
+          "Sweet fruits - Melons, grapes, pomegranates",
+          "Leafy greens - Kale, spinach, lettuce",
+          "Cooling grains - Basmati rice, barley, oats",
+          "Moderate dairy - Milk, ghee, fresh cheese (paneer)",
+          "Herbal teas - Peppermint, rose, fennel, coriander"
+        ],
+        spiritual: {
+          islamic: [
+            "Surah Ar-Rahman for cooling the heart",
+            "Dhikr: 'Astaghfirullah' (forgiveness) to soften anger",
+            "Tahajjud prayer in the cool night hours",
+            "Reflect on patience (Sabr) and gratitude (Shukr)"
+          ],
+          universal: [
+            "Cooling breath (Shitali Pranayama) - Reduce internal heat",
+            "Loving-kindness meditation - Cultivate compassion",
+            "Moon gazing meditation - Absorb cooling lunar energy",
+            "Forgiveness practice - Release resentment and anger"
+          ]
+        }
+      },
+      kapha: {
+        yoga: [
+          "Dynamic Vinyasa Flow - Build heat and energy",
+          "Sun Salutations (Surya Namaskar) - Energizing morning practice",
+          "Warrior Poses - Build strength and determination",
+          "Camel Pose (Ustrasana) - Opens chest and energizes",
+          "Plow Pose (Halasana) - Stimulates metabolism"
+        ],
+        foods: [
+          "Light, warm meals - Avoid heavy, oily foods",
+          "Pungent spices - Black pepper, chili, mustard seeds",
+          "Bitter greens - Arugula, dandelion, kale",
+          "Legumes - Lentils, mung beans, chickpeas",
+          "Astringent fruits - Apples, pomegranates, cranberries",
+          "Stimulating teas - Ginger tea, green tea, tulsi (holy basil)"
+        ],
+        spiritual: {
+          islamic: [
+            "Surah Al-Asr for motivation and purpose",
+            "Dhikr: 'La hawla wa la quwwata illa billah' for strength",
+            "Fajr prayer to establish early morning routine",
+            "Study and reflection on purposeful action"
+          ],
+          universal: [
+            "Energizing breathwork - Kapalabhati (skull shining breath)",
+            "Morning gratitude practice - Start day with intention",
+            "Active meditation - Walking meditation, mindful movement",
+            "Visualization practice - Envision goals and aspirations"
+          ]
+        }
+      }
+    };
+
+    const currentRecommendations = doshaRecommendations[primaryDosha as keyof typeof doshaRecommendations];
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
         <Card className="w-full max-w-2xl">
@@ -430,7 +528,7 @@ export default function Onboarding() {
               <Sparkles className="w-12 h-12 text-primary" />
             </div>
             <CardTitle className="text-3xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Wellness Profile</CardTitle>
-            <CardDescription>Here's what we've discovered about your unique constitution</CardDescription>
+            <CardDescription>Here&apos;s what we&apos;ve discovered about your unique constitution</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
@@ -446,6 +544,68 @@ export default function Onboarding() {
                     You also have qualities of {secondaryDosha}, which adds depth to your constitution.
                   </p>
                 </div>
+              )}
+
+              {currentRecommendations && (
+                <>
+                  <div className="p-4 rounded-lg border border-wellness-sage/30 bg-wellness-sage/5">
+                    <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
+                      <Heart className="w-4 h-4" /> Yoga Practices for {primaryDosha}
+                    </h4>
+                    <ul className="space-y-2">
+                      {currentRecommendations.yoga.map((pose, idx) => (
+                        <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                          <span className="text-wellness-sage mt-0.5">•</span>
+                          <span>{pose}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="p-4 rounded-lg border border-wellness-lilac/30 bg-wellness-lilac/5">
+                    <h4 className="font-medium text-foreground mb-3">Ayurvedic Nutrition</h4>
+                    <ul className="space-y-2">
+                      {currentRecommendations.foods.map((food, idx) => (
+                        <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                          <span className="text-wellness-lilac mt-0.5">•</span>
+                          <span>{food}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="p-4 rounded-lg border border-primary/30 bg-primary/5">
+                    <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
+                      <Moon className="w-4 h-4" /> Spiritual Practices
+                    </h4>
+                    {(spiritualPreference === "islamic" || spiritualPreference === "both") && (
+                      <div className="mb-4">
+                        <p className="text-sm font-medium text-foreground mb-2">Islamic Practices:</p>
+                        <ul className="space-y-2">
+                          {currentRecommendations.spiritual.islamic.map((practice, idx) => (
+                            <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                              <span className="text-primary mt-0.5">•</span>
+                              <span>{practice}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {(spiritualPreference === "universal" || spiritualPreference === "both") && (
+                      <div>
+                        <p className="text-sm font-medium text-foreground mb-2">Universal Practices:</p>
+                        <ul className="space-y-2">
+                          {currentRecommendations.spiritual.universal.map((practice, idx) => (
+                            <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                              <span className="text-primary mt-0.5">•</span>
+                              <span>{practice}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
 
               <div className="grid gap-3">
