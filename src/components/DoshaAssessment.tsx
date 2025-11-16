@@ -93,9 +93,11 @@ const doshaQuestions: Question[] = [
 interface DoshaAssessmentProps {
   onComplete: (primary: string, secondary: string) => void;
   onBack: () => void;
+  currentStep?: number;
+  totalSteps?: number;
 }
 
-export default function DoshaAssessment({ onComplete, onBack }: DoshaAssessmentProps) {
+export default function DoshaAssessment({ onComplete, onBack, currentStep = 2, totalSteps = 6 }: DoshaAssessmentProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
@@ -148,6 +150,20 @@ export default function DoshaAssessment({ onComplete, onBack }: DoshaAssessmentP
         <CardDescription>
           Question {currentQuestion + 1} of {doshaQuestions.length}
         </CardDescription>
+        {/* Overall onboarding progress */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">Step {currentStep} of {totalSteps}</span>
+            <span className="text-sm font-medium text-primary">{Math.round((currentStep / totalSteps) * 100)}%</span>
+          </div>
+          <div className="h-2 bg-secondary rounded-full overflow-hidden mb-4">
+            <div 
+              className="h-full bg-gradient-to-r from-wellness-lilac to-wellness-sage transition-all duration-500 ease-out"
+              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            />
+          </div>
+        </div>
+        {/* Dosha assessment progress */}
         <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
           <div
             className="h-full bg-primary transition-all duration-300"

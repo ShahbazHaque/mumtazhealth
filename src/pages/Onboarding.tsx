@@ -12,10 +12,38 @@ import DoshaAssessment from "@/components/DoshaAssessment";
 
 type OnboardingStep = "welcome" | "cycle" | "dosha" | "spiritual" | "pregnancy" | "preferences" | "complete";
 
+const ProgressIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => (
+  <div className="mb-6">
+    <div className="flex items-center justify-between mb-2">
+      <span className="text-sm text-muted-foreground">Step {currentStep} of {totalSteps}</span>
+      <span className="text-sm font-medium text-primary">{Math.round((currentStep / totalSteps) * 100)}%</span>
+    </div>
+    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+      <div 
+        className="h-full bg-gradient-to-r from-wellness-lilac to-wellness-sage transition-all duration-500 ease-out"
+        style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+      />
+    </div>
+  </div>
+);
+
 export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState<OnboardingStep>("welcome");
   const [loading, setLoading] = useState(false);
+
+  const getStepInfo = () => {
+    const stepMap: Record<OnboardingStep, number> = {
+      welcome: 0,
+      cycle: 1,
+      dosha: 2,
+      spiritual: 3,
+      pregnancy: 4,
+      preferences: 5,
+      complete: 6,
+    };
+    return { current: stepMap[step], total: 6 };
+  };
 
   // Profile data
   const [primaryDosha, setPrimaryDosha] = useState("");
@@ -148,6 +176,7 @@ export default function Onboarding() {
             <CardDescription>Help us understand where you are in your menstrual cycle and energy levels</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
             <div className="space-y-2">
               <Label>Where are you in your cycle?</Label>
               <RadioGroup value={cyclePhase} onValueChange={setCyclePhase}>
@@ -236,7 +265,12 @@ export default function Onboarding() {
   if (step === "dosha") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
-        <DoshaAssessment onComplete={handleDoshaComplete} onBack={() => setStep("cycle")} />
+        <DoshaAssessment 
+          onComplete={handleDoshaComplete} 
+          onBack={() => setStep("cycle")}
+          currentStep={getStepInfo().current}
+          totalSteps={getStepInfo().total}
+        />
       </div>
     );
   }
@@ -250,6 +284,7 @@ export default function Onboarding() {
             <CardDescription>How would you like to nourish your spirit?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
             <RadioGroup value={spiritualPreference} onValueChange={setSpiritualPreference}>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
@@ -310,6 +345,7 @@ export default function Onboarding() {
             <CardDescription>Where are you in your wellness journey?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
             <RadioGroup value={pregnancyStatus} onValueChange={setPregnancyStatus}>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
@@ -382,6 +418,7 @@ export default function Onboarding() {
             <CardDescription>Help us personalize your experience</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
             <div className="space-y-2">
               <Label>Preferred Yoga Style (Optional)</Label>
               <RadioGroup value={yogaStyle} onValueChange={setYogaStyle}>
@@ -531,6 +568,7 @@ export default function Onboarding() {
             <CardDescription>Here&apos;s what we&apos;ve discovered about your unique constitution</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-secondary/50">
                 <h4 className="font-medium text-foreground mb-2">Your Primary Dosha: {primaryDosha}</h4>
