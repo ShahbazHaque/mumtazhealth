@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Sparkles, Heart, Moon, Baby } from "lucide-react";
 import DoshaAssessment from "@/components/DoshaAssessment";
 
-type OnboardingStep = "welcome" | "dosha" | "spiritual" | "pregnancy" | "preferences" | "complete";
+type OnboardingStep = "welcome" | "cycle" | "dosha" | "spiritual" | "pregnancy" | "preferences" | "complete";
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -24,6 +24,8 @@ export default function Onboarding() {
   const [pregnancyStatus, setPregnancyStatus] = useState("not_pregnant");
   const [dueDate, setDueDate] = useState("");
   const [yogaStyle, setYogaStyle] = useState("");
+  const [cyclePhase, setCyclePhase] = useState("");
+  const [energyLevel, setEnergyLevel] = useState("");
 
   const handleDoshaComplete = (primary: string, secondary: string) => {
     setPrimaryDosha(primary);
@@ -81,13 +83,13 @@ export default function Onboarding() {
 
   if (step === "welcome") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-warm">
-        <Card className="w-full max-w-2xl border-wellness-taupe/20">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+        <Card className="w-full max-w-2xl">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
               <Sparkles className="w-16 h-16 text-primary" />
             </div>
-            <CardTitle className="text-3xl text-wellness-taupe">Welcome to Your Wellness Journey</CardTitle>
+            <CardTitle className="text-3xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Welcome to Your Wellness Journey</CardTitle>
             <CardDescription className="text-base">
               Let's create your personalized holistic wellness experience. We'll guide you through understanding your
               unique constitution (dosha), spiritual preferences, and current life stage to provide tailored
@@ -125,8 +127,8 @@ export default function Onboarding() {
               </div>
             </div>
             <Button
-              onClick={() => setStep("dosha")}
-              className="w-full bg-wellness-taupe hover:bg-wellness-taupe/90"
+              onClick={() => setStep("cycle")}
+              className="w-full"
               size="lg"
             >
               Begin Your Journey
@@ -137,20 +139,114 @@ export default function Onboarding() {
     );
   }
 
+  if (step === "cycle") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Understanding Your Cycle</CardTitle>
+            <CardDescription>Help us understand where you are in your menstrual cycle and energy levels</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label>Where are you in your cycle?</Label>
+              <RadioGroup value={cyclePhase} onValueChange={setCyclePhase}>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
+                    <RadioGroupItem value="menstrual" id="menstrual" />
+                    <Label htmlFor="menstrual" className="flex-1 cursor-pointer">
+                      <div>
+                        <div className="font-medium">Menstrual Phase (Days 1-5)</div>
+                        <div className="text-sm text-muted-foreground">Time of rest and renewal</div>
+                      </div>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
+                    <RadioGroupItem value="follicular" id="follicular" />
+                    <Label htmlFor="follicular" className="flex-1 cursor-pointer">
+                      <div>
+                        <div className="font-medium">Follicular Phase (Days 6-14)</div>
+                        <div className="text-sm text-muted-foreground">Energy rising, new beginnings</div>
+                      </div>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
+                    <RadioGroupItem value="ovulation" id="ovulation" />
+                    <Label htmlFor="ovulation" className="flex-1 cursor-pointer">
+                      <div>
+                        <div className="font-medium">Ovulation (Days 14-16)</div>
+                        <div className="text-sm text-muted-foreground">Peak energy and confidence</div>
+                      </div>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
+                    <RadioGroupItem value="luteal" id="luteal" />
+                    <Label htmlFor="luteal" className="flex-1 cursor-pointer">
+                      <div>
+                        <div className="font-medium">Luteal Phase (Days 17-28)</div>
+                        <div className="text-sm text-muted-foreground">Energy winding down, introspection</div>
+                      </div>
+                    </Label>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-2">
+              <Label>How would you describe your energy levels today?</Label>
+              <RadioGroup value={energyLevel} onValueChange={setEnergyLevel}>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary transition-colors">
+                    <RadioGroupItem value="low" id="low" />
+                    <Label htmlFor="low" className="cursor-pointer">Low - Need rest</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary transition-colors">
+                    <RadioGroupItem value="moderate" id="moderate" />
+                    <Label htmlFor="moderate" className="cursor-pointer">Moderate - Balanced</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary transition-colors">
+                    <RadioGroupItem value="high" id="high" />
+                    <Label htmlFor="high" className="cursor-pointer">High - Energized</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary transition-colors">
+                    <RadioGroupItem value="variable" id="variable" />
+                    <Label htmlFor="variable" className="cursor-pointer">Variable - Up & down</Label>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="flex justify-between pt-4">
+              <Button variant="outline" onClick={() => setStep("welcome")}>
+                Back
+              </Button>
+              <Button
+                onClick={() => setStep("dosha")}
+                disabled={!cyclePhase || !energyLevel}
+              >
+                Continue to Dosha Check-in
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (step === "dosha") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-warm">
-        <DoshaAssessment onComplete={handleDoshaComplete} onBack={() => setStep("welcome")} />
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+        <DoshaAssessment onComplete={handleDoshaComplete} onBack={() => setStep("cycle")} />
       </div>
     );
   }
 
   if (step === "spiritual") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-warm">
-        <Card className="w-full max-w-2xl border-wellness-taupe/20">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+        <Card className="w-full max-w-2xl">
           <CardHeader>
-            <CardTitle className="text-2xl text-wellness-taupe">Spiritual Connection</CardTitle>
+            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Spiritual Connection</CardTitle>
             <CardDescription>How would you like to nourish your spirit?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -195,7 +291,7 @@ export default function Onboarding() {
               <Button variant="outline" onClick={() => setStep("dosha")}>
                 Back
               </Button>
-              <Button onClick={() => setStep("pregnancy")} className="bg-wellness-taupe hover:bg-wellness-taupe/90">
+              <Button onClick={() => setStep("pregnancy")}>
                 Next
               </Button>
             </div>
@@ -207,10 +303,10 @@ export default function Onboarding() {
 
   if (step === "pregnancy") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-warm">
-        <Card className="w-full max-w-2xl border-wellness-taupe/20">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+        <Card className="w-full max-w-2xl">
           <CardHeader>
-            <CardTitle className="text-2xl text-wellness-taupe">Your Journey Stage</CardTitle>
+            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Journey Stage</CardTitle>
             <CardDescription>Where are you in your wellness journey?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -237,22 +333,26 @@ export default function Onboarding() {
                 <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
                   <RadioGroupItem value="postpartum" id="postpartum" />
                   <Label htmlFor="postpartum" className="flex-1 cursor-pointer">
-                    Postpartum
+                    Postpartum recovery
                   </Label>
                 </div>
               </div>
             </RadioGroup>
 
             {pregnancyStatus === "pregnant" && (
-              <div className="space-y-2">
-                <Label htmlFor="due_date">Due Date</Label>
-                <Input
-                  id="due_date"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="border-wellness-taupe/20"
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="due_date">Due Date</Label>
+                  <Input
+                    id="due_date"
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    We'll calculate your trimester and provide tailored guidance for each stage
+                  </p>
+                </div>
               </div>
             )}
 
@@ -263,7 +363,6 @@ export default function Onboarding() {
               <Button
                 onClick={() => setStep("preferences")}
                 disabled={pregnancyStatus === "pregnant" && !dueDate}
-                className="bg-wellness-taupe hover:bg-wellness-taupe/90"
               >
                 Next
               </Button>
@@ -276,10 +375,10 @@ export default function Onboarding() {
 
   if (step === "preferences") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-warm">
-        <Card className="w-full max-w-2xl border-wellness-taupe/20">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+        <Card className="w-full max-w-2xl">
           <CardHeader>
-            <CardTitle className="text-2xl text-wellness-taupe">Your Preferences</CardTitle>
+            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Preferences</CardTitle>
             <CardDescription>Help us personalize your experience</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -306,7 +405,7 @@ export default function Onboarding() {
               <Button variant="outline" onClick={() => setStep("pregnancy")}>
                 Back
               </Button>
-              <Button onClick={() => setStep("complete")} className="bg-wellness-taupe hover:bg-wellness-taupe/90">
+              <Button onClick={() => setStep("complete")}>
                 Next
               </Button>
             </div>
@@ -324,13 +423,13 @@ export default function Onboarding() {
     };
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-warm">
-        <Card className="w-full max-w-2xl border-wellness-taupe/20">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+        <Card className="w-full max-w-2xl">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <Sparkles className="w-12 h-12 text-primary" />
             </div>
-            <CardTitle className="text-3xl text-wellness-taupe">Your Wellness Profile</CardTitle>
+            <CardTitle className="text-3xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Wellness Profile</CardTitle>
             <CardDescription>Here's what we've discovered about your unique constitution</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -373,10 +472,25 @@ export default function Onboarding() {
               </p>
             </div>
 
+            <div className="p-4 rounded-lg border border-wellness-lilac/30 bg-wellness-lilac/5">
+              <p className="text-sm text-center font-medium mb-2">Want More Personalized Guidance?</p>
+              <p className="text-xs text-center text-muted-foreground mb-3">
+                Book a one-on-one consultation for deeper insights into your dosha, cycle, and wellness journey
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => navigate("/bookings")}
+              >
+                Book a Consultation
+              </Button>
+            </div>
+
             <Button
               onClick={saveProfile}
               disabled={loading}
-              className="w-full bg-wellness-taupe hover:bg-wellness-taupe/90"
+              className="w-full"
               size="lg"
             >
               {loading ? "Creating Your Profile..." : "Begin Tracking"}

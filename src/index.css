@@ -7,41 +7,41 @@ All colors MUST be HSL.
 */
 
 @layer base {
-:root {
-    --background: 35 25% 96%;
-    --foreground: 25 20% 25%;
+  :root {
+    --background: 270 30% 97%;
+    --foreground: 270 15% 25%;
 
-    --card: 35 40% 98%;
-    --card-foreground: 25 20% 25%;
+    --card: 270 25% 98%;
+    --card-foreground: 270 15% 25%;
 
-    --popover: 35 40% 98%;
-    --popover-foreground: 25 20% 25%;
+    --popover: 270 25% 98%;
+    --popover-foreground: 270 15% 25%;
 
-    --primary: 28 25% 55%;
-    --primary-foreground: 35 40% 98%;
+    --primary: 280 45% 70%;
+    --primary-foreground: 270 25% 98%;
 
-    --secondary: 35 30% 92%;
-    --secondary-foreground: 25 20% 25%;
+    --secondary: 100 25% 75%;
+    --secondary-foreground: 270 15% 25%;
 
-    --muted: 35 30% 92%;
-    --muted-foreground: 25 15% 50%;
+    --muted: 100 20% 92%;
+    --muted-foreground: 270 10% 50%;
 
-    --accent: 350 40% 85%;
-    --accent-foreground: 25 20% 25%;
+    --accent: 280 40% 85%;
+    --accent-foreground: 270 15% 25%;
 
     --destructive: 0 70% 55%;
-    --destructive-foreground: 35 40% 98%;
+    --destructive-foreground: 270 25% 98%;
 
-    --border: 35 20% 88%;
-    --input: 35 20% 88%;
-    --ring: 28 25% 55%;
+    --border: 100 15% 88%;
+    --input: 100 15% 88%;
+    --ring: 280 45% 70%;
 
     --radius: 0.75rem;
     
-    --wellness-beige: 35 25% 96%;
-    --wellness-taupe: 28 25% 55%;
-    --wellness-soft-pink: 350 40% 85%;
-    --wellness-warm: 30 30% 90%;
+    --wellness-lilac: 280 45% 70%;
+    --wellness-sage: 100 25% 75%;
+    --wellness-lilac-light: 280 40% 85%;
+    --wellness-sage-light: 100 20% 92%;
 
     --sidebar-background: 0 0% 98%;
 

@@ -20,10 +20,10 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         wellness: {
-          beige: "hsl(var(--wellness-beige))",
-          taupe: "hsl(var(--wellness-taupe))",
-          pink: "hsl(var(--wellness-soft-pink))",
-          warm: "hsl(var(--wellness-warm))",
+          lilac: "hsl(var(--wellness-lilac))",
+          sage: "hsl(var(--wellness-sage))",
+          "lilac-light": "hsl(var(--wellness-lilac-light))",
+          "sage-light": "hsl(var(--wellness-sage-light))",
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
