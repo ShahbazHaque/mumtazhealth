@@ -22,7 +22,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Tracker />} />
+          <Route path="/" element={<Index />} />
+          <Route path="/tracker" element={<Tracker />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/summary" element={<MonthlySummary />} />
