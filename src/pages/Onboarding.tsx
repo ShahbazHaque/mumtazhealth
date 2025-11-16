@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Sparkles, Heart, Moon, Baby } from "lucide-react";
 import DoshaAssessment from "@/components/DoshaAssessment";
 
-type OnboardingStep = "welcome" | "cycle" | "dosha" | "spiritual" | "pregnancy" | "preferences" | "complete";
+type OnboardingStep = "welcome" | "lifeStage" | "cycle" | "dosha" | "spiritual" | "pregnancy" | "preferences" | "complete";
 
 const ProgressIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => (
   <div className="mb-6">
@@ -35,17 +35,19 @@ export default function Onboarding() {
   const getStepInfo = () => {
     const stepMap: Record<OnboardingStep, number> = {
       welcome: 0,
-      cycle: 1,
-      dosha: 2,
-      spiritual: 3,
-      pregnancy: 4,
-      preferences: 5,
-      complete: 6,
+      lifeStage: 1,
+      cycle: 2,
+      dosha: 3,
+      spiritual: 4,
+      pregnancy: 5,
+      preferences: 6,
+      complete: 7,
     };
-    return { current: stepMap[step], total: 6 };
+    return { current: stepMap[step], total: 7 };
   };
 
   // Profile data
+  const [lifeStage, setLifeStage] = useState("");
   const [primaryDosha, setPrimaryDosha] = useState("");
   const [secondaryDosha, setSecondaryDosha] = useState("");
   const [spiritualPreference, setSpiritualPreference] = useState("both");
@@ -87,6 +89,7 @@ export default function Onboarding() {
 
       const { error } = await supabase.from("user_wellness_profiles").upsert({
         user_id: user.id,
+        life_stage: lifeStage,
         primary_dosha: primaryDosha,
         secondary_dosha: secondaryDosha,
         spiritual_preference: spiritualPreference,
@@ -155,11 +158,69 @@ export default function Onboarding() {
               </div>
             </div>
             <Button
-              onClick={() => setStep("cycle")}
+              onClick={() => setStep("lifeStage")}
               className="w-full"
               size="lg"
             >
               Begin Your Journey
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (step === "lifeStage") {
+    const lifeStages = [
+      { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling", icon: "🌸" },
+      { value: "pregnancy", label: "Pregnancy", description: "Expecting a baby", icon: "🤰" },
+      { value: "postpartum", label: "Postpartum", description: "After childbirth", icon: "👶" },
+      { value: "perimenopause", label: "Perimenopause", description: "Transition to menopause", icon: "🌅" },
+      { value: "menopause", label: "Menopause", description: "End of menstrual cycles", icon: "🌙" },
+      { value: "post_menopause", label: "Post-Menopause", description: "After menopause", icon: "✨" },
+    ];
+
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
+              Your Life Stage
+            </CardTitle>
+            <CardDescription>
+              Select the stage that best describes your current journey. This helps us provide personalized recommendations.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+            <div className="space-y-2">
+              <Label>Which life stage are you in?</Label>
+              <RadioGroup value={lifeStage} onValueChange={setLifeStage}>
+                <div className="space-y-3">
+                  {lifeStages.map((stage) => (
+                    <div
+                      key={stage.value}
+                      className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+                    >
+                      <RadioGroupItem value={stage.value} id={stage.value} className="mt-1" />
+                      <div className="flex-1">
+                        <Label htmlFor={stage.value} className="font-medium cursor-pointer flex items-center gap-2">
+                          <span className="text-xl">{stage.icon}</span>
+                          {stage.label}
+                        </Label>
+                        <p className="text-sm text-muted-foreground mt-1">{stage.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </RadioGroup>
+            </div>
+            <Button
+              onClick={() => setStep("cycle")}
+              disabled={!lifeStage}
+              className="w-full"
+            >
+              Continue
             </Button>
           </CardContent>
         </Card>
