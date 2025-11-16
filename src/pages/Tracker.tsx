@@ -469,9 +469,6 @@ export default function Tracker() {
             <CardTitle className="text-3xl font-bold text-wellness-taupe">
               {getTrackerTitle()}
             </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Vata-Pitta Balance for Fertility & Calm
-            </p>
             <div className="flex items-center justify-center gap-4 pt-2">
               <Input
                 type="date"
