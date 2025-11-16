@@ -86,6 +86,16 @@ export default function Tracker() {
   const [mantras, setMantras] = useState('');
   const [meditationMinutes, setMeditationMinutes] = useState('');
   
+  // Pregnancy tracking fields
+  const [pregnancyNausea, setPregnancyNausea] = useState('');
+  const [pregnancyFatigue, setPregnancyFatigue] = useState('');
+  const [pregnancySleep, setPregnancySleep] = useState('');
+  const [pregnancyMood, setPregnancyMood] = useState('');
+  const [pregnancyBackPain, setPregnancyBackPain] = useState('');
+  const [pregnancyDigestion, setPregnancyDigestion] = useState('');
+  const [pregnancyBabyMovement, setPregnancyBabyMovement] = useState('');
+  const [pregnancyNotes, setPregnancyNotes] = useState('');
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -188,6 +198,17 @@ export default function Tracker() {
       setTweakPlan(data.tweak_plan || '');
       setMonthlyReflection(data.monthly_reflection || '');
       setPractices(typeof data.daily_practices === 'object' && data.daily_practices !== null ? data.daily_practices as Record<string, any> : {});
+      
+      // Load pregnancy tracking data
+      const pregnancyData = typeof data.pregnancy_tracking === 'object' && data.pregnancy_tracking !== null ? data.pregnancy_tracking as Record<string, any> : {};
+      setPregnancyNausea(pregnancyData.nausea || '');
+      setPregnancyFatigue(pregnancyData.fatigue || '');
+      setPregnancySleep(pregnancyData.sleep || '');
+      setPregnancyMood(pregnancyData.mood || '');
+      setPregnancyBackPain(pregnancyData.backPain || '');
+      setPregnancyDigestion(pregnancyData.digestion || '');
+      setPregnancyBabyMovement(pregnancyData.babyMovement || '');
+      setPregnancyNotes(pregnancyData.notes || '');
     } else {
       // Reset form for new date
       setCyclePhase('');
@@ -200,6 +221,14 @@ export default function Tracker() {
       setVataCrash('No');
       setTweakPlan('');
       setPractices({});
+      setPregnancyNausea('');
+      setPregnancyFatigue('');
+      setPregnancySleep('');
+      setPregnancyMood('');
+      setPregnancyBackPain('');
+      setPregnancyDigestion('');
+      setPregnancyBabyMovement('');
+      setPregnancyNotes('');
     }
   };
 
@@ -221,6 +250,16 @@ export default function Tracker() {
         tweak_plan: tweakPlan,
         monthly_reflection: monthlyReflection,
         daily_practices: practices,
+        pregnancy_tracking: {
+          nausea: pregnancyNausea,
+          fatigue: pregnancyFatigue,
+          sleep: pregnancySleep,
+          mood: pregnancyMood,
+          backPain: pregnancyBackPain,
+          digestion: pregnancyDigestion,
+          babyMovement: pregnancyBabyMovement,
+          notes: pregnancyNotes,
+        },
       };
       
       const { error } = await supabase
@@ -412,6 +451,136 @@ export default function Tracker() {
                   <SelectItem value="3">Trimester 3 (Weeks 28-40)</SelectItem>
                 </SelectContent>
               </Select>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Pregnancy Tracking - Only show for pregnancy life stage */}
+        {lifeStage === 'pregnancy' && (
+          <Card className="mb-6 bg-wellness-pink/20 border-wellness-taupe/30">
+            <CardHeader>
+              <CardTitle className="text-xl">2. Pregnancy Tracking</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Track your daily symptoms and how you're feeling
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Nausea Level:</Label>
+                <Select value={pregnancyNausea} onValueChange={setPregnancyNausea}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="mild">Mild</SelectItem>
+                    <SelectItem value="moderate">Moderate</SelectItem>
+                    <SelectItem value="severe">Severe</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Fatigue Level:</Label>
+                <Select value={pregnancyFatigue} onValueChange={setPregnancyFatigue}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low - Feeling energetic</SelectItem>
+                    <SelectItem value="moderate">Moderate - Managing well</SelectItem>
+                    <SelectItem value="high">High - Very tired</SelectItem>
+                    <SelectItem value="extreme">Extreme - Need extra rest</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Sleep Quality:</Label>
+                <Select value={pregnancySleep} onValueChange={setPregnancySleep}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select quality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="excellent">Excellent</SelectItem>
+                    <SelectItem value="good">Good</SelectItem>
+                    <SelectItem value="fair">Fair</SelectItem>
+                    <SelectItem value="poor">Poor</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Mood:</Label>
+                <Select value={pregnancyMood} onValueChange={setPregnancyMood}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How are you feeling?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="happy">Happy & Positive</SelectItem>
+                    <SelectItem value="content">Content & Calm</SelectItem>
+                    <SelectItem value="anxious">Anxious or Worried</SelectItem>
+                    <SelectItem value="emotional">Emotional or Tearful</SelectItem>
+                    <SelectItem value="irritable">Irritable</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Back Pain:</Label>
+                <Select value={pregnancyBackPain} onValueChange={setPregnancyBackPain}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="mild">Mild</SelectItem>
+                    <SelectItem value="moderate">Moderate</SelectItem>
+                    <SelectItem value="severe">Severe</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Digestion/Bloating:</Label>
+                <Select value={pregnancyDigestion} onValueChange={setPregnancyDigestion}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="How's your digestion?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="good">Good - No issues</SelectItem>
+                    <SelectItem value="slight_bloating">Slight bloating</SelectItem>
+                    <SelectItem value="constipation">Constipation</SelectItem>
+                    <SelectItem value="heartburn">Heartburn</SelectItem>
+                    <SelectItem value="multiple">Multiple issues</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Baby Movement:</Label>
+                <Select value={pregnancyBabyMovement} onValueChange={setPregnancyBabyMovement}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Any movement today?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="not_yet">Not felt yet (early pregnancy)</SelectItem>
+                    <SelectItem value="light">Light flutters</SelectItem>
+                    <SelectItem value="moderate">Moderate movement</SelectItem>
+                    <SelectItem value="active">Very active</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Notes:</Label>
+                <Textarea
+                  value={pregnancyNotes}
+                  onChange={(e) => setPregnancyNotes(e.target.value)}
+                  placeholder="Any other symptoms, concerns, or notes about how you're feeling today..."
+                  className="mt-2 min-h-[100px]"
+                />
+              </div>
             </CardContent>
           </Card>
         )}
