@@ -216,7 +216,14 @@ export default function Onboarding() {
               </RadioGroup>
             </div>
             <Button
-              onClick={() => setStep("cycle")}
+              onClick={() => {
+                // Skip menstrual cycle questions for non-menstrual life stages
+                if (lifeStage === 'menstrual_cycle') {
+                  setStep("cycle");
+                } else {
+                  setStep("dosha");
+                }
+              }}
               disabled={!lifeStage}
               className="w-full"
             >
@@ -307,7 +314,7 @@ export default function Onboarding() {
             </div>
 
             <div className="flex justify-between pt-4">
-              <Button variant="outline" onClick={() => setStep("welcome")}>
+              <Button variant="outline" onClick={() => setStep("lifeStage")}>
                 Back
               </Button>
               <Button
@@ -328,7 +335,14 @@ export default function Onboarding() {
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
         <DoshaAssessment 
           onComplete={handleDoshaComplete} 
-          onBack={() => setStep("cycle")}
+          onBack={() => {
+            // Go back to cycle step only if life stage is menstrual_cycle
+            if (lifeStage === 'menstrual_cycle') {
+              setStep("cycle");
+            } else {
+              setStep("lifeStage");
+            }
+          }}
           currentStep={getStepInfo().current}
           totalSteps={getStepInfo().total}
         />
