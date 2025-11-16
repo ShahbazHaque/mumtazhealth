@@ -216,6 +216,7 @@ export type Database = {
           dosha_assessment_date: string | null
           due_date: string | null
           id: string
+          life_stage: string | null
           onboarding_completed: boolean | null
           preferred_yoga_style: string | null
           pregnancy_status: string | null
@@ -233,6 +234,7 @@ export type Database = {
           dosha_assessment_date?: string | null
           due_date?: string | null
           id?: string
+          life_stage?: string | null
           onboarding_completed?: boolean | null
           preferred_yoga_style?: string | null
           pregnancy_status?: string | null
@@ -250,6 +252,7 @@ export type Database = {
           dosha_assessment_date?: string | null
           due_date?: string | null
           id?: string
+          life_stage?: string | null
           onboarding_completed?: boolean | null
           preferred_yoga_style?: string | null
           pregnancy_status?: string | null
