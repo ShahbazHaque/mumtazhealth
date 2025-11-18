@@ -716,6 +716,26 @@ export default function Tracker() {
                   className="mt-2 min-h-[100px]"
                 />
               </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={saveData}
+                  className="flex-1 bg-wellness-taupe hover:bg-wellness-taupe/90"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save
+                </Button>
+                <Button
+                  onClick={() => {
+                    saveData();
+                    navigate('/');
+                  }}
+                  className="flex-1"
+                  variant="secondary"
+                >
+                  Next
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -815,6 +835,26 @@ export default function Tracker() {
                   placeholder="Any other notes about your recovery, concerns, or how you're feeling today..."
                   className="mt-2 min-h-[100px]"
                 />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={saveData}
+                  className="flex-1 bg-wellness-taupe hover:bg-wellness-taupe/90"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save
+                </Button>
+                <Button
+                  onClick={() => {
+                    saveData();
+                    navigate('/');
+                  }}
+                  className="flex-1"
+                  variant="secondary"
+                >
+                  Next
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -1022,6 +1062,26 @@ export default function Tracker() {
                     <SelectItem value="None-Quiet">None, quiet reflection only</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={saveData}
+                  className="flex-1 bg-wellness-taupe hover:bg-wellness-taupe/90"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save
+                </Button>
+                <Button
+                  onClick={() => {
+                    saveData();
+                    navigate('/');
+                  }}
+                  className="flex-1"
+                  variant="secondary"
+                >
+                  Next
+                </Button>
               </div>
             </CardContent>
           </Card>
