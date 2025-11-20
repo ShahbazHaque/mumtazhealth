@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 interface WellnessContent {
@@ -38,12 +39,15 @@ const ContentLibrary = () => {
   const [selectedContent, setSelectedContent] = useState<WellnessContent | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [savedContentIds, setSavedContentIds] = useState<Set<string>>(new Set());
+  const [completedContentIds, setCompletedContentIds] = useState<Set<string>>(new Set());
+  const [progressStats, setProgressStats] = useState({ total: 0, completed: 0 });
   
   // Filters
   const [selectedDosha, setSelectedDosha] = useState<string>("all");
   const [selectedLifePhase, setSelectedLifePhase] = useState<string>("all");
   const [selectedPregnancyStatus, setSelectedPregnancyStatus] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedCompletion, setSelectedCompletion] = useState<string>("all");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -61,12 +65,18 @@ const ContentLibrary = () => {
     loadContent();
     if (user) {
       loadSavedContent();
+      loadProgress();
     }
   }, [user]);
 
   useEffect(() => {
+    // Update total count when content changes
+    setProgressStats(prev => ({ ...prev, total: content.length }));
+  }, [content]);
+
+  useEffect(() => {
     applyFilters();
-  }, [content, selectedDosha, selectedLifePhase, selectedPregnancyStatus, selectedType]);
+  }, [content, selectedDosha, selectedLifePhase, selectedPregnancyStatus, selectedType, selectedCompletion, completedContentIds]);
 
   const loadContent = async () => {
     const { data, error } = await supabase
@@ -100,6 +110,30 @@ const ContentLibrary = () => {
     setSavedContentIds(new Set(data?.map(item => item.content_id) || []));
   };
 
+  const loadProgress = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('user_content_progress')
+      .select('content_id, completed')
+      .eq('user_id', user.id)
+      .eq('completed', true);
+
+    if (error) {
+      console.error('Error loading progress:', error);
+      return;
+    }
+
+    const completedIds = new Set(data?.map(item => item.content_id) || []);
+    setCompletedContentIds(completedIds);
+    
+    // Update stats
+    setProgressStats({
+      total: content.length,
+      completed: completedIds.size
+    });
+  };
+
   const applyFilters = () => {
     let filtered = [...content];
 
@@ -123,6 +157,14 @@ const ContentLibrary = () => {
       filtered = filtered.filter(item => 
         !item.pregnancy_statuses || item.pregnancy_statuses.length === 0 || item.pregnancy_statuses.includes(selectedPregnancyStatus)
       );
+    }
+
+    if (selectedCompletion !== "all") {
+      if (selectedCompletion === "completed") {
+        filtered = filtered.filter(item => completedContentIds.has(item.id));
+      } else if (selectedCompletion === "not-completed") {
+        filtered = filtered.filter(item => !completedContentIds.has(item.id));
+      }
     }
 
     setFilteredContent(filtered);
@@ -179,11 +221,64 @@ const ContentLibrary = () => {
     setIsDialogOpen(true);
   };
 
+  const toggleCompletion = async (contentId: string) => {
+    if (!user) {
+      toast.error('Please log in to track progress');
+      return;
+    }
+
+    const isCompleted = completedContentIds.has(contentId);
+
+    if (isCompleted) {
+      // Mark as not completed
+      const { error } = await supabase
+        .from('user_content_progress')
+        .update({ completed: false, completed_at: null })
+        .eq('user_id', user.id)
+        .eq('content_id', contentId);
+
+      if (error) {
+        console.error('Error updating progress:', error);
+        toast.error('Failed to update progress');
+        return;
+      }
+
+      const newCompleted = new Set(completedContentIds);
+      newCompleted.delete(contentId);
+      setCompletedContentIds(newCompleted);
+      setProgressStats(prev => ({ ...prev, completed: prev.completed - 1 }));
+      toast.success('Marked as not completed');
+    } else {
+      // Mark as completed
+      const { error } = await supabase
+        .from('user_content_progress')
+        .upsert({
+          user_id: user.id,
+          content_id: contentId,
+          completed: true,
+          completed_at: new Date().toISOString(),
+        });
+
+      if (error) {
+        console.error('Error updating progress:', error);
+        toast.error('Failed to update progress');
+        return;
+      }
+
+      const newCompleted = new Set(completedContentIds);
+      newCompleted.add(contentId);
+      setCompletedContentIds(newCompleted);
+      setProgressStats(prev => ({ ...prev, completed: prev.completed + 1 }));
+      toast.success('Marked as completed! 🎉');
+    }
+  };
+
   const clearFilters = () => {
     setSelectedDosha("all");
     setSelectedLifePhase("all");
     setSelectedPregnancyStatus("all");
     setSelectedType("all");
+    setSelectedCompletion("all");
   };
 
   const getContentIcon = (type: string) => {
@@ -215,6 +310,37 @@ const ContentLibrary = () => {
           </div>
         </div>
 
+        {/* Progress Summary */}
+        {user && (
+          <Card className="mb-6 bg-gradient-to-r from-primary/10 to-secondary/10">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-primary/20 rounded-full">
+                    <TrendingUp className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold">Your Wellness Journey</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {progressStats.completed} of {progressStats.total} items completed
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-primary">
+                    {progressStats.total > 0 ? Math.round((progressStats.completed / progressStats.total) * 100) : 0}%
+                  </div>
+                  <p className="text-xs text-muted-foreground">Complete</p>
+                </div>
+              </div>
+              <Progress 
+                value={progressStats.total > 0 ? (progressStats.completed / progressStats.total) * 100 : 0} 
+                className="h-2"
+              />
+            </CardContent>
+          </Card>
+        )}
+
         {/* Filters */}
         <Card className="mb-6">
           <CardHeader>
@@ -229,7 +355,7 @@ const ContentLibrary = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Content Type</label>
                 <Select value={selectedType} onValueChange={setSelectedType}>
@@ -294,6 +420,20 @@ const ContentLibrary = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Progress</label>
+                <Select value={selectedCompletion} onValueChange={setSelectedCompletion}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All content" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Content</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="not-completed">Not Completed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -317,15 +457,22 @@ const ContentLibrary = () => {
                     {getContentIcon(item.content_type)}
                     <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => toggleSaveContent(item.id)}
-                  >
-                    <Heart 
-                      className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
-                    />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {user && completedContentIds.has(item.id) && (
+                      <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                        <CheckCircle2 className="h-3 w-3" />
+                      </Badge>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => toggleSaveContent(item.id)}
+                    >
+                      <Heart 
+                        className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
+                      />
+                    </Button>
+                  </div>
                 </div>
                 <CardDescription className="line-clamp-2">
                   {item.description}
@@ -343,12 +490,31 @@ const ContentLibrary = () => {
                     <Badge variant="outline">{item.duration_minutes} min</Badge>
                   )}
                 </div>
-                <Button 
-                  className="w-full" 
-                  onClick={() => openContentDetail(item)}
-                >
-                  View Details
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    className="flex-1" 
+                    onClick={() => openContentDetail(item)}
+                  >
+                    View Details
+                  </Button>
+                  {user && (
+                    <Button
+                      variant={completedContentIds.has(item.id) ? "default" : "outline"}
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleCompletion(item.id);
+                      }}
+                      title={completedContentIds.has(item.id) ? "Mark as not completed" : "Mark as completed"}
+                    >
+                      {completedContentIds.has(item.id) ? (
+                        <CheckCircle2 className="h-4 w-4" />
+                      ) : (
+                        <Circle className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
