@@ -31,6 +31,7 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState<OnboardingStep>("welcome");
   const [loading, setLoading] = useState(false);
+  const [userName, setUserName] = useState("");
 
   const getStepInfo = () => {
     const stepMap: Record<OnboardingStep, number> = {
@@ -114,56 +115,48 @@ export default function Onboarding() {
 
   if (step === "welcome") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
-        <Card className="w-full max-w-2xl">
-          <CardHeader className="text-center space-y-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
+        <Card className="w-full max-w-2xl border-none shadow-lg bg-card/95 backdrop-blur-sm">
+          <CardHeader className="text-center space-y-6 pb-8">
             <div className="flex justify-center">
-              <Sparkles className="w-16 h-16 text-primary" />
+              <Sparkles className="w-20 h-20 text-accent" />
             </div>
-            <CardTitle className="text-3xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Welcome to Your Wellness Journey</CardTitle>
-            <CardDescription className="text-base">
-              Let's create your personalized holistic wellness experience. We'll guide you through understanding your
-              unique constitution (dosha), spiritual preferences, and current life stage to provide tailored
-              recommendations for yoga, nutrition, and daily practices.
-            </CardDescription>
+            <CardTitle className="text-4xl font-bold text-foreground leading-tight">
+              Empowering You Through Each Phase of Womanhood
+            </CardTitle>
+            {userName && (
+              <p className="text-xl text-muted-foreground">
+                Welcome, {userName}! 
+              </p>
+            )}
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid gap-4">
-              <div className="flex items-start space-x-3">
-                <Heart className="w-5 h-5 text-primary mt-1" />
-                <div>
-                  <h4 className="font-medium text-foreground">Personalized Guidance</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Receive daily recommendations based on your cycle phase, dosha, and life stage
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <Moon className="w-5 h-5 text-primary mt-1" />
-                <div>
-                  <h4 className="font-medium text-foreground">Spiritual Nourishment</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Access prayers, duas, and affirmations that resonate with your beliefs
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <Baby className="w-5 h-5 text-primary mt-1" />
-                <div>
-                  <h4 className="font-medium text-foreground">Journey Support</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Track your cycle, prepare for pregnancy, or navigate each trimester with wisdom
-                  </p>
-                </div>
-              </div>
+          <CardContent className="space-y-8">
+            <div className="space-y-4">
+              <Label htmlFor="name" className="text-base font-medium text-foreground">
+                What should we call you?
+              </Label>
+              <Input
+                id="name"
+                placeholder="Enter your name"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="text-lg h-12"
+              />
             </div>
-            <Button
-              onClick={() => setStep("lifeStage")}
-              className="w-full"
-              size="lg"
-            >
-              Begin Your Journey
-            </Button>
+            
+            <div className="text-center py-6">
+              <p className="text-2xl font-semibold text-foreground mb-6">
+                Where are you today?
+              </p>
+              <Button
+                onClick={() => setStep("lifeStage")}
+                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                size="lg"
+                disabled={!userName.trim()}
+              >
+                Continue
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -181,7 +174,7 @@ export default function Onboarding() {
     ];
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
         <Card className="w-full max-w-2xl">
           <CardHeader>
             <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
@@ -237,7 +230,7 @@ export default function Onboarding() {
 
   if (step === "cycle") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
         <Card className="w-full max-w-2xl">
           <CardHeader>
             <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Understanding Your Cycle</CardTitle>
@@ -332,7 +325,7 @@ export default function Onboarding() {
 
   if (step === "dosha") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
         <DoshaAssessment 
           onComplete={handleDoshaComplete} 
           onBack={() => {
@@ -352,7 +345,7 @@ export default function Onboarding() {
 
   if (step === "spiritual") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
         <Card className="w-full max-w-2xl">
           <CardHeader>
             <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Spiritual Connection</CardTitle>
@@ -413,7 +406,7 @@ export default function Onboarding() {
 
   if (step === "pregnancy") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
         <Card className="w-full max-w-2xl">
           <CardHeader>
             <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Journey Stage</CardTitle>
@@ -486,7 +479,7 @@ export default function Onboarding() {
 
   if (step === "preferences") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
         <Card className="w-full max-w-2xl">
           <CardHeader>
             <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Preferences</CardTitle>
@@ -633,7 +626,7 @@ export default function Onboarding() {
     const currentRecommendations = doshaRecommendations[primaryDosha as keyof typeof doshaRecommendations];
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
         <Card className="w-full max-w-2xl">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
