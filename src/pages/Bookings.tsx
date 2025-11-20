@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar, Clock, DollarSign, Users, Check } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Users, Check } from "lucide-react";
 
 interface Service {
   id: string;
@@ -241,6 +241,14 @@ export default function Bookings() {
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
+  const formatDualCurrency = (priceGBP: number) => {
+    const priceSAR = priceGBP * 4.7;
+    return {
+      gbp: `£${priceGBP.toFixed(2)}`,
+      sar: `${priceSAR.toFixed(2)} SAR`
+    };
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-wellness-beige">
@@ -326,9 +334,13 @@ export default function Bookings() {
                               )}
                             </div>
                             <div className="flex items-center justify-between">
-                              <div className="text-2xl font-bold text-wellness-taupe flex items-center gap-1">
-                                <DollarSign className="w-5 h-5" />
-                                {service.price.toFixed(2)}
+                              <div className="flex flex-col">
+                                <div className="text-2xl font-bold text-wellness-taupe">
+                                  {formatDualCurrency(service.price).gbp}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {formatDualCurrency(service.price).sar}
+                                </div>
                               </div>
                               <Button 
                                 onClick={() => handleBookService(service)}
@@ -452,9 +464,14 @@ export default function Bookings() {
                 <div className="bg-muted p-4 rounded-md">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Total:</span>
-                    <span className="text-xl font-bold text-wellness-taupe">
-                      ${selectedService.price.toFixed(2)}
-                    </span>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-wellness-taupe">
+                        {formatDualCurrency(selectedService.price).gbp}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {formatDualCurrency(selectedService.price).sar}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
