@@ -6,7 +6,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light">
+    <div className="min-h-screen bg-wellness-sage-light">
       <div className="container mx-auto px-6 py-16 space-y-12">
         {/* Hero Section */}
         <div className="text-center space-y-6 max-w-3xl mx-auto">

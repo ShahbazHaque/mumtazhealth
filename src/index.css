@@ -8,40 +8,40 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 270 30% 97%;
-    --foreground: 270 15% 25%;
+    --background: 100 25% 94%;
+    --foreground: 100 15% 20%;
 
-    --card: 270 25% 98%;
-    --card-foreground: 270 15% 25%;
+    --card: 100 20% 98%;
+    --card-foreground: 100 15% 20%;
 
-    --popover: 270 25% 98%;
-    --popover-foreground: 270 15% 25%;
+    --popover: 100 20% 98%;
+    --popover-foreground: 100 15% 20%;
 
-    --primary: 280 45% 70%;
-    --primary-foreground: 270 25% 98%;
+    --primary: 100 30% 70%;
+    --primary-foreground: 100 15% 20%;
 
-    --secondary: 100 25% 75%;
-    --secondary-foreground: 270 15% 25%;
+    --secondary: 100 20% 88%;
+    --secondary-foreground: 100 15% 20%;
 
-    --muted: 100 20% 92%;
-    --muted-foreground: 270 10% 50%;
+    --muted: 100 15% 90%;
+    --muted-foreground: 100 10% 45%;
 
-    --accent: 280 40% 85%;
-    --accent-foreground: 270 15% 25%;
+    --accent: 280 45% 75%;
+    --accent-foreground: 100 15% 20%;
 
     --destructive: 0 70% 55%;
-    --destructive-foreground: 270 25% 98%;
+    --destructive-foreground: 100 20% 98%;
 
-    --border: 100 15% 88%;
-    --input: 100 15% 88%;
-    --ring: 280 45% 70%;
+    --border: 100 15% 85%;
+    --input: 100 15% 85%;
+    --ring: 280 45% 75%;
 
     --radius: 0.75rem;
     
-    --wellness-lilac: 280 45% 70%;
-    --wellness-sage: 100 25% 75%;
-    --wellness-lilac-light: 280 40% 85%;
-    --wellness-sage-light: 100 20% 92%;
+    --wellness-lilac: 280 45% 75%;
+    --wellness-sage: 100 30% 70%;
+    --wellness-lilac-light: 280 40% 88%;
+    --wellness-sage-light: 100 25% 94%;
 
     --sidebar-background: 0 0% 98%;
 
