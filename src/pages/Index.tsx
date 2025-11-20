@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Flame, Trophy, Award } from "lucide-react";
+import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Flame, Trophy, Award, Download, Users, Flower2, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { format, subDays, parseISO, differenceInCalendarDays } from "date-fns";
+import founderPortrait from "@/assets/founder-portrait.jpeg";
 
 interface UserProfile {
   username: string;
@@ -502,70 +503,203 @@ const Index = () => {
   // Show welcome screen for non-authenticated or non-onboarded users
 
   return (
-    <div className="min-h-screen bg-wellness-sage-light">
-      <div className="container mx-auto px-6 py-16 space-y-12">
-        {/* Hero Section */}
-        <div className="text-center space-y-6 max-w-3xl mx-auto">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Sprout className="h-10 w-10 text-primary" />
-            <h1 className="text-5xl font-bold text-foreground">
-              Sacred Cycle Wellness
-            </h1>
-            <Heart className="h-10 w-10 text-accent" />
-          </div>
-          
-          <p className="text-2xl font-medium text-foreground leading-relaxed">
-            Welcome to Your Holistic Journey
-          </p>
-          
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose Your Path to Balance and Empowerment
-          </p>
-        </div>
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-wellness-sage-light via-background to-wellness-lilac-light py-20 md:py-32">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
+            {/* Left: Copy */}
+            <div className="text-center lg:text-left order-2 lg:order-1">
+              <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+                Mumtaz Health: Your Sanctuary for Holistic Wellness
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
+                Built on 30+ years of personal experience in Yoga, Ayurveda, and spiritual guidance. 
+                Support for every woman, in every phase.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Button 
+                  size="lg"
+                  onClick={() => navigate('/onboarding')}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Download Now
+                </Button>
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate('/auth')}
+                  className="border-2 border-primary/50 text-foreground hover:bg-primary/10 text-lg px-8 py-6"
+                >
+                  <Users className="mr-2 h-5 w-5" />
+                  Join the Community
+                </Button>
+              </div>
+            </div>
 
-        {/* Main CTA */}
-        <div className="max-w-md mx-auto">
-          <Button
-            size="lg"
-            className="w-full h-24 text-xl font-semibold bg-accent hover:bg-accent/90 text-accent-foreground transition-all shadow-lg"
-            onClick={() => navigate("/onboarding")}
-          >
-            <Heart className="mr-3 h-6 w-6" />
-            Begin Your Journey
-          </Button>
-          
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            Personalized guidance for every stage of womanhood
-          </p>
+            {/* Right: Founder Portrait */}
+            <div className="flex justify-center lg:justify-end order-1 lg:order-2">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-primary/20 rounded-3xl blur-3xl"></div>
+                <img 
+                  src={founderPortrait} 
+                  alt="Founder portrait - A warm, welcoming guide on your wellness journey" 
+                  className="relative rounded-3xl shadow-2xl w-full max-w-md object-cover aspect-[3/4]"
+                />
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        {/* Supporting Info */}
-        <div className="grid md:grid-cols-3 gap-6 mt-16 max-w-4xl mx-auto">
-          <div className="text-center p-6 rounded-lg bg-card/50 backdrop-blur-sm">
-            <div className="text-3xl mb-3">🧘‍♀️</div>
-            <h3 className="font-semibold mb-2">Yoga & Movement</h3>
-            <p className="text-sm text-muted-foreground">
-              Practices aligned with your cycle and dosha
+      {/* Founder's Story Section */}
+      <section className="py-20 md:py-32 bg-card">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-8">
+              Guided by Experience, Not Judgment
+            </h2>
+            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+              <p>
+                I am a 50-year-old woman who has navigated fertility issues, postpartum mental health, 
+                peri-menopause, cancer, and hysterectomy rehab. For over 30 years, I've dedicated myself 
+                to the holistic wellness industry—studying, practicing, and teaching Yoga, Ayurveda, and 
+                spiritual guidance.
+              </p>
+              <p className="text-2xl font-semibold text-foreground italic">
+                "I am here to help, not judge. You are not alone."
+              </p>
+              <p>
+                Every challenge you face, I've walked through myself. This isn't just knowledge from books—
+                it's wisdom earned through lived experience, deep study, and decades of supporting women 
+                just like you.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core Features Section */}
+      <section className="py-20 md:py-32 bg-gradient-to-br from-background to-wellness-lilac-light">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
+              Integrated Support for Your Unique Journey
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Comprehensive guidance that honors the complexity of your life, your body, and your spirit
             </p>
           </div>
-          
-          <div className="text-center p-6 rounded-lg bg-card/50 backdrop-blur-sm">
-            <div className="text-3xl mb-3">🌿</div>
-            <h3 className="font-semibold mb-2">Ayurvedic Wisdom</h3>
-            <p className="text-sm text-muted-foreground">
-              Nutrition and lifestyle guidance for balance
-            </p>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Feature 1: Life-Phase Tracker */}
+            <Card className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Calendar className="w-8 h-8 text-primary" />
+                </div>
+                <CardTitle className="text-2xl mb-3">Life-Phase Tracker</CardTitle>
+                <CardDescription className="text-base leading-relaxed">
+                  Track symptoms, mood, and health goals specific to your current phase (Fertility, 
+                  Postpartum, Peri-Menopause). Understand your patterns and honor your body's wisdom.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            {/* Feature 2: Holistic Guidance */}
+            <Card className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Flower2 className="w-8 h-8 text-accent" />
+                </div>
+                <CardTitle className="text-2xl mb-3">Holistic Guidance</CardTitle>
+                <CardDescription className="text-base leading-relaxed">
+                  Tap into curated guidance across Yoga, Ayurvedic Nutrition, and Spiritual Wisdom—
+                  available on demand for every challenge you face on your journey.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            {/* Feature 3: Movement & Rehab */}
+            <Card className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Activity className="w-8 h-8 text-primary" />
+                </div>
+                <CardTitle className="text-2xl mb-3">Movement & Rehab</CardTitle>
+                <CardDescription className="text-base leading-relaxed">
+                  Access video flows and mobility work designed for sensitive life moments, like 
+                  hysterectomy rehab or postpartum recovery. Gentle, therapeutic, and deeply nurturing.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            {/* Feature 4: The Mumtaz Community */}
+            <Card className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group">
+              <CardHeader>
+                <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Users className="w-8 h-8 text-accent" />
+                </div>
+                <CardTitle className="text-2xl mb-3">The Mumtaz Community</CardTitle>
+                <CardDescription className="text-base leading-relaxed">
+                  Connect, study, and share with like-minded women in a non-judgmental space. 
+                  Feel valued, supported, and inspired on your wellness journey.
+                </CardDescription>
+              </CardHeader>
+            </Card>
           </div>
-          
-          <div className="text-center p-6 rounded-lg bg-card/50 backdrop-blur-sm">
-            <div className="text-3xl mb-3">✨</div>
-            <h3 className="font-semibold mb-2">Spiritual Support</h3>
-            <p className="text-sm text-muted-foreground">
-              Optional Islamic and holistic practices
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 md:py-32 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-8">
+              Deepen Your Connection
+            </h2>
+            <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
+              Your life, your journey is a privilege. Let us help you celebrate it.
+            </p>
+
+            <div className="grid sm:grid-cols-3 gap-6 mb-12">
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/onboarding')}
+                className="border-2 border-primary/50 hover:bg-primary/10 h-auto py-6 flex flex-col gap-2"
+              >
+                <Users className="h-6 w-6" />
+                <span className="font-semibold">Join Our Online<br />Study Groups</span>
+              </Button>
+
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/bookings')}
+                className="border-2 border-accent/50 hover:bg-accent/10 h-auto py-6 flex flex-col gap-2"
+              >
+                <Sparkles className="h-6 w-6" />
+                <span className="font-semibold">Explore Wellness<br />Retreats</span>
+              </Button>
+
+              <Button 
+                size="lg"
+                onClick={() => navigate('/onboarding')}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground h-auto py-6 flex flex-col gap-2 shadow-lg"
+              >
+                <Download className="h-6 w-6" />
+                <span className="font-semibold">Download the<br />Mumtaz Health App</span>
+              </Button>
+            </div>
+
+            <p className="text-lg text-foreground italic font-medium">
+              Your life, your journey is a privilege. Let us help you celebrate it.
             </p>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
