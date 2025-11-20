@@ -41,7 +41,7 @@ const ContentLibrary = () => {
   
   // Filters
   const [selectedDosha, setSelectedDosha] = useState<string>("all");
-  const [selectedCyclePhase, setSelectedCyclePhase] = useState<string>("all");
+  const [selectedLifePhase, setSelectedLifePhase] = useState<string>("all");
   const [selectedPregnancyStatus, setSelectedPregnancyStatus] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
 
@@ -66,7 +66,7 @@ const ContentLibrary = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [content, selectedDosha, selectedCyclePhase, selectedPregnancyStatus, selectedType]);
+  }, [content, selectedDosha, selectedLifePhase, selectedPregnancyStatus, selectedType]);
 
   const loadContent = async () => {
     const { data, error } = await supabase
@@ -113,9 +113,9 @@ const ContentLibrary = () => {
       );
     }
 
-    if (selectedCyclePhase !== "all") {
+    if (selectedLifePhase !== "all") {
       filtered = filtered.filter(item => 
-        !item.cycle_phases || item.cycle_phases.length === 0 || item.cycle_phases.includes(selectedCyclePhase)
+        !item.cycle_phases || item.cycle_phases.length === 0 || item.cycle_phases.includes(selectedLifePhase)
       );
     }
 
@@ -181,7 +181,7 @@ const ContentLibrary = () => {
 
   const clearFilters = () => {
     setSelectedDosha("all");
-    setSelectedCyclePhase("all");
+    setSelectedLifePhase("all");
     setSelectedPregnancyStatus("all");
     setSelectedType("all");
   };
@@ -262,17 +262,20 @@ const ContentLibrary = () => {
               </div>
 
               <div>
-                <label className="text-sm font-medium mb-2 block">Cycle Phase</label>
-                <Select value={selectedCyclePhase} onValueChange={setSelectedCyclePhase}>
+                <label className="text-sm font-medium mb-2 block">Life Phase</label>
+                <Select value={selectedLifePhase} onValueChange={setSelectedLifePhase}>
                   <SelectTrigger>
                     <SelectValue placeholder="All phases" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Phases</SelectItem>
                     <SelectItem value="menstrual">Menstrual</SelectItem>
-                    <SelectItem value="follicular">Follicular</SelectItem>
-                    <SelectItem value="ovulation">Ovulation</SelectItem>
-                    <SelectItem value="luteal">Luteal</SelectItem>
+                    <SelectItem value="fertility">Fertility</SelectItem>
+                    <SelectItem value="pregnancy">Pregnancy</SelectItem>
+                    <SelectItem value="postpartum">Postpartum</SelectItem>
+                    <SelectItem value="perimenopause">Perimenopause</SelectItem>
+                    <SelectItem value="menopause">Menopause</SelectItem>
+                    <SelectItem value="post-menopause">Post-menopause</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
