@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar, Clock, Users, Check } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Users, Check, Filter, X } from "lucide-react";
 
 interface Service {
   id: string;
@@ -44,6 +44,10 @@ export default function Bookings() {
   const [bookingDate, setBookingDate] = useState('');
   const [bookingNotes, setBookingNotes] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
+  const [durationFilter, setDurationFilter] = useState<string>('all');
+  const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -221,6 +225,54 @@ export default function Bookings() {
     return services.filter(s => s.category === category);
   };
 
+  const getFilteredServices = () => {
+    return services.filter(service => {
+      // Category filter
+      if (selectedCategories.length > 0 && !selectedCategories.includes(service.category)) {
+        return false;
+      }
+      
+      // Price filter (convert to GBP if needed)
+      const servicePrice = service.currency === 'GBP' ? service.price : service.price;
+      if (servicePrice < priceRange[0] || servicePrice > priceRange[1]) {
+        return false;
+      }
+      
+      // Duration filter
+      if (durationFilter !== 'all') {
+        if (durationFilter === 'short' && service.duration_hours && service.duration_hours > 4) {
+          return false;
+        }
+        if (durationFilter === 'medium' && (!service.duration_hours || service.duration_hours <= 4) && (!service.duration_days || service.duration_days > 7)) {
+          return false;
+        }
+        if (durationFilter === 'long' && (!service.duration_days || service.duration_days <= 7)) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  };
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedCategories([]);
+    setPriceRange([0, 5000]);
+    setDurationFilter('all');
+  };
+
+  const hasActiveFilters = selectedCategories.length > 0 || 
+    priceRange[0] !== 0 || priceRange[1] !== 5000 || 
+    durationFilter !== 'all';
+
   const getCategoryLabel = (category: string) => {
     const labels: Record<string, string> = {
       consultation: 'Consultations',
@@ -293,8 +345,130 @@ export default function Bookings() {
 
           {/* Browse Services */}
           <TabsContent value="services" className="space-y-6">
+            {/* Filters Section */}
+            <Card className="bg-white border-wellness-taupe/20">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-5 h-5 text-wellness-taupe" />
+                    <CardTitle className="text-lg">Filters</CardTitle>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {hasActiveFilters && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearFilters}
+                        className="text-wellness-taupe"
+                      >
+                        <X className="w-4 h-4 mr-1" />
+                        Clear All
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowFilters(!showFilters)}
+                      className="text-wellness-taupe"
+                    >
+                      {showFilters ? 'Hide' : 'Show'}
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              {showFilters && (
+                <CardContent className="space-y-4">
+                  {/* Category Filter */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Category</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { value: 'consultation', label: 'Consultations' },
+                        { value: 'workshop', label: 'Workshops' },
+                        { value: 'retreat', label: 'Retreats' },
+                        { value: 'training', label: 'Teacher Training' }
+                      ].map(category => (
+                        <Badge
+                          key={category.value}
+                          variant={selectedCategories.includes(category.value) ? 'default' : 'outline'}
+                          className={`cursor-pointer ${
+                            selectedCategories.includes(category.value)
+                              ? 'bg-wellness-taupe hover:bg-wellness-taupe/90'
+                              : 'hover:bg-wellness-taupe/10'
+                          }`}
+                          onClick={() => toggleCategory(category.value)}
+                        >
+                          {category.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Price Range Filter */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">
+                      Price Range: £{priceRange[0]} - £{priceRange[1]}
+                    </Label>
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <Label className="text-xs text-muted-foreground">Min</Label>
+                        <Input
+                          type="number"
+                          value={priceRange[0]}
+                          onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                          min={0}
+                          max={priceRange[1]}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Label className="text-xs text-muted-foreground">Max</Label>
+                        <Input
+                          type="number"
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                          min={priceRange[0]}
+                          max={10000}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Duration Filter */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Duration</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { value: 'all', label: 'All Durations' },
+                        { value: 'short', label: 'Short (≤4 hours)' },
+                        { value: 'medium', label: 'Medium (1-7 days)' },
+                        { value: 'long', label: 'Long (7+ days)' }
+                      ].map(duration => (
+                        <Badge
+                          key={duration.value}
+                          variant={durationFilter === duration.value ? 'default' : 'outline'}
+                          className={`cursor-pointer ${
+                            durationFilter === duration.value
+                              ? 'bg-wellness-taupe hover:bg-wellness-taupe/90'
+                              : 'hover:bg-wellness-taupe/10'
+                          }`}
+                          onClick={() => setDurationFilter(duration.value)}
+                        >
+                          {duration.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+
+            {/* Services List */}
             {['consultation', 'workshop', 'retreat', 'training'].map(category => {
-              const categoryServices = getServicesByCategory(category);
+              const filteredServices = getFilteredServices();
+              const categoryServices = filteredServices.filter(s => s.category === category);
               if (categoryServices.length === 0) return null;
 
               return (
@@ -357,6 +531,18 @@ export default function Bookings() {
                 </div>
               );
             })}
+            
+            {/* No results message */}
+            {getFilteredServices().length === 0 && (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="text-muted-foreground mb-4">No services match your current filters</p>
+                  <Button onClick={clearFilters} variant="outline">
+                    Clear Filters
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* My Bookings */}
