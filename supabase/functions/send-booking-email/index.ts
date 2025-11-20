@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import React from "https://esm.sh/react@18.3.1";
-import { render } from "https://esm.sh/@react-email/render@1.0.0";
+import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22";
 import { BookingConfirmedEmail } from "./_templates/booking-confirmed.tsx";
 import { BookingCancelledEmail } from "./_templates/booking-cancelled.tsx";
 import { AdminNotificationEmail } from "./_templates/admin-notification.tsx";
@@ -18,9 +18,9 @@ interface BookingEmailRequest {
   type: "confirmed" | "cancelled" | "admin_notification";
   bookingId: string;
   userEmail: string;
-  userName: string;
-  serviceTitle: string;
-  bookingDate: string;
+  userName?: string;
+  serviceTitle?: string;
+  bookingDate?: string;
   duration?: string;
   price?: string;
   notes?: string;
@@ -37,36 +37,36 @@ const handler = async (req: Request): Promise<Response> => {
       type,
       bookingId,
       userEmail,
-      userName,
-      serviceTitle,
-      bookingDate,
-      duration,
-      price,
+      userName = "Valued Client",
+      serviceTitle = "Wellness Service",
+      bookingDate = "To be confirmed",
+      duration = "60 minutes",
+      price = "TBD",
       notes,
       adminEmail,
     }: BookingEmailRequest = await req.json();
 
-    console.log("Sending booking email:", { type, bookingId, userEmail });
+    console.log("Sending booking email:", { type, bookingId, userEmail, userName, serviceTitle });
 
     let html: string;
     let subject: string;
     let to: string;
 
     if (type === "confirmed") {
-      html = await render(
+      html = await renderAsync(
         React.createElement(BookingConfirmedEmail, {
           userName,
           serviceTitle,
           bookingDate,
-          duration: duration || "",
-          price: price || "",
+          duration,
+          price,
           notes,
         })
       );
       subject = `Booking Confirmed: ${serviceTitle}`;
       to = userEmail;
     } else if (type === "cancelled") {
-      html = await render(
+      html = await renderAsync(
         React.createElement(BookingCancelledEmail, {
           userName,
           serviceTitle,
@@ -76,15 +76,15 @@ const handler = async (req: Request): Promise<Response> => {
       subject = `Booking Cancelled: ${serviceTitle}`;
       to = userEmail;
     } else if (type === "admin_notification") {
-      html = await render(
+      html = await renderAsync(
         React.createElement(AdminNotificationEmail, {
           userName,
           userEmail,
           serviceTitle,
           bookingDate,
-          duration: duration || "",
-          price: price || "",
-          notes,
+          duration,
+          price,
+          notes: notes || "",
           bookingId,
         })
       );
