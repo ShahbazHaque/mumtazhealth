@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp } from "lucide-react";
+import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Flame, Trophy, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, subDays, parseISO, differenceInCalendarDays } from "date-fns";
 
 interface UserProfile {
   username: string;
@@ -36,10 +36,71 @@ const Index = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [wellnessProfile, setWellnessProfile] = useState<WellnessProfile | null>(null);
   const [recentEntries, setRecentEntries] = useState<WellnessEntry[]>([]);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [longestStreak, setLongestStreak] = useState(0);
 
   useEffect(() => {
     checkUserProfile();
   }, []);
+
+  const calculateStreak = (entries: WellnessEntry[]) => {
+    if (entries.length === 0) return { current: 0, longest: 0 };
+
+    // Sort entries by date descending
+    const sortedEntries = [...entries].sort((a, b) => 
+      new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime()
+    );
+
+    // Calculate current streak
+    let currentStreakCount = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Check if there's an entry for today or yesterday (to keep streak alive)
+    const mostRecentDate = parseISO(sortedEntries[0].entry_date);
+    const daysDiff = differenceInCalendarDays(today, mostRecentDate);
+
+    if (daysDiff <= 1) {
+      // Start counting from the most recent entry
+      let expectedDate = mostRecentDate;
+      
+      for (const entry of sortedEntries) {
+        const entryDate = parseISO(entry.entry_date);
+        const diff = differenceInCalendarDays(expectedDate, entryDate);
+        
+        if (diff === 0) {
+          currentStreakCount++;
+          expectedDate = subDays(expectedDate, 1);
+        } else if (diff === 1) {
+          // Skip a day but check if it continues
+          expectedDate = subDays(expectedDate, diff);
+        } else {
+          // Streak broken
+          break;
+        }
+      }
+    }
+
+    // Calculate longest streak
+    let longestStreakCount = 0;
+    let tempStreak = 1;
+    
+    for (let i = 0; i < sortedEntries.length - 1; i++) {
+      const currentDate = parseISO(sortedEntries[i].entry_date);
+      const nextDate = parseISO(sortedEntries[i + 1].entry_date);
+      const diff = differenceInCalendarDays(currentDate, nextDate);
+      
+      if (diff === 1) {
+        tempStreak++;
+      } else {
+        longestStreakCount = Math.max(longestStreakCount, tempStreak);
+        tempStreak = 1;
+      }
+    }
+    longestStreakCount = Math.max(longestStreakCount, tempStreak);
+
+    return { current: currentStreakCount, longest: longestStreakCount };
+  };
 
   const checkUserProfile = async () => {
     try {
@@ -64,17 +125,23 @@ const Index = () => {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      // Fetch recent wellness entries
-      const { data: entries } = await supabase
+      // Fetch ALL wellness entries for streak calculation
+      const { data: allEntries } = await supabase
         .from("wellness_entries")
         .select("id, entry_date, emotional_score, emotional_state, pain_level, cycle_phase, daily_practices")
         .eq("user_id", user.id)
-        .order("entry_date", { ascending: false })
-        .limit(5);
+        .order("entry_date", { ascending: false });
+
+      // Calculate streaks
+      if (allEntries && allEntries.length > 0) {
+        const streaks = calculateStreak(allEntries);
+        setCurrentStreak(streaks.current);
+        setLongestStreak(streaks.longest);
+        setRecentEntries(allEntries.slice(0, 5));
+      }
 
       setUserProfile(profile);
       setWellnessProfile(wellness);
-      setRecentEntries(entries || []);
     } catch (error) {
       console.error("Error fetching profile:", error);
     } finally {
@@ -112,6 +179,15 @@ const Index = () => {
     if (level <= 3) return "text-green-600";
     if (level <= 6) return "text-yellow-600";
     return "text-red-600";
+  };
+
+  const getMilestones = () => {
+    const milestones = [
+      { days: 7, label: "Week Warrior", icon: Award, achieved: currentStreak >= 7 || longestStreak >= 7 },
+      { days: 30, label: "Monthly Master", icon: Trophy, achieved: currentStreak >= 30 || longestStreak >= 30 },
+      { days: 90, label: "Quarter Champion", icon: Flame, achieved: currentStreak >= 90 || longestStreak >= 90 },
+    ];
+    return milestones;
   };
 
   // If user has completed onboarding, show dashboard
@@ -186,6 +262,102 @@ const Index = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Streak Counter */}
+          <Card className="max-w-5xl mx-auto bg-gradient-to-br from-accent/20 to-primary/20 border-accent/40 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-center flex items-center justify-center gap-3 text-2xl">
+                <Flame className="h-7 w-7 text-orange-500" />
+                Your Wellness Streak
+              </CardTitle>
+              <CardDescription className="text-center">
+                Keep up the momentum and build lasting habits
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-center gap-8">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Flame className="h-8 w-8 text-orange-500 animate-pulse" />
+                    <p className="text-5xl font-bold text-foreground">{currentStreak}</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium">Current Streak</p>
+                  <p className="text-xs text-muted-foreground">
+                    {currentStreak === 1 ? "day" : "days"} in a row
+                  </p>
+                </div>
+                
+                <div className="h-16 w-px bg-border" />
+                
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Trophy className="h-7 w-7 text-accent" />
+                    <p className="text-4xl font-bold text-foreground">{longestStreak}</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium">Longest Streak</p>
+                  <p className="text-xs text-muted-foreground">
+                    Personal best
+                  </p>
+                </div>
+              </div>
+
+              {/* Milestones */}
+              <div className="pt-4 border-t border-border/50">
+                <p className="text-sm font-semibold text-foreground mb-3 text-center">
+                  Milestone Achievements
+                </p>
+                <div className="flex items-center justify-center gap-4">
+                  {getMilestones().map((milestone) => {
+                    const Icon = milestone.icon;
+                    return (
+                      <div
+                        key={milestone.days}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-lg transition-all ${
+                          milestone.achieved
+                            ? "bg-accent/30 border-2 border-accent"
+                            : "bg-muted/30 border border-border opacity-50"
+                        }`}
+                      >
+                        <Icon
+                          className={`h-8 w-8 ${
+                            milestone.achieved ? "text-accent" : "text-muted-foreground"
+                          }`}
+                        />
+                        <div className="text-center">
+                          <p className="text-sm font-bold text-foreground">
+                            {milestone.days} Days
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {milestone.label}
+                          </p>
+                        </div>
+                        {milestone.achieved && (
+                          <Badge variant="secondary" className="text-xs bg-accent/20">
+                            Unlocked!
+                          </Badge>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {currentStreak === 0 && (
+                <div className="text-center py-2">
+                  <p className="text-sm text-muted-foreground">
+                    Start your streak today by tracking your wellness! 🌟
+                  </p>
+                  <Button
+                    onClick={() => navigate("/tracker")}
+                    className="mt-3 bg-accent hover:bg-accent/90"
+                    size="sm"
+                  >
+                    Begin Tracking
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Quick Access Section */}
           <div className="max-w-5xl mx-auto">
