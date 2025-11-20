@@ -77,6 +77,14 @@ export default function Onboarding() {
         return;
       }
 
+      // Update username in profiles table
+      if (userName.trim()) {
+        await supabase
+          .from("profiles")
+          .update({ username: userName.trim() })
+          .eq("user_id", user.id);
+      }
+
       // Calculate trimester if pregnant
       let currentTrimester = null;
       if (pregnancyStatus === "pregnant" && dueDate) {
@@ -105,7 +113,7 @@ export default function Onboarding() {
       if (error) throw error;
 
       toast.success("Your wellness profile is complete! Let's start tracking your journey.");
-      navigate("/tracker");
+      navigate("/");
     } catch (error: any) {
       toast.error(error.message || "Failed to save profile");
     } finally {
