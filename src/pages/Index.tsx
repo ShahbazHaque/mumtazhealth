@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles } from "lucide-react";
+import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 interface UserProfile {
   username: string;
@@ -19,11 +20,22 @@ interface WellnessProfile {
   spiritual_preference: string | null;
 }
 
+interface WellnessEntry {
+  id: string;
+  entry_date: string;
+  emotional_score: number | null;
+  emotional_state: string | null;
+  pain_level: number | null;
+  cycle_phase: string | null;
+  daily_practices: any;
+}
+
 const Index = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [wellnessProfile, setWellnessProfile] = useState<WellnessProfile | null>(null);
+  const [recentEntries, setRecentEntries] = useState<WellnessEntry[]>([]);
 
   useEffect(() => {
     checkUserProfile();
@@ -52,8 +64,17 @@ const Index = () => {
         .eq("user_id", user.id)
         .maybeSingle();
 
+      // Fetch recent wellness entries
+      const { data: entries } = await supabase
+        .from("wellness_entries")
+        .select("id, entry_date, emotional_score, emotional_state, pain_level, cycle_phase, daily_practices")
+        .eq("user_id", user.id)
+        .order("entry_date", { ascending: false })
+        .limit(5);
+
       setUserProfile(profile);
       setWellnessProfile(wellness);
+      setRecentEntries(entries || []);
     } catch (error) {
       console.error("Error fetching profile:", error);
     } finally {
@@ -77,6 +98,20 @@ const Index = () => {
   const getDoshaDisplay = (dosha: string | null) => {
     if (!dosha) return "Not assessed";
     return dosha.charAt(0).toUpperCase() + dosha.slice(1);
+  };
+
+  const getEmotionalScoreColor = (score: number | null) => {
+    if (!score) return "text-muted-foreground";
+    if (score >= 8) return "text-green-600";
+    if (score >= 5) return "text-yellow-600";
+    return "text-orange-600";
+  };
+
+  const getPainLevelColor = (level: number | null) => {
+    if (!level) return "text-muted-foreground";
+    if (level <= 3) return "text-green-600";
+    if (level <= 6) return "text-yellow-600";
+    return "text-red-600";
   };
 
   // If user has completed onboarding, show dashboard
@@ -199,6 +234,79 @@ const Index = () => {
               </Button>
             </div>
           </div>
+
+          {/* Recent Wellness Entries */}
+          {recentEntries.length > 0 && (
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                  <TrendingUp className="h-6 w-6 text-accent" />
+                  Recent Wellness Entries
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/insights")}
+                  className="text-accent border-accent hover:bg-accent/10"
+                >
+                  View All
+                </Button>
+              </div>
+              <div className="grid gap-4">
+                {recentEntries.map((entry) => (
+                  <Card key={entry.id} className="bg-card/95 backdrop-blur-sm hover:shadow-md transition-shadow">
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-3 flex-1">
+                          <div className="flex items-center gap-3">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-semibold text-foreground">
+                              {format(new Date(entry.entry_date), "EEEE, MMMM d, yyyy")}
+                            </span>
+                            {entry.cycle_phase && (
+                              <Badge variant="secondary" className="capitalize">
+                                {entry.cycle_phase.replace('_', ' ')}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                            <div className="space-y-1">
+                              <p className="text-xs text-muted-foreground">Emotional Score</p>
+                              <p className={`text-2xl font-bold ${getEmotionalScoreColor(entry.emotional_score)}`}>
+                                {entry.emotional_score ? `${entry.emotional_score}/10` : "N/A"}
+                              </p>
+                            </div>
+                            {entry.emotional_state && (
+                              <div className="space-y-1">
+                                <p className="text-xs text-muted-foreground">Emotional State</p>
+                                <p className="text-sm font-medium text-foreground capitalize">
+                                  {entry.emotional_state}
+                                </p>
+                              </div>
+                            )}
+                            <div className="space-y-1">
+                              <p className="text-xs text-muted-foreground">Pain Level</p>
+                              <p className={`text-2xl font-bold ${getPainLevelColor(entry.pain_level)}`}>
+                                {entry.pain_level ? `${entry.pain_level}/10` : "N/A"}
+                              </p>
+                            </div>
+                            {entry.daily_practices && Object.keys(entry.daily_practices).length > 0 && (
+                              <div className="space-y-1">
+                                <p className="text-xs text-muted-foreground">Daily Practices</p>
+                                <p className="text-sm font-medium text-foreground">
+                                  {Object.values(entry.daily_practices).filter((p: any) => p?.status).length} completed
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Daily Inspiration */}
           <Card className="max-w-3xl mx-auto bg-gradient-to-r from-accent/10 to-primary/10 border-accent/30">
