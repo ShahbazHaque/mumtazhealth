@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 
 interface WellnessContent {
@@ -283,11 +283,42 @@ const ContentLibrary = () => {
 
   const getContentIcon = (type: string) => {
     switch (type) {
-      case 'yoga': return <Sparkles className="h-5 w-5" />;
-      case 'meditation': return <Heart className="h-5 w-5" />;
-      case 'nutrition': return <Apple className="h-5 w-5" />;
-      case 'article': return <BookOpen className="h-5 w-5" />;
+      case 'yoga': return <Flower2 className="h-5 w-5 text-dosha-pitta" />;
+      case 'meditation': return <Sparkles className="h-5 w-5 text-dosha-vata" />;
+      case 'nutrition': return <Leaf className="h-5 w-5 text-dosha-kapha" />;
+      case 'article': return <BookOpen className="h-5 w-5 text-primary" />;
+      case 'learning': return <Lightbulb className="h-5 w-5 text-primary" />;
+      case 'community': return <Users className="h-5 w-5 text-secondary" />;
+      case 'life-phase': return <Calendar className="h-5 w-5 text-accent" />;
       default: return <BookOpen className="h-5 w-5" />;
+    }
+  };
+
+  const getDoshaIcon = (dosha: string) => {
+    switch (dosha.toLowerCase()) {
+      case 'pitta':
+        return (
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-dosha-pitta/10 border border-dosha-pitta/30" title="Pitta - Fire/Transformation">
+            <Flame className="h-4 w-4 text-dosha-pitta" />
+            <span className="text-xs font-medium text-dosha-pitta">Pitta</span>
+          </div>
+        );
+      case 'vata':
+        return (
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-dosha-vata/10 border border-dosha-vata/30" title="Vata - Air/Movement">
+            <Wind className="h-4 w-4 text-dosha-vata" />
+            <span className="text-xs font-medium text-dosha-vata">Vata</span>
+          </div>
+        );
+      case 'kapha':
+        return (
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-dosha-kapha/10 border border-dosha-kapha/30" title="Kapha - Earth/Stability">
+            <Mountain className="h-4 w-4 text-dosha-kapha" />
+            <span className="text-xs font-medium text-dosha-kapha">Kapha</span>
+          </div>
+        );
+      default:
+        return null;
     }
   };
 
@@ -479,17 +510,32 @@ const ContentLibrary = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="secondary" className="capitalize">
-                    {item.content_type}
-                  </Badge>
-                  {item.difficulty_level && (
-                    <Badge variant="outline">{item.difficulty_level}</Badge>
+                <div className="space-y-3 mb-4">
+                  {/* Dosha Icons */}
+                  {item.doshas && item.doshas.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {item.doshas.map((dosha) => (
+                        <div key={dosha}>
+                          {getDoshaIcon(dosha)}
+                        </div>
+                      ))}
+                    </div>
                   )}
-                  {item.duration_minutes && (
-                    <Badge variant="outline">{item.duration_minutes} min</Badge>
-                  )}
+                  
+                  {/* Other Badges */}
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="capitalize">
+                      {item.content_type}
+                    </Badge>
+                    {item.difficulty_level && (
+                      <Badge variant="outline">{item.difficulty_level}</Badge>
+                    )}
+                    {item.duration_minutes && (
+                      <Badge variant="outline">{item.duration_minutes} min</Badge>
+                    )}
+                  </div>
                 </div>
+                
                 <div className="flex gap-2">
                   <Button 
                     className="flex-1" 
@@ -554,16 +600,30 @@ const ContentLibrary = () => {
                     
                     <div>
                       <h3 className="font-semibold mb-2">Details</h3>
-                      <div className="flex flex-wrap gap-2 mb-4">
+                      <div className="space-y-3">
+                        {/* Dosha Icons */}
                         {selectedContent.doshas?.length > 0 && (
-                          <Badge>Doshas: {selectedContent.doshas.join(', ')}</Badge>
+                          <div>
+                            <p className="text-sm text-muted-foreground mb-2">Recommended for Doshas:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedContent.doshas.map((dosha) => (
+                                <div key={dosha}>
+                                  {getDoshaIcon(dosha)}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         )}
-                        {selectedContent.cycle_phases?.length > 0 && (
-                          <Badge>Phases: {selectedContent.cycle_phases.join(', ')}</Badge>
-                        )}
-                        {selectedContent.difficulty_level && (
-                          <Badge variant="outline">{selectedContent.difficulty_level}</Badge>
-                        )}
+                        
+                        {/* Other Details */}
+                        <div className="flex flex-wrap gap-2">
+                          {selectedContent.cycle_phases?.length > 0 && (
+                            <Badge variant="outline">Phases: {selectedContent.cycle_phases.join(', ')}</Badge>
+                          )}
+                          {selectedContent.difficulty_level && (
+                            <Badge variant="outline">{selectedContent.difficulty_level}</Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
 
