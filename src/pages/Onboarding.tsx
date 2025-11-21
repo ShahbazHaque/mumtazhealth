@@ -112,6 +112,19 @@ export default function Onboarding() {
 
       if (error) throw error;
 
+      // Send welcome email
+      try {
+        await supabase.functions.invoke('send-welcome-email', {
+          body: { 
+            userEmail: user.email,
+            userName: userName.trim() || undefined 
+          }
+        });
+      } catch (emailError) {
+        console.error("Failed to send welcome email:", emailError);
+        // Don't block onboarding if email fails
+      }
+
       toast.success("Your wellness profile is complete! Let's start tracking your journey.");
       navigate("/");
     } catch (error: any) {

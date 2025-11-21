@@ -8,6 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Sage Green - Primary Base (calming, earthy foundation) */
     --background: 100 25% 94%;
     --foreground: 100 15% 20%;
 
@@ -17,6 +18,7 @@ All colors MUST be HSL.
     --popover: 100 20% 98%;
     --popover-foreground: 100 15% 20%;
 
+    /* Sage Green for primary elements */
     --primary: 100 30% 70%;
     --primary-foreground: 100 15% 20%;
 
@@ -26,22 +28,29 @@ All colors MUST be HSL.
     --muted: 100 15% 90%;
     --muted-foreground: 100 10% 45%;
 
-    --accent: 280 45% 75%;
-    --accent-foreground: 100 15% 20%;
+    /* Lilac/Soft Lavender - Accent (elegant contrast for CTAs and interactive elements) */
+    --accent: 280 50% 70%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 55%;
     --destructive-foreground: 100 20% 98%;
 
     --border: 100 15% 85%;
     --input: 100 15% 85%;
-    --ring: 280 45% 75%;
+    --ring: 280 50% 70%;
 
     --radius: 0.75rem;
     
-    --wellness-lilac: 280 45% 75%;
+    /* Wellness theme tokens */
+    --wellness-lilac: 280 50% 70%;
     --wellness-sage: 100 30% 70%;
     --wellness-lilac-light: 280 40% 88%;
     --wellness-sage-light: 100 25% 94%;
+    
+    /* Dosha element colors */
+    --dosha-pitta: 25 95% 53%;  /* Flame/Sun - warm orange-red */
+    --dosha-vata: 200 80% 60%;   /* Wind/Air - light sky blue */
+    --dosha-kapha: 120 25% 45%;  /* Earth/Mountain - deep earthy green */
 
     --sidebar-background: 0 0% 98%;
 

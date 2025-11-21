@@ -562,13 +562,18 @@ const Index = () => {
             </h2>
             <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
               <p>
-                I am a 50-year-old woman who has navigated fertility issues, postpartum mental health, 
-                peri-menopause, cancer, and hysterectomy rehab. For over 30 years, I've dedicated myself 
-                to the holistic wellness industry—studying, practicing, and teaching Yoga, Ayurveda, and 
-                spiritual guidance.
+                Built on 30+ years of holistic expertise. I am an <strong>Ayurvedic Practitioner</strong> (focusing 
+                on holistic lifestyle, nutrition, and tailored herbal remedies), an <strong>International Yoga 
+                Teacher Trainer</strong>, and a specialist in <strong>transformational work</strong> including inner 
+                child healing and hands-on rehabilitation.
+              </p>
+              <p>
+                I created Mumtaz Health because I understand the journey—having navigated fertility challenges, 
+                postpartum mental health, peri-menopause, and recovery through hysterectomy rehab. This app introduces 
+                my personalized, one-size-does-not-fit-all approach to women's holistic wellness.
               </p>
               <p className="text-2xl font-semibold text-foreground italic">
-                "I am here to help, not judge. You are not alone."
+                "I'm here to help, not judge. You are not alone."
               </p>
               <p>
                 Every challenge you face, I've walked through myself. This isn't just knowledge from books—
