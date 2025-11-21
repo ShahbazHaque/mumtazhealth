@@ -7,10 +7,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sparkles, Heart, Moon, Baby } from "lucide-react";
+import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info } from "lucide-react";
 import DoshaAssessment from "@/components/DoshaAssessment";
 
-type OnboardingStep = "welcome" | "lifeStage" | "cycle" | "dosha" | "spiritual" | "pregnancy" | "preferences" | "complete";
+type OnboardingStep = "welcome" | "lifeStage" | "cycle" | "dosha" | "doshaResults" | "spiritual" | "pregnancy" | "preferences" | "complete";
 
 const ProgressIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => (
   <div className="mb-6">
@@ -39,12 +39,13 @@ export default function Onboarding() {
       lifeStage: 1,
       cycle: 2,
       dosha: 3,
-      spiritual: 4,
-      pregnancy: 5,
-      preferences: 6,
-      complete: 7,
+      doshaResults: 4,
+      spiritual: 5,
+      pregnancy: 6,
+      preferences: 7,
+      complete: 8,
     };
-    return { current: stepMap[step], total: 7 };
+    return { current: stepMap[step], total: 8 };
   };
 
   // Profile data
@@ -61,7 +62,7 @@ export default function Onboarding() {
   const handleDoshaComplete = (primary: string, secondary: string) => {
     setPrimaryDosha(primary);
     setSecondaryDosha(secondary);
-    setStep("spiritual");
+    setStep("doshaResults");
   };
 
   const saveProfile = async () => {
@@ -364,6 +365,129 @@ export default function Onboarding() {
     );
   }
 
+  if (step === "doshaResults") {
+    const getDoshaInfo = (dosha: string) => {
+      switch (dosha.toLowerCase()) {
+        case 'pitta':
+          return {
+            icon: <Flame className="h-12 w-12 text-dosha-pitta" />,
+            name: 'Pitta',
+            element: 'Fire & Transformation',
+            description: 'Governs metabolism, digestion, and energy production. Pitta types are often focused, driven, and have strong appetites.',
+            bgClass: 'bg-dosha-pitta/5 border-dosha-pitta/30',
+            iconBgClass: 'bg-dosha-pitta/20',
+            textClass: 'text-dosha-pitta'
+          };
+        case 'vata':
+          return {
+            icon: <Wind className="h-12 w-12 text-dosha-vata" />,
+            name: 'Vata',
+            element: 'Air & Movement',
+            description: 'Governs circulation, breathing, and the nervous system. Vata types are creative, energetic, and adaptable.',
+            bgClass: 'bg-dosha-vata/5 border-dosha-vata/30',
+            iconBgClass: 'bg-dosha-vata/20',
+            textClass: 'text-dosha-vata'
+          };
+        case 'kapha':
+          return {
+            icon: <Mountain className="h-12 w-12 text-dosha-kapha" />,
+            name: 'Kapha',
+            element: 'Earth & Stability',
+            description: 'Governs structure, immunity, and fluid balance. Kapha types are calm, steady, and nurturing.',
+            bgClass: 'bg-dosha-kapha/5 border-dosha-kapha/30',
+            iconBgClass: 'bg-dosha-kapha/20',
+            textClass: 'text-dosha-kapha'
+          };
+        default:
+          return null;
+      }
+    };
+
+    const primaryInfo = getDoshaInfo(primaryDosha);
+    const secondaryInfo = getDoshaInfo(secondaryDosha);
+
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
+        <Card className="w-full max-w-3xl">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <Info className="h-6 w-6 text-primary" />
+              <CardTitle className="text-3xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
+                Your Dosha Profile
+              </CardTitle>
+            </div>
+            <CardDescription className="text-base">
+              Understanding your unique Ayurvedic constitution helps us personalize your wellness journey
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+            
+            {/* Primary Dosha */}
+            {primaryInfo && (
+              <div className={`p-6 rounded-lg border ${primaryInfo.bgClass}`}>
+                <div className="flex items-start gap-4">
+                  <div className={`p-4 rounded-full ${primaryInfo.iconBgClass}`}>
+                    {primaryInfo.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-2xl font-bold mb-1 ${primaryInfo.textClass}`}>
+                      Your Primary Dosha: {primaryInfo.name}
+                    </h3>
+                    <p className="text-sm font-semibold text-muted-foreground mb-2">
+                      {primaryInfo.element}
+                    </p>
+                    <p className="text-foreground">
+                      {primaryInfo.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Secondary Dosha */}
+            {secondaryInfo && (
+              <div className={`p-6 rounded-lg border ${secondaryInfo.bgClass}`}>
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-full ${secondaryInfo.iconBgClass}`}>
+                    {secondaryInfo.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-xl font-semibold mb-1 ${secondaryInfo.textClass}`}>
+                      Your Secondary Dosha: {secondaryInfo.name}
+                    </h3>
+                    <p className="text-sm font-semibold text-muted-foreground mb-2">
+                      {secondaryInfo.element}
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      {secondaryInfo.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Info Box */}
+            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">What this means:</strong> We'll personalize your wellness content based on your dosha profile, recommending practices, foods, and lifestyle adjustments that support your unique constitution.
+              </p>
+            </div>
+
+            <div className="flex justify-between pt-4">
+              <Button variant="outline" onClick={() => setStep("dosha")}>
+                Retake Assessment
+              </Button>
+              <Button onClick={() => setStep("spiritual")} className="bg-primary hover:bg-primary/90">
+                Continue
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (step === "spiritual") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
@@ -412,7 +536,7 @@ export default function Onboarding() {
               </div>
             </RadioGroup>
             <div className="flex justify-between pt-4">
-              <Button variant="outline" onClick={() => setStep("dosha")}>
+              <Button variant="outline" onClick={() => setStep("doshaResults")}>
                 Back
               </Button>
               <Button onClick={() => setStep("pregnancy")}>
