@@ -25,6 +25,11 @@ export default {
           "lilac-light": "hsl(var(--wellness-lilac-light))",
           "sage-light": "hsl(var(--wellness-sage-light))",
         },
+        dosha: {
+          pitta: "hsl(var(--dosha-pitta))",
+          vata: "hsl(var(--dosha-vata))",
+          kapha: "hsl(var(--dosha-kapha))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
