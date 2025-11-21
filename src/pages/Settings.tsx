@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ArrowLeft, Heart, User } from "lucide-react";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
+import { NotificationSettings } from "@/components/NotificationSettings";
 
 const lifeStages = [
   { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling" },
@@ -171,6 +172,8 @@ export default function Settings() {
             </Button>
           </CardContent>
         </Card>
+
+        <NotificationSettings />
       </div>
     </div>
   );
