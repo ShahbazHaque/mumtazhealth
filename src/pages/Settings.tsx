@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft, Heart, User } from "lucide-react";
+import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 
 const lifeStages = [
   { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling" },
@@ -22,6 +23,8 @@ export default function Settings() {
   const [loading, setLoading] = useState(false);
   const [lifeStage, setLifeStage] = useState("");
   const [initialLifeStage, setInitialLifeStage] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
     fetchProfile();
@@ -39,17 +42,32 @@ export default function Settings() {
         return;
       }
 
-      const { data, error } = await supabase
+      // Fetch wellness profile
+      const { data: wellnessData, error: wellnessError } = await supabase
         .from("user_wellness_profiles")
         .select("life_stage")
         .eq("user_id", user.id)
         .single();
 
-      if (error) throw error;
+      if (wellnessError) throw wellnessError;
 
-      if (data?.life_stage) {
-        setLifeStage(data.life_stage);
-        setInitialLifeStage(data.life_stage);
+      if (wellnessData?.life_stage) {
+        setLifeStage(wellnessData.life_stage);
+        setInitialLifeStage(wellnessData.life_stage);
+      }
+
+      // Fetch profile (username and avatar)
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("username, avatar_url")
+        .eq("user_id", user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (profileData) {
+        setUsername(profileData.username || "");
+        setAvatarUrl(profileData.avatar_url || null);
       }
     } catch (error: any) {
       console.error("Error fetching profile:", error);
@@ -107,6 +125,14 @@ export default function Settings() {
             <CardDescription>Manage your wellness profile preferences</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Profile Photo Section */}
+            <div className="flex flex-col items-center pb-6 border-b border-border">
+              <ProfilePhotoUpload
+                currentAvatarUrl={avatarUrl}
+                username={username}
+                onAvatarUpdate={setAvatarUrl}
+              />
+            </div>
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Heart className="w-5 h-5 text-primary" />
