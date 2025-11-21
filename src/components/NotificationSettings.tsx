@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, Sparkles } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import {
   requestNotificationPermission,
@@ -142,6 +142,78 @@ export function NotificationSettings() {
     }
   };
 
+  const sendTestNotification = async () => {
+    if (!notificationsEnabled) {
+      toast({
+        title: "Enable notifications first",
+        description: "Please enable notifications before testing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      // Get user profile for personalization
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("user_id", user.id)
+        .single();
+
+      const { data: wellnessProfile } = await supabase
+        .from("user_wellness_profiles")
+        .select("primary_dosha, life_stage")
+        .eq("user_id", user.id)
+        .single();
+
+      // Generate personalized test message
+      const userName = profile?.username || "beautiful";
+      const dosha = wellnessProfile?.primary_dosha;
+      
+      let doshaAdvice = "Remember to honor your wellness journey today. I'm here to help, not judge. You are not alone.";
+      
+      if (dosha) {
+        const doshaMessages: Record<string, string> = {
+          vata: "Ground yourself with warm, nourishing foods and gentle movement. Your journey is sacred.",
+          pitta: "Balance your energy with cooling practices and self-compassion. You're doing beautifully.",
+          kapha: "Energize with invigorating movement and lighter foods. Embrace your natural rhythm.",
+        };
+        doshaAdvice = doshaMessages[dosha.toLowerCase()] || doshaAdvice;
+      }
+
+      // Send test notification
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(
+        `Good morning, ${userName}! 🌸`,
+        {
+          body: doshaAdvice,
+          icon: "/favicon.ico",
+          badge: "/favicon.ico",
+          data: { url: "/tracker" },
+          tag: "test-notification",
+        }
+      );
+
+      toast({
+        title: "Test notification sent!",
+        description: "Check your notifications to see how it looks.",
+      });
+    } catch (error: any) {
+      console.error("Test notification error:", error);
+      toast({
+        title: "Failed to send test notification",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -229,16 +301,28 @@ export function NotificationSettings() {
               </>
             )}
 
-            <div className="flex gap-2">
-              <Button onClick={savePreferences} disabled={loading} className="flex-1">
-                Save Preferences
-              </Button>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Button onClick={savePreferences} disabled={loading} className="flex-1">
+                  Save Preferences
+                </Button>
+                <Button
+                  onClick={handleDisableNotifications}
+                  disabled={loading}
+                  variant="outline"
+                >
+                  Disable
+                </Button>
+              </div>
+              
               <Button
-                onClick={handleDisableNotifications}
+                onClick={sendTestNotification}
                 disabled={loading}
-                variant="outline"
+                variant="secondary"
+                className="w-full"
               >
-                Disable
+                <Sparkles className="h-4 w-4 mr-2" />
+                Send Test Notification
               </Button>
             </div>
           </div>
