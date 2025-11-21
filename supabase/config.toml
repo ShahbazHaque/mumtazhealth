@@ -67,3 +67,9 @@ verify_jwt = true
 
 [functions.analyze-wellness-insights]
 verify_jwt = true
+
+[functions.mumtaz-wisdom-guide]
+verify_jwt = true
+
+[functions.send-welcome-email]
+verify_jwt = false
