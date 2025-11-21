@@ -31,6 +31,7 @@ const App = () => (
         <Route path="/summary" element={<MonthlySummary />} />
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/content" element={<ContentLibrary />} />
+        <Route path="/content-library" element={<ContentLibrary />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin" element={<Admin />} />
