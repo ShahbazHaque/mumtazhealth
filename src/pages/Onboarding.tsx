@@ -7,7 +7,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info } from "lucide-react";
+import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info, HelpCircle, Activity, ArrowLeft, ArrowRight } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import DoshaAssessment from "@/components/DoshaAssessment";
 
 type OnboardingStep = "welcome" | "lifeStage" | "cycle" | "dosha" | "doshaResults" | "spiritual" | "pregnancy" | "preferences" | "complete";
@@ -408,82 +409,108 @@ export default function Onboarding() {
 
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
-        <Card className="w-full max-w-3xl">
-          <CardHeader>
-            <div className="flex items-center gap-2 mb-2">
-              <Info className="h-6 w-6 text-primary" />
-              <CardTitle className="text-3xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
-                Your Dosha Profile
-              </CardTitle>
-            </div>
-            <CardDescription className="text-base">
-              Understanding your unique Ayurvedic constitution helps us personalize your wellness journey
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-            
-            {/* Primary Dosha */}
-            {primaryInfo && (
-              <div className={`p-6 rounded-lg border ${primaryInfo.bgClass}`}>
-                <div className="flex items-start gap-4">
-                  <div className={`p-4 rounded-full ${primaryInfo.iconBgClass}`}>
-                    {primaryInfo.icon}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className={`text-2xl font-bold mb-1 ${primaryInfo.textClass}`}>
-                      Your Primary Dosha: {primaryInfo.name}
-                    </h3>
-                    <p className="text-sm font-semibold text-muted-foreground mb-2">
-                      {primaryInfo.element}
-                    </p>
-                    <p className="text-foreground">
-                      {primaryInfo.description}
-                    </p>
-                  </div>
-                </div>
+        <TooltipProvider>
+          <Card className="w-full max-w-3xl">
+            <CardHeader>
+              <div className="flex items-center gap-2 mb-2">
+                <Info className="h-6 w-6 text-primary" />
+                <CardTitle className="text-3xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
+                  Your Dosha Profile
+                </CardTitle>
               </div>
-            )}
+              <CardDescription className="text-base">
+                Understanding your unique Ayurvedic constitution helps us personalize your wellness journey
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+              
+              {/* Primary Dosha */}
+              {primaryInfo && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className={`p-6 rounded-lg border ${primaryInfo.bgClass} cursor-help hover:shadow-md transition-shadow`}>
+                      <div className="flex items-start gap-4">
+                        <div className={`p-4 rounded-full ${primaryInfo.iconBgClass}`}>
+                          {primaryInfo.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className={`text-2xl font-bold mb-1 ${primaryInfo.textClass} flex items-center gap-2`}>
+                            Your Primary Dosha: {primaryInfo.name}
+                            <HelpCircle className="h-4 w-4 opacity-50" />
+                          </h3>
+                          <p className="text-sm font-semibold text-muted-foreground mb-2">
+                            {primaryInfo.element}
+                          </p>
+                          <p className="text-foreground">
+                            {primaryInfo.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-sm p-4">
+                    <p className="font-semibold mb-2">{primaryInfo.name} Dosha Traits:</p>
+                    <p className="text-sm">
+                      {primaryInfo.name === 'Pitta' && "Sharp intellect, warm body, strong digestion. Benefits from cooling practices and avoiding excessive heat."}
+                      {primaryInfo.name === 'Vata' && "Creative mind, light build, variable energy. Benefits from grounding practices and warm, nourishing foods."}
+                      {primaryInfo.name === 'Kapha' && "Calm nature, sturdy build, steady energy. Benefits from energizing practices and stimulating activities."}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
 
-            {/* Secondary Dosha */}
-            {secondaryInfo && (
-              <div className={`p-6 rounded-lg border ${secondaryInfo.bgClass}`}>
-                <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-full ${secondaryInfo.iconBgClass}`}>
-                    {secondaryInfo.icon}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className={`text-xl font-semibold mb-1 ${secondaryInfo.textClass}`}>
-                      Your Secondary Dosha: {secondaryInfo.name}
-                    </h3>
-                    <p className="text-sm font-semibold text-muted-foreground mb-2">
-                      {secondaryInfo.element}
+              {/* Secondary Dosha */}
+              {secondaryInfo && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className={`p-6 rounded-lg border ${secondaryInfo.bgClass} cursor-help hover:shadow-md transition-shadow`}>
+                      <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-full ${secondaryInfo.iconBgClass}`}>
+                          {secondaryInfo.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className={`text-xl font-semibold mb-1 ${secondaryInfo.textClass} flex items-center gap-2`}>
+                            Your Secondary Dosha: {secondaryInfo.name}
+                            <HelpCircle className="h-4 w-4 opacity-50" />
+                          </h3>
+                          <p className="text-sm font-semibold text-muted-foreground mb-2">
+                            {secondaryInfo.element}
+                          </p>
+                          <p className="text-muted-foreground text-sm">
+                            {secondaryInfo.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-sm p-4">
+                    <p className="font-semibold mb-2">{secondaryInfo.name} Influence:</p>
+                    <p className="text-sm">
+                      Your secondary dosha adds complementary qualities to your constitution and may become more prominent during different seasons or life stages.
                     </p>
-                    <p className="text-muted-foreground text-sm">
-                      {secondaryInfo.description}
-                    </p>
-                  </div>
-                </div>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+
+              {/* Info Box */}
+              <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                <p className="text-sm text-muted-foreground">
+                  <strong className="text-foreground">What this means:</strong> We'll personalize your wellness content based on your dosha profile, recommending practices, foods, and lifestyle adjustments that support your unique constitution.
+                </p>
               </div>
-            )}
 
-            {/* Info Box */}
-            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-              <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">What this means:</strong> We'll personalize your wellness content based on your dosha profile, recommending practices, foods, and lifestyle adjustments that support your unique constitution.
-              </p>
-            </div>
-
-            <div className="flex justify-between pt-4">
-              <Button variant="outline" onClick={() => setStep("dosha")}>
-                Retake Assessment
-              </Button>
-              <Button onClick={() => setStep("spiritual")} className="bg-primary hover:bg-primary/90">
-                Continue
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="flex justify-between pt-4">
+                <Button variant="outline" onClick={() => setStep("dosha")}>
+                  Retake Assessment
+                </Button>
+                <Button onClick={() => setStep("spiritual")} className="bg-primary hover:bg-primary/90">
+                  Continue
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TooltipProvider>
       </div>
     );
   }
@@ -623,44 +650,85 @@ export default function Onboarding() {
   }
 
   if (step === "preferences") {
+    const getYogaIcon = (style: string) => {
+      switch (style.toLowerCase()) {
+        case "hatha":
+          return <Activity className="h-5 w-5 text-primary" />;
+        case "vinyasa":
+          return <Wind className="h-5 w-5 text-primary" />;
+        case "yin":
+          return <Mountain className="h-5 w-5 text-primary" />;
+        case "restorative":
+          return <Heart className="h-5 w-5 text-primary" />;
+        case "prenatal":
+          return <Baby className="h-5 w-5 text-primary" />;
+        case "gentle":
+          return <Moon className="h-5 w-5 text-primary" />;
+        default:
+          return <Sparkles className="h-5 w-5 text-muted-foreground" />;
+      }
+    };
+
+    const getYogaTooltip = (style: string) => {
+      const tooltips: Record<string, string> = {
+        hatha: "Hatha yoga is a gentle, foundational practice perfect for beginners. It emphasizes proper alignment, breathing techniques, and holding postures to build strength and flexibility. Great for all fitness levels.",
+        vinyasa: "Vinyasa is a dynamic, flowing style that links breath with movement. Each movement flows smoothly into the next, creating a dance-like quality. Great for building cardiovascular health, strength, and maintaining focus.",
+        yin: "Yin yoga targets deep connective tissues through passive, long-held poses (3-5 minutes each). This meditative practice is excellent for flexibility, joint health, and cultivating mindfulness and patience.",
+        restorative: "Restorative yoga uses props to support the body in restful poses held for 5-20 minutes. Perfect for stress relief, recovery, and deep relaxation. Ideal for anyone needing gentle healing.",
+        prenatal: "Prenatal yoga is specifically designed for pregnancy, focusing on poses that are safe and beneficial for expecting mothers. Helps with strength, flexibility, breathing, and preparing for childbirth.",
+        gentle: "Gentle yoga is a slower-paced, nurturing practice suitable for all levels. Perfect for those new to yoga, recovering from injury, or seeking a calmer practice. Emphasizes relaxation and ease of movement.",
+      };
+      return tooltips[style.toLowerCase()] || "";
+    };
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
-        <Card className="w-full max-w-2xl">
-          <CardHeader>
-            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Preferences</CardTitle>
-            <CardDescription>Help us personalize your experience</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-            <div className="space-y-2">
-              <Label>Preferred Yoga Style (Optional)</Label>
-              <RadioGroup value={yogaStyle} onValueChange={setYogaStyle}>
-                <div className="grid grid-cols-2 gap-3">
-                  {["Hatha", "Vinyasa", "Yin", "Restorative", "Prenatal", "Gentle"].map((style) => (
-                    <div
-                      key={style}
-                      className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary transition-colors"
-                    >
-                      <RadioGroupItem value={style.toLowerCase()} id={style} />
-                      <Label htmlFor={style} className="cursor-pointer">
-                        {style}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </RadioGroup>
-            </div>
+        <TooltipProvider>
+          <Card className="w-full max-w-2xl">
+            <CardHeader>
+              <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Preferences</CardTitle>
+              <CardDescription>Help us personalize your experience - hover for details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+              <div className="space-y-2">
+                <Label>Preferred Yoga Style (Optional)</Label>
+                <RadioGroup value={yogaStyle} onValueChange={setYogaStyle}>
+                  <div className="grid grid-cols-2 gap-3">
+                    {["Hatha", "Vinyasa", "Yin", "Restorative", "Prenatal", "Gentle"].map((style) => (
+                      <Tooltip key={style}>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
+                            <RadioGroupItem value={style.toLowerCase()} id={style} />
+                            <div className="flex items-center gap-2 flex-1">
+                              {getYogaIcon(style)}
+                              <Label htmlFor={style} className="cursor-pointer flex items-center gap-1">
+                                {style}
+                                <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                              </Label>
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-sm p-4">
+                          <p className="text-sm">{getYogaTooltip(style)}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </RadioGroup>
+              </div>
 
-            <div className="flex justify-between pt-4">
-              <Button variant="outline" onClick={() => setStep("pregnancy")}>
-                Back
-              </Button>
-              <Button onClick={() => setStep("complete")}>
-                Next
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="flex justify-between pt-4">
+                <Button variant="outline" onClick={() => setStep("pregnancy")}>
+                  Back
+                </Button>
+                <Button onClick={() => setStep("complete")}>
+                  Next
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TooltipProvider>
       </div>
     );
   }

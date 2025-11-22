@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
 interface WellnessContent {
@@ -342,53 +343,106 @@ const ContentLibrary = () => {
         </div>
 
         {/* Dosha Legend Guide */}
-        <Card className="mb-6 bg-gradient-to-br from-wellness-sage-light via-background to-wellness-lilac-light border-wellness-sage/30">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Info className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Understanding Your Dosha</CardTitle>
-            </div>
-            <CardDescription>
-              Content is personalized based on Ayurvedic elements
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Pitta - Fire */}
-              <div className="flex flex-col items-center p-4 rounded-lg bg-dosha-pitta/5 border border-dosha-pitta/20 hover:bg-dosha-pitta/10 transition-colors">
-                <div className="p-3 bg-dosha-pitta/20 rounded-full mb-3">
-                  <Flame className="h-8 w-8 text-dosha-pitta" />
-                </div>
-                <h3 className="font-semibold text-dosha-pitta mb-1">Pitta</h3>
-                <p className="text-sm text-center text-muted-foreground">
-                  Fire & Transformation • Governs metabolism, digestion, and energy production
-                </p>
+        <TooltipProvider>
+          <Card className="mb-6 bg-gradient-to-br from-wellness-sage-light via-background to-wellness-lilac-light border-wellness-sage/30">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Info className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Understanding Your Dosha</CardTitle>
               </div>
+              <CardDescription>
+                Content is personalized based on Ayurvedic elements - hover for details
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Pitta - Fire */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex flex-col items-center p-4 rounded-lg bg-dosha-pitta/5 border border-dosha-pitta/20 hover:bg-dosha-pitta/10 transition-colors cursor-help">
+                      <div className="p-3 bg-dosha-pitta/20 rounded-full mb-3">
+                        <Flame className="h-8 w-8 text-dosha-pitta" />
+                      </div>
+                      <h3 className="font-semibold text-dosha-pitta mb-1 flex items-center gap-1">
+                        Pitta
+                        <HelpCircle className="h-3 w-3 opacity-50" />
+                      </h3>
+                      <p className="text-sm text-center text-muted-foreground">
+                        Fire & Transformation • Governs metabolism, digestion, and energy production
+                      </p>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-4">
+                    <p className="font-semibold mb-2">Pitta Characteristics:</p>
+                    <ul className="text-sm space-y-1 list-disc list-inside">
+                      <li>Sharp intellect and focus</li>
+                      <li>Medium build, warm body temperature</li>
+                      <li>Strong digestion and appetite</li>
+                      <li>May experience heat-related issues</li>
+                      <li>Benefits from cooling practices</li>
+                    </ul>
+                  </TooltipContent>
+                </Tooltip>
 
-              {/* Vata - Air */}
-              <div className="flex flex-col items-center p-4 rounded-lg bg-dosha-vata/5 border border-dosha-vata/20 hover:bg-dosha-vata/10 transition-colors">
-                <div className="p-3 bg-dosha-vata/20 rounded-full mb-3">
-                  <Wind className="h-8 w-8 text-dosha-vata" />
-                </div>
-                <h3 className="font-semibold text-dosha-vata mb-1">Vata</h3>
-                <p className="text-sm text-center text-muted-foreground">
-                  Air & Movement • Governs circulation, breathing, and nervous system
-                </p>
-              </div>
+                {/* Vata - Air */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex flex-col items-center p-4 rounded-lg bg-dosha-vata/5 border border-dosha-vata/20 hover:bg-dosha-vata/10 transition-colors cursor-help">
+                      <div className="p-3 bg-dosha-vata/20 rounded-full mb-3">
+                        <Wind className="h-8 w-8 text-dosha-vata" />
+                      </div>
+                      <h3 className="font-semibold text-dosha-vata mb-1 flex items-center gap-1">
+                        Vata
+                        <HelpCircle className="h-3 w-3 opacity-50" />
+                      </h3>
+                      <p className="text-sm text-center text-muted-foreground">
+                        Air & Movement • Governs circulation, breathing, and nervous system
+                      </p>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-4">
+                    <p className="font-semibold mb-2">Vata Characteristics:</p>
+                    <ul className="text-sm space-y-1 list-disc list-inside">
+                      <li>Creative and quick-thinking</li>
+                      <li>Light, slender build</li>
+                      <li>Variable energy and appetite</li>
+                      <li>May experience anxiety or restlessness</li>
+                      <li>Benefits from grounding practices</li>
+                    </ul>
+                  </TooltipContent>
+                </Tooltip>
 
-              {/* Kapha - Earth */}
-              <div className="flex flex-col items-center p-4 rounded-lg bg-dosha-kapha/5 border border-dosha-kapha/20 hover:bg-dosha-kapha/10 transition-colors">
-                <div className="p-3 bg-dosha-kapha/20 rounded-full mb-3">
-                  <Mountain className="h-8 w-8 text-dosha-kapha" />
-                </div>
-                <h3 className="font-semibold text-dosha-kapha mb-1">Kapha</h3>
-                <p className="text-sm text-center text-muted-foreground">
-                  Earth & Stability • Governs structure, immunity, and fluid balance
-                </p>
+                {/* Kapha - Earth */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex flex-col items-center p-4 rounded-lg bg-dosha-kapha/5 border border-dosha-kapha/20 hover:bg-dosha-kapha/10 transition-colors cursor-help">
+                      <div className="p-3 bg-dosha-kapha/20 rounded-full mb-3">
+                        <Mountain className="h-8 w-8 text-dosha-kapha" />
+                      </div>
+                      <h3 className="font-semibold text-dosha-kapha mb-1 flex items-center gap-1">
+                        Kapha
+                        <HelpCircle className="h-3 w-3 opacity-50" />
+                      </h3>
+                      <p className="text-sm text-center text-muted-foreground">
+                        Earth & Stability • Governs structure, immunity, and fluid balance
+                      </p>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-4">
+                    <p className="font-semibold mb-2">Kapha Characteristics:</p>
+                    <ul className="text-sm space-y-1 list-disc list-inside">
+                      <li>Calm, steady, and nurturing</li>
+                      <li>Strong, sturdy build</li>
+                      <li>Good endurance and stamina</li>
+                      <li>May experience sluggishness</li>
+                      <li>Benefits from energizing practices</li>
+                    </ul>
+                  </TooltipContent>
+                </Tooltip>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </TooltipProvider>
 
         {/* Progress Summary */}
         {user && (
