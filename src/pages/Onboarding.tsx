@@ -254,56 +254,128 @@ export default function Onboarding() {
   if (step === "cycle") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
-        <Card className="w-full max-w-2xl">
-          <CardHeader>
-            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Understanding Your Cycle</CardTitle>
-            <CardDescription>Help us understand where you are in your menstrual cycle and energy levels</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-            <div className="space-y-2">
-              <Label>Where are you in your cycle?</Label>
-              <RadioGroup value={cyclePhase} onValueChange={setCyclePhase}>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
-                    <RadioGroupItem value="menstrual" id="menstrual" />
-                    <Label htmlFor="menstrual" className="flex-1 cursor-pointer">
-                      <div>
-                        <div className="font-medium">Menstrual Phase (Days 1-5)</div>
-                        <div className="text-sm text-muted-foreground">Time of rest and renewal</div>
-                      </div>
-                    </Label>
+        <TooltipProvider>
+          <Card className="w-full max-w-2xl">
+            <CardHeader>
+              <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Understanding Your Cycle</CardTitle>
+              <CardDescription>Help us understand where you are in your menstrual cycle - hover for details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+              <div className="space-y-2">
+                <Label>Where are you in your cycle?</Label>
+                <RadioGroup value={cyclePhase} onValueChange={setCyclePhase}>
+                  <div className="space-y-3">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
+                          <RadioGroupItem value="menstrual" id="menstrual" />
+                          <Label htmlFor="menstrual" className="flex-1 cursor-pointer">
+                            <div>
+                              <div className="font-medium flex items-center gap-2">
+                                Menstrual Phase (Days 1-5)
+                                <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                              </div>
+                              <div className="text-sm text-muted-foreground">Time of rest and renewal</div>
+                            </div>
+                          </Label>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-sm p-4">
+                        <p className="font-semibold mb-2">Menstrual Phase:</p>
+                        <ul className="text-sm space-y-1 list-disc list-inside">
+                          <li>Hormone levels (estrogen & progesterone) are at their lowest</li>
+                          <li>Body is shedding the uterine lining</li>
+                          <li>Energy levels typically low - time for rest and reflection</li>
+                          <li>May experience cramping, fatigue, or mood changes</li>
+                          <li>Best practices: gentle movement, warm foods, self-care</li>
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
+                          <RadioGroupItem value="follicular" id="follicular" />
+                          <Label htmlFor="follicular" className="flex-1 cursor-pointer">
+                            <div>
+                              <div className="font-medium flex items-center gap-2">
+                                Follicular Phase (Days 6-14)
+                                <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                              </div>
+                              <div className="text-sm text-muted-foreground">Energy rising, new beginnings</div>
+                            </div>
+                          </Label>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-sm p-4">
+                        <p className="font-semibold mb-2">Follicular Phase:</p>
+                        <ul className="text-sm space-y-1 list-disc list-inside">
+                          <li>Estrogen levels gradually rise, boosting energy and mood</li>
+                          <li>Follicles in ovaries develop and prepare an egg</li>
+                          <li>Increased mental clarity, creativity, and motivation</li>
+                          <li>Skin often looks clearer and brighter</li>
+                          <li>Best practices: start new projects, intense workouts, social activities</li>
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
+                          <RadioGroupItem value="ovulation" id="ovulation" />
+                          <Label htmlFor="ovulation" className="flex-1 cursor-pointer">
+                            <div>
+                              <div className="font-medium flex items-center gap-2">
+                                Ovulation (Days 14-16)
+                                <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                              </div>
+                              <div className="text-sm text-muted-foreground">Peak energy and confidence</div>
+                            </div>
+                          </Label>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-sm p-4">
+                        <p className="font-semibold mb-2">Ovulation Phase:</p>
+                        <ul className="text-sm space-y-1 list-disc list-inside">
+                          <li>Estrogen peaks and triggers release of an egg</li>
+                          <li>Highest energy levels and peak fertility window</li>
+                          <li>Enhanced confidence, communication, and social skills</li>
+                          <li>May experience mild cramping or spotting</li>
+                          <li>Best practices: important meetings, challenges, high-intensity activities</li>
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
+                          <RadioGroupItem value="luteal" id="luteal" />
+                          <Label htmlFor="luteal" className="flex-1 cursor-pointer">
+                            <div>
+                              <div className="font-medium flex items-center gap-2">
+                                Luteal Phase (Days 17-28)
+                                <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                              </div>
+                              <div className="text-sm text-muted-foreground">Energy winding down, introspection</div>
+                            </div>
+                          </Label>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-sm p-4">
+                        <p className="font-semibold mb-2">Luteal Phase:</p>
+                        <ul className="text-sm space-y-1 list-disc list-inside">
+                          <li>Progesterone rises to prepare body for potential pregnancy</li>
+                          <li>Energy gradually decreases as hormones shift</li>
+                          <li>May experience PMS symptoms: bloating, cravings, mood swings</li>
+                          <li>Time for completing tasks and turning inward</li>
+                          <li>Best practices: moderate exercise, nourishing foods, self-compassion</li>
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
-                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
-                    <RadioGroupItem value="follicular" id="follicular" />
-                    <Label htmlFor="follicular" className="flex-1 cursor-pointer">
-                      <div>
-                        <div className="font-medium">Follicular Phase (Days 6-14)</div>
-                        <div className="text-sm text-muted-foreground">Energy rising, new beginnings</div>
-                      </div>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
-                    <RadioGroupItem value="ovulation" id="ovulation" />
-                    <Label htmlFor="ovulation" className="flex-1 cursor-pointer">
-                      <div>
-                        <div className="font-medium">Ovulation (Days 14-16)</div>
-                        <div className="text-sm text-muted-foreground">Peak energy and confidence</div>
-                      </div>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
-                    <RadioGroupItem value="luteal" id="luteal" />
-                    <Label htmlFor="luteal" className="flex-1 cursor-pointer">
-                      <div>
-                        <div className="font-medium">Luteal Phase (Days 17-28)</div>
-                        <div className="text-sm text-muted-foreground">Energy winding down, introspection</div>
-                      </div>
-                    </Label>
-                  </div>
-                </div>
-              </RadioGroup>
-            </div>
+                </RadioGroup>
+              </div>
 
             <div className="space-y-2">
               <Label>How would you describe your energy levels today?</Label>
@@ -342,6 +414,7 @@ export default function Onboarding() {
             </div>
           </CardContent>
         </Card>
+        </TooltipProvider>
       </div>
     );
   }
