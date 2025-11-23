@@ -652,41 +652,105 @@ export default function Onboarding() {
   if (step === "pregnancy") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
-        <Card className="w-full max-w-2xl">
-          <CardHeader>
-            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Journey Stage</CardTitle>
-            <CardDescription>Where are you in your wellness journey?</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-            <RadioGroup value={pregnancyStatus} onValueChange={setPregnancyStatus}>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
-                  <RadioGroupItem value="not_pregnant" id="not_pregnant" />
-                  <Label htmlFor="not_pregnant" className="flex-1 cursor-pointer">
-                    Tracking my cycle for wellness
-                  </Label>
+        <TooltipProvider>
+          <Card className="w-full max-w-2xl">
+            <CardHeader>
+              <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Journey Stage</CardTitle>
+              <CardDescription>Where are you in your wellness journey? Hover for details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+              <RadioGroup value={pregnancyStatus} onValueChange={setPregnancyStatus}>
+                <div className="space-y-3">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
+                        <RadioGroupItem value="not_pregnant" id="not_pregnant" />
+                        <Label htmlFor="not_pregnant" className="flex-1 cursor-pointer flex items-center gap-2">
+                          Tracking my cycle for wellness
+                          <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                        </Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm p-4">
+                      <p className="font-semibold mb-2">Not Pregnant:</p>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Focus on understanding your natural cycle patterns</li>
+                        <li>Track energy levels, mood, and physical symptoms</li>
+                        <li>Build sustainable wellness habits aligned with hormonal changes</li>
+                        <li>Optimize nutrition, exercise, and self-care for each phase</li>
+                        <li>Expect: personalized recommendations for cycle syncing</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
+                        <RadioGroupItem value="trying_to_conceive" id="trying_to_conceive" />
+                        <Label htmlFor="trying_to_conceive" className="flex-1 cursor-pointer flex items-center gap-2">
+                          Preparing for pregnancy
+                          <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                        </Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm p-4">
+                      <p className="font-semibold mb-2">Trying to Conceive:</p>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Optimize fertility through cycle awareness and timing</li>
+                        <li>Nourishing practices to prepare your body for conception</li>
+                        <li>Stress management and emotional support during this journey</li>
+                        <li>Track ovulation patterns and fertile window</li>
+                        <li>Expect: fertility-focused nutrition, yoga, and wellness tips</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
+                        <RadioGroupItem value="pregnant" id="pregnant" />
+                        <Label htmlFor="pregnant" className="flex-1 cursor-pointer flex items-center gap-2">
+                          Currently pregnant
+                          <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                        </Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm p-4">
+                      <p className="font-semibold mb-2">Pregnancy:</p>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Trimester-specific guidance as your body changes</li>
+                        <li>Safe pregnancy yoga, movements, and exercises</li>
+                        <li>Nutrition and wellness practices for you and baby</li>
+                        <li>Emotional support and preparation for birth</li>
+                        <li>Expect: prenatal care tips, birth preparation, and milestone tracking</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
+                        <RadioGroupItem value="postpartum" id="postpartum" />
+                        <Label htmlFor="postpartum" className="flex-1 cursor-pointer flex items-center gap-2">
+                          Postpartum recovery
+                          <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                        </Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm p-4">
+                      <p className="font-semibold mb-2">Postpartum:</p>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Gentle healing and recovery after childbirth</li>
+                        <li>Support for physical recovery and core restoration</li>
+                        <li>Emotional wellness during the "fourth trimester"</li>
+                        <li>Navigate hormonal shifts, breastfeeding, and sleep deprivation</li>
+                        <li>Expect: restorative practices, pelvic floor care, and self-compassion</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
-                <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
-                  <RadioGroupItem value="trying_to_conceive" id="trying_to_conceive" />
-                  <Label htmlFor="trying_to_conceive" className="flex-1 cursor-pointer">
-                    Preparing for pregnancy
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
-                  <RadioGroupItem value="pregnant" id="pregnant" />
-                  <Label htmlFor="pregnant" className="flex-1 cursor-pointer">
-                    Currently pregnant
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors">
-                  <RadioGroupItem value="postpartum" id="postpartum" />
-                  <Label htmlFor="postpartum" className="flex-1 cursor-pointer">
-                    Postpartum recovery
-                  </Label>
-                </div>
-              </div>
-            </RadioGroup>
+              </RadioGroup>
 
             {pregnancyStatus === "pregnant" && (
               <div className="space-y-4">
@@ -718,6 +782,7 @@ export default function Onboarding() {
             </div>
           </CardContent>
         </Card>
+        </TooltipProvider>
       </div>
     );
   }
