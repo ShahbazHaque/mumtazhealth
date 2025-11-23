@@ -59,6 +59,7 @@ export default function Onboarding() {
   const [yogaStyle, setYogaStyle] = useState("");
   const [cyclePhase, setCyclePhase] = useState("");
   const [energyLevel, setEnergyLevel] = useState("");
+  const [menstrualCondition, setMenstrualCondition] = useState("");
 
   const handleDoshaComplete = (primary: string, secondary: string) => {
     setPrimaryDosha(primary);
@@ -188,65 +189,144 @@ export default function Onboarding() {
 
   if (step === "lifeStage") {
     const lifeStages = [
-      { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling", icon: "🌸" },
-      { value: "pregnancy", label: "Pregnancy", description: "Expecting a baby", icon: "🤰" },
-      { value: "postpartum", label: "Postpartum", description: "After childbirth", icon: "👶" },
-      { value: "perimenopause", label: "Perimenopause", description: "Transition to menopause", icon: "🌅" },
-      { value: "menopause", label: "Menopause", description: "End of menstrual cycles", icon: "🌙" },
-      { value: "post_menopause", label: "Post-Menopause", description: "After menopause", icon: "✨" },
+      { 
+        value: "menstrual_cycle", 
+        label: "Menstrual Cycle", 
+        description: "Regular monthly cycling", 
+        icon: "🌸",
+        tooltip: "Experience the natural rhythm of your monthly cycle. We provide guidance for cycle tracking, managing symptoms, understanding hormonal changes, and supporting conditions like PCOS and endometriosis."
+      },
+      { 
+        value: "pregnancy", 
+        label: "Pregnancy", 
+        description: "Expecting a baby", 
+        icon: "🤰",
+        tooltip: "Navigate your pregnancy journey trimester by trimester. Access prenatal yoga, nutrition guidance, emotional support, and preparation for childbirth tailored to your needs."
+      },
+      { 
+        value: "postpartum", 
+        label: "Postpartum", 
+        description: "After childbirth", 
+        icon: "👶",
+        tooltip: "Support your recovery and adjustment to motherhood. Find resources for physical healing, postpartum yoga, managing emotions, breastfeeding support, and reconnecting with yourself."
+      },
+      { 
+        value: "perimenopause", 
+        label: "Perimenopause", 
+        description: "Transition to menopause", 
+        icon: "🌅",
+        tooltip: "Navigate this transitional phase with confidence. Access tools for managing irregular cycles, hot flashes, mood changes, and hormonal fluctuations through holistic practices."
+      },
+      { 
+        value: "menopause", 
+        label: "Menopause", 
+        description: "End of menstrual cycles", 
+        icon: "🌙",
+        tooltip: "Embrace this new chapter. Find support for managing symptoms like hot flashes, sleep issues, bone health, and rediscovering vitality through Ayurvedic wisdom and yoga."
+      },
+      { 
+        value: "post_menopause", 
+        label: "Post-Menopause", 
+        description: "After menopause", 
+        icon: "✨",
+        tooltip: "Thrive in your wisdom years. Access practices for maintaining bone health, cardiovascular wellness, cognitive vitality, and cultivating purpose and joy in this empowered stage."
+      },
     ];
 
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
-        <Card className="w-full max-w-2xl">
-          <CardHeader>
-            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
-              Your Life Stage
-            </CardTitle>
-            <CardDescription>
-              Select the stage that best describes your current journey. This helps us provide personalized recommendations.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-            <div className="space-y-2">
-              <Label>Which life stage are you in?</Label>
-              <RadioGroup value={lifeStage} onValueChange={setLifeStage}>
-                <div className="space-y-3">
-                  {lifeStages.map((stage) => (
-                    <div
-                      key={stage.value}
-                      className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
-                    >
-                      <RadioGroupItem value={stage.value} id={stage.value} className="mt-1" />
-                      <div className="flex-1">
-                        <Label htmlFor={stage.value} className="font-medium cursor-pointer flex items-center gap-2">
-                          <span className="text-xl">{stage.icon}</span>
-                          {stage.label}
-                        </Label>
-                        <p className="text-sm text-muted-foreground mt-1">{stage.description}</p>
+        <TooltipProvider>
+          <Card className="w-full max-w-2xl">
+            <CardHeader>
+              <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
+                Your Life Stage
+              </CardTitle>
+              <CardDescription>
+                Select the stage that best describes your current journey - hover for details about support available.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+              <div className="space-y-2">
+                <Label>Which life stage are you in?</Label>
+                <RadioGroup value={lifeStage} onValueChange={(value) => {
+                  setLifeStage(value);
+                  if (value !== "menstrual_cycle") {
+                    setMenstrualCondition("");
+                  }
+                }}>
+                  <div className="space-y-3">
+                    {lifeStages.map((stage) => (
+                      <Tooltip key={stage.value}>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-help">
+                            <RadioGroupItem value={stage.value} id={stage.value} className="mt-1" />
+                            <div className="flex-1">
+                              <Label htmlFor={stage.value} className="font-medium cursor-pointer flex items-center gap-2">
+                                <span className="text-xl">{stage.icon}</span>
+                                {stage.label}
+                                <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                              </Label>
+                              <p className="text-sm text-muted-foreground mt-1">{stage.description}</p>
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-sm p-4">
+                          <p className="text-sm">{stage.tooltip}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {lifeStage === "menstrual_cycle" && (
+                <div className="space-y-2 p-4 bg-accent/20 rounded-lg border border-border">
+                  <Label className="text-sm font-medium">Do you have any specific menstrual health conditions? (Optional)</Label>
+                  <RadioGroup value={menstrualCondition} onValueChange={setMenstrualCondition}>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="none" id="none" />
+                        <Label htmlFor="none" className="cursor-pointer text-sm">None</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="pcos" id="pcos" />
+                        <Label htmlFor="pcos" className="cursor-pointer text-sm">PCOS (Polycystic Ovary Syndrome)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="endometriosis" id="endometriosis" />
+                        <Label htmlFor="endometriosis" className="cursor-pointer text-sm">Endometriosis</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="pmdd" id="pmdd" />
+                        <Label htmlFor="pmdd" className="cursor-pointer text-sm">PMDD (Premenstrual Dysphoric Disorder)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="irregular" id="irregular" />
+                        <Label htmlFor="irregular" className="cursor-pointer text-sm">Irregular or Heavy Periods</Label>
                       </div>
                     </div>
-                  ))}
+                  </RadioGroup>
                 </div>
-              </RadioGroup>
-            </div>
-            <Button
-              onClick={() => {
-                // Skip menstrual cycle questions for non-menstrual life stages
-                if (lifeStage === 'menstrual_cycle') {
-                  setStep("cycle");
-                } else {
-                  setStep("dosha");
-                }
-              }}
-              disabled={!lifeStage}
-              className="w-full"
-            >
-              Continue
-            </Button>
-          </CardContent>
-        </Card>
+              )}
+
+              <Button
+                onClick={() => {
+                  // Skip menstrual cycle questions for non-menstrual life stages
+                  if (lifeStage === 'menstrual_cycle') {
+                    setStep("cycle");
+                  } else {
+                    setStep("dosha");
+                  }
+                }}
+                disabled={!lifeStage}
+                className="w-full"
+              >
+                Continue
+              </Button>
+            </CardContent>
+          </Card>
+        </TooltipProvider>
       </div>
     );
   }
