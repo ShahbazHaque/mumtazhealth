@@ -377,6 +377,16 @@ const Index = () => {
               </Button>
 
               <Button
+                onClick={() => navigate("/condition-tracker")}
+                className="h-32 flex-col gap-3 bg-wellness-lilac hover:bg-wellness-lilac/90 text-white"
+                size="lg"
+              >
+                <Activity className="h-8 w-8" />
+                <span className="text-lg font-semibold">Symptom Tracker</span>
+                <span className="text-xs opacity-80">Track PCOS & Endo</span>
+              </Button>
+
+              <Button
                 onClick={() => navigate("/insights")}
                 className="h-32 flex-col gap-3 bg-primary hover:bg-primary/90 text-primary-foreground"
                 size="lg"

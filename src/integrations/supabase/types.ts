@@ -55,6 +55,42 @@ export type Database = {
           },
         ]
       }
+      condition_symptom_tracking: {
+        Row: {
+          condition_type: string
+          created_at: string
+          entry_date: string
+          id: string
+          notes: string | null
+          pain_level: number | null
+          symptoms: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          condition_type: string
+          created_at?: string
+          entry_date: string
+          id?: string
+          notes?: string | null
+          pain_level?: number | null
+          symptoms?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          condition_type?: string
+          created_at?: string
+          entry_date?: string
+          id?: string
+          notes?: string | null
+          pain_level?: number | null
+          symptoms?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_recommendations: {
         Row: {
           content_ids: string[]

@@ -13,6 +13,7 @@ import Bookings from "./pages/Bookings";
 import ContentLibrary from "./pages/ContentLibrary";
 import Insights from "./pages/Insights";
 import Settings from "./pages/Settings";
+import ConditionTracker from "./pages/ConditionTracker";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
         <Route path="/content-library" element={<ContentLibrary />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/condition-tracker" element={<ConditionTracker />} />
         <Route path="/admin" element={<Admin />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
