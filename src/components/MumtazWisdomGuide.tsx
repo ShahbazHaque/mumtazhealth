@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Sparkles, Send, Loader2, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import mumtazAvatar from "@/assets/mumtaz-avatar.jpg";
+import mumtazAvatar from "@/assets/mumtaz-avatar.jpeg";
 
 interface Message {
   role: "user" | "assistant";
