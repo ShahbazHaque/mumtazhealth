@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Sparkles, Send, Loader2, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import mumtazAvatar from "@/assets/mumtaz-avatar.jpg";
 
 interface Message {
   role: "user" | "assistant";
@@ -137,10 +138,10 @@ export function MumtazWisdomGuide() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-110 transition-transform"
-          size="icon"
+          className="fixed bottom-6 right-6 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-105 transition-transform pl-6 pr-5 py-6 gap-2"
         >
-          <Sparkles className="h-6 w-6 text-white" />
+          <Sparkles className="h-5 w-5 text-white" />
+          <span className="text-white font-medium text-sm">Ask me a question</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl h-[600px] p-0 gap-0">
@@ -148,7 +149,7 @@ export function MumtazWisdomGuide() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12 border-2 border-accent">
-                <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mumtaz&backgroundColor=c0aede" />
+                <AvatarImage src={mumtazAvatar} />
                 <AvatarFallback className="bg-accent/20 text-accent">
                   <Sparkles className="h-6 w-6" />
                 </AvatarFallback>
@@ -174,7 +175,7 @@ export function MumtazWisdomGuide() {
                 >
                   {message.role === "assistant" && (
                     <Avatar className="h-8 w-8 border border-accent/30">
-                      <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mumtaz&backgroundColor=c0aede" />
+                      <AvatarImage src={mumtazAvatar} />
                       <AvatarFallback className="bg-accent/20">
                         <Sparkles className="h-4 w-4 text-accent" />
                       </AvatarFallback>
