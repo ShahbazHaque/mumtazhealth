@@ -31,19 +31,22 @@ export function MumtazWisdomGuide() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (open) {
+    if (open && messages.length === 0) {
       fetchUserProfile();
-      if (messages.length === 0) {
-        // Add initial greeting
-        setMessages([
-          {
-            role: "assistant",
-            content: "Hello beautiful! I'm here to support you on your wellness journey. How can I help you today?",
-          },
-        ]);
-      }
     }
   }, [open]);
+
+  useEffect(() => {
+    if (open && messages.length === 0 && userProfile) {
+      // Add initial greeting with user's name
+      setMessages([
+        {
+          role: "assistant",
+          content: `Hi ${userProfile.username}, how can I support you today?`,
+        },
+      ]);
+    }
+  }, [open, userProfile]);
 
   useEffect(() => {
     // Scroll to bottom when messages update
