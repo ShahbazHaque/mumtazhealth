@@ -37,70 +37,24 @@ const Index = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [wellnessProfile, setWellnessProfile] = useState<WellnessProfile | null>(null);
   const [recentEntries, setRecentEntries] = useState<WellnessEntry[]>([]);
-  const [currentStreak, setCurrentStreak] = useState(0);
-  const [longestStreak, setLongestStreak] = useState(0);
+  const [totalCheckIns, setTotalCheckIns] = useState(0);
+  const [totalVisits, setTotalVisits] = useState(0);
 
   useEffect(() => {
     checkUserProfile();
   }, []);
 
-  const calculateStreak = (entries: WellnessEntry[]) => {
-    if (entries.length === 0) return { current: 0, longest: 0 };
+  const calculateTotals = (entries: WellnessEntry[]) => {
+    if (entries.length === 0) return { checkIns: 0, visits: 0 };
 
-    // Sort entries by date descending
-    const sortedEntries = [...entries].sort((a, b) => 
-      new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime()
-    );
+    // Total check-ins is simply the count of all entries
+    const checkIns = entries.length;
 
-    // Calculate current streak
-    let currentStreakCount = 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Total visits is the count of unique dates
+    const uniqueDates = new Set(entries.map(entry => entry.entry_date));
+    const visits = uniqueDates.size;
 
-    // Check if there's an entry for today or yesterday (to keep streak alive)
-    const mostRecentDate = parseISO(sortedEntries[0].entry_date);
-    const daysDiff = differenceInCalendarDays(today, mostRecentDate);
-
-    if (daysDiff <= 1) {
-      // Start counting from the most recent entry
-      let expectedDate = mostRecentDate;
-      
-      for (const entry of sortedEntries) {
-        const entryDate = parseISO(entry.entry_date);
-        const diff = differenceInCalendarDays(expectedDate, entryDate);
-        
-        if (diff === 0) {
-          currentStreakCount++;
-          expectedDate = subDays(expectedDate, 1);
-        } else if (diff === 1) {
-          // Skip a day but check if it continues
-          expectedDate = subDays(expectedDate, diff);
-        } else {
-          // Streak broken
-          break;
-        }
-      }
-    }
-
-    // Calculate longest streak
-    let longestStreakCount = 0;
-    let tempStreak = 1;
-    
-    for (let i = 0; i < sortedEntries.length - 1; i++) {
-      const currentDate = parseISO(sortedEntries[i].entry_date);
-      const nextDate = parseISO(sortedEntries[i + 1].entry_date);
-      const diff = differenceInCalendarDays(currentDate, nextDate);
-      
-      if (diff === 1) {
-        tempStreak++;
-      } else {
-        longestStreakCount = Math.max(longestStreakCount, tempStreak);
-        tempStreak = 1;
-      }
-    }
-    longestStreakCount = Math.max(longestStreakCount, tempStreak);
-
-    return { current: currentStreakCount, longest: longestStreakCount };
+    return { checkIns, visits };
   };
 
   const checkUserProfile = async () => {
@@ -133,11 +87,11 @@ const Index = () => {
         .eq("user_id", user.id)
         .order("entry_date", { ascending: false });
 
-      // Calculate streaks
+      // Calculate totals
       if (allEntries && allEntries.length > 0) {
-        const streaks = calculateStreak(allEntries);
-        setCurrentStreak(streaks.current);
-        setLongestStreak(streaks.longest);
+        const totals = calculateTotals(allEntries);
+        setTotalCheckIns(totals.checkIns);
+        setTotalVisits(totals.visits);
         setRecentEntries(allEntries.slice(0, 5));
       }
 
@@ -184,9 +138,9 @@ const Index = () => {
 
   const getMilestones = () => {
     const milestones = [
-      { days: 7, label: "Week Warrior", icon: Award, achieved: currentStreak >= 7 || longestStreak >= 7 },
-      { days: 30, label: "Monthly Master", icon: Trophy, achieved: currentStreak >= 30 || longestStreak >= 30 },
-      { days: 90, label: "Quarter Champion", icon: Flame, achieved: currentStreak >= 90 || longestStreak >= 90 },
+      { count: 7, label: "Getting Started", icon: Award, achieved: totalCheckIns >= 7 },
+      { count: 30, label: "Making Progress", icon: Trophy, achieved: totalCheckIns >= 30 },
+      { count: 90, label: "Wellness Champion", icon: Flower2, achieved: totalCheckIns >= 90 },
     ];
     return milestones;
   };
@@ -264,27 +218,27 @@ const Index = () => {
             </Card>
           </div>
 
-          {/* Streak Counter */}
+          {/* Progress Tracker */}
           <Card className="max-w-5xl mx-auto bg-gradient-to-br from-accent/20 to-primary/20 border-accent/40 shadow-lg">
             <CardHeader>
               <CardTitle className="text-center flex items-center justify-center gap-3 text-2xl">
-                <Flame className="h-7 w-7 text-orange-500" />
-                Your Wellness Streak
+                <Activity className="h-7 w-7 text-accent" />
+                Your Wellness Journey
               </CardTitle>
               <CardDescription className="text-center">
-                Keep up the momentum and build lasting habits
+                Track your progress and celebrate your commitment
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-center gap-8">
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Flame className="h-8 w-8 text-orange-500 animate-pulse" />
-                    <p className="text-5xl font-bold text-foreground">{currentStreak}</p>
+                    <Calendar className="h-8 w-8 text-primary" />
+                    <p className="text-5xl font-bold text-foreground">{totalCheckIns}</p>
                   </div>
-                  <p className="text-sm text-muted-foreground font-medium">Current Streak</p>
+                  <p className="text-sm text-muted-foreground font-medium">Total Check-Ins</p>
                   <p className="text-xs text-muted-foreground">
-                    {currentStreak === 1 ? "day" : "days"} in a row
+                    {totalCheckIns === 1 ? "entry" : "entries"} logged
                   </p>
                 </div>
                 
@@ -292,12 +246,12 @@ const Index = () => {
                 
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Trophy className="h-7 w-7 text-accent" />
-                    <p className="text-4xl font-bold text-foreground">{longestStreak}</p>
+                    <Users className="h-7 w-7 text-accent" />
+                    <p className="text-4xl font-bold text-foreground">{totalVisits}</p>
                   </div>
-                  <p className="text-sm text-muted-foreground font-medium">Longest Streak</p>
+                  <p className="text-sm text-muted-foreground font-medium">Total Visits</p>
                   <p className="text-xs text-muted-foreground">
-                    Personal best
+                    {totalVisits === 1 ? "day" : "days"} tracked
                   </p>
                 </div>
               </div>
@@ -312,7 +266,7 @@ const Index = () => {
                     const Icon = milestone.icon;
                     return (
                       <div
-                        key={milestone.days}
+                        key={milestone.count}
                         className={`flex flex-col items-center gap-2 p-4 rounded-lg transition-all ${
                           milestone.achieved
                             ? "bg-accent/30 border-2 border-accent"
@@ -326,7 +280,7 @@ const Index = () => {
                         />
                         <div className="text-center">
                           <p className="text-sm font-bold text-foreground">
-                            {milestone.days} Days
+                            {milestone.count} Check-Ins
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {milestone.label}
@@ -343,10 +297,10 @@ const Index = () => {
                 </div>
               </div>
 
-              {currentStreak === 0 && (
+              {totalCheckIns === 0 && (
                 <div className="text-center py-2">
                   <p className="text-sm text-muted-foreground">
-                    Start your streak today by tracking your wellness! 🌟
+                    Start your wellness journey today by logging your first check-in! 🌟
                   </p>
                   <Button
                     onClick={() => navigate("/tracker")}
