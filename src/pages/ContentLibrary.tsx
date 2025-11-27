@@ -9,9 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import yogaImage from "@/assets/wellness-yoga.jpg";
+import meditationImage from "@/assets/wellness-meditation.jpg";
+import nutritionImage from "@/assets/wellness-nutrition.jpg";
+import articleImage from "@/assets/wellness-article.jpg";
+import lockedImage from "@/assets/locked-content.jpg";
 
 interface WellnessContent {
   id: string;
@@ -30,11 +35,16 @@ interface WellnessContent {
   image_url: string;
   video_url: string;
   audio_url: string;
+  tier_requirement: string;
+  is_premium: boolean;
+  preview_content: string;
+  unlock_after_completions: number;
 }
 
 const ContentLibrary = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
+  const [userTier, setUserTier] = useState<string>("free");
   const [content, setContent] = useState<WellnessContent[]>([]);
   const [filteredContent, setFilteredContent] = useState<WellnessContent[]>([]);
   const [selectedContent, setSelectedContent] = useState<WellnessContent | null>(null);
@@ -65,10 +75,28 @@ const ContentLibrary = () => {
   useEffect(() => {
     loadContent();
     if (user) {
+      loadUserTier();
       loadSavedContent();
       loadProgress();
     }
   }, [user]);
+
+  const loadUserTier = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('user_wellness_profiles')
+      .select('subscription_tier')
+      .eq('user_id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error loading user tier:', error);
+      return;
+    }
+
+    setUserTier(data?.subscription_tier || 'free');
+  };
 
   useEffect(() => {
     // Update total count when content changes
@@ -293,6 +321,37 @@ const ContentLibrary = () => {
       case 'life-phase': return <Calendar className="h-5 w-5 text-accent" />;
       default: return <BookOpen className="h-5 w-5" />;
     }
+  };
+
+  const getContentImage = (type: string) => {
+    switch (type) {
+      case 'yoga': return yogaImage;
+      case 'meditation': return meditationImage;
+      case 'nutrition': return nutritionImage;
+      case 'article': return articleImage;
+      case 'learning': return articleImage;
+      default: return articleImage;
+    }
+  };
+
+  const isContentUnlocked = (item: WellnessContent) => {
+    if (!user) return false;
+    
+    // Check tier requirement
+    const tierHierarchy: Record<string, number> = { free: 0, basic: 1, premium: 2 };
+    const userTierLevel = tierHierarchy[userTier] || 0;
+    const requiredTierLevel = tierHierarchy[item.tier_requirement] || 0;
+    
+    if (userTierLevel < requiredTierLevel) {
+      return false;
+    }
+
+    // Check completion requirement
+    if (item.unlock_after_completions > 0 && progressStats.completed < item.unlock_after_completions) {
+      return false;
+    }
+
+    return true;
   };
 
   const getDoshaIcon = (dosha: string) => {
@@ -574,99 +633,139 @@ const ContentLibrary = () => {
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredContent.map((item) => (
-            <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              {item.image_url && (
-                <div className="h-48 overflow-hidden bg-muted">
+          {filteredContent.map((item) => {
+            const isLocked = !isContentUnlocked(item);
+            
+            return (
+              <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
+                {/* Content Image with Lock Overlay */}
+                <div className="h-48 overflow-hidden bg-muted relative">
                   <img 
-                    src={item.image_url} 
+                    src={item.image_url || getContentImage(item.content_type)}
                     alt={item.title}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
                   />
-                </div>
-              )}
-              <CardHeader>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2 flex-1">
-                    {getContentIcon(item.content_type)}
-                    <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {user && completedContentIds.has(item.id) && (
-                      <Badge variant="default" className="bg-green-600 hover:bg-green-700">
-                        <CheckCircle2 className="h-3 w-3" />
-                      </Badge>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => toggleSaveContent(item.id)}
-                    >
-                      <Heart 
-                        className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
-                      />
-                    </Button>
-                  </div>
-                </div>
-                <CardDescription className="line-clamp-2">
-                  {item.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 mb-4">
-                  {/* Dosha Icons */}
-                  {item.doshas && item.doshas.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {item.doshas.map((dosha) => (
-                        <div key={dosha}>
-                          {getDoshaIcon(dosha)}
-                        </div>
-                      ))}
+                  {isLocked && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                      <div className="text-center text-white p-4">
+                        <Lock className="h-12 w-12 mx-auto mb-2" />
+                        <p className="text-sm font-semibold mb-1">Locked Content</p>
+                        {item.tier_requirement !== 'free' && (
+                          <Badge className="bg-primary/90 text-primary-foreground">
+                            <Crown className="h-3 w-3 mr-1" />
+                            {item.tier_requirement === 'basic' ? 'Basic' : 'Premium'} Required
+                          </Badge>
+                        )}
+                        {item.unlock_after_completions > 0 && (
+                          <p className="text-xs mt-2">
+                            Complete {item.unlock_after_completions} items to unlock
+                            <br />
+                            ({progressStats.completed}/{item.unlock_after_completions})
+                          </p>
+                        )}
+                      </div>
                     </div>
                   )}
-                  
-                  {/* Other Badges */}
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="capitalize">
-                      {item.content_type}
+                  {item.is_premium && (
+                    <Badge className="absolute top-2 right-2 bg-gradient-to-r from-purple-600 to-pink-600">
+                      <Crown className="h-3 w-3 mr-1" />
+                      Premium
                     </Badge>
-                    {item.difficulty_level && (
-                      <Badge variant="outline">{item.difficulty_level}</Badge>
-                    )}
-                    {item.duration_minutes && (
-                      <Badge variant="outline">{item.duration_minutes} min</Badge>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  <Button 
-                    className="flex-1" 
-                    onClick={() => openContentDetail(item)}
-                  >
-                    View Details
-                  </Button>
-                  {user && (
-                    <Button
-                      variant={completedContentIds.has(item.id) ? "default" : "outline"}
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleCompletion(item.id);
-                      }}
-                      title={completedContentIds.has(item.id) ? "Mark as not completed" : "Mark as completed"}
-                    >
-                      {completedContentIds.has(item.id) ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : (
-                        <Circle className="h-4 w-4" />
-                      )}
-                    </Button>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+                
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 flex-1">
+                      {getContentIcon(item.content_type)}
+                      <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {user && completedContentIds.has(item.id) && (
+                        <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                          <CheckCircle2 className="h-3 w-3" />
+                        </Badge>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => toggleSaveContent(item.id)}
+                      >
+                        <Heart 
+                          className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
+                        />
+                      </Button>
+                    </div>
+                  </div>
+                  <CardDescription className="line-clamp-2">
+                    {isLocked && item.preview_content ? item.preview_content : item.description}
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent>
+                  <div className="space-y-3 mb-4">
+                    {/* Dosha Icons */}
+                    {item.doshas && item.doshas.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {item.doshas.map((dosha) => (
+                          <div key={dosha}>
+                            {getDoshaIcon(dosha)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Other Badges */}
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="capitalize">
+                        {item.content_type}
+                      </Badge>
+                      {item.difficulty_level && (
+                        <Badge variant="outline">{item.difficulty_level}</Badge>
+                      )}
+                      {item.duration_minutes && (
+                        <Badge variant="outline">{item.duration_minutes} min</Badge>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button 
+                      className="flex-1" 
+                      onClick={() => openContentDetail(item)}
+                      disabled={isLocked}
+                    >
+                      {isLocked ? (
+                        <>
+                          <Lock className="h-4 w-4 mr-2" />
+                          View Preview
+                        </>
+                      ) : (
+                        'View Details'
+                      )}
+                    </Button>
+                    {user && !isLocked && (
+                      <Button
+                        variant={completedContentIds.has(item.id) ? "default" : "outline"}
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleCompletion(item.id);
+                        }}
+                        title={completedContentIds.has(item.id) ? "Mark as not completed" : "Mark as completed"}
+                      >
+                        {completedContentIds.has(item.id) ? (
+                          <CheckCircle2 className="h-4 w-4" />
+                        ) : (
+                          <Circle className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {filteredContent.length === 0 && (
@@ -683,89 +782,125 @@ const ContentLibrary = () => {
             {selectedContent && (
               <>
                 <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    {getContentIcon(selectedContent.content_type)}
-                    {selectedContent.title}
-                  </DialogTitle>
+                  <div className="flex items-center justify-between">
+                    <DialogTitle className="flex items-center gap-2">
+                      {getContentIcon(selectedContent.content_type)}
+                      {selectedContent.title}
+                    </DialogTitle>
+                    {selectedContent.is_premium && (
+                      <Badge className="bg-gradient-to-r from-purple-600 to-pink-600">
+                        <Crown className="h-3 w-3 mr-1" />
+                        Premium
+                      </Badge>
+                    )}
+                  </div>
                   <DialogDescription>
                     {selectedContent.description}
                   </DialogDescription>
                 </DialogHeader>
                 <ScrollArea className="max-h-[50vh]">
                   <div className="space-y-4">
-                    {selectedContent.image_url && (
-                      <img 
-                        src={selectedContent.image_url} 
-                        alt={selectedContent.title}
-                        className="w-full rounded-lg"
-                      />
-                    )}
-                    
-                    <div>
-                      <h3 className="font-semibold mb-2">Details</h3>
-                      <div className="space-y-3">
-                        {/* Dosha Icons */}
-                        {selectedContent.doshas?.length > 0 && (
-                          <div>
-                            <p className="text-sm text-muted-foreground mb-2">Recommended for Doshas:</p>
-                            <div className="flex flex-wrap gap-2">
-                              {selectedContent.doshas.map((dosha) => (
-                                <div key={dosha}>
-                                  {getDoshaIcon(dosha)}
-                                </div>
-                              ))}
+                    {/* Content Image */}
+                    {(selectedContent.image_url || getContentImage(selectedContent.content_type)) && (
+                      <div className="relative">
+                        <img 
+                          src={selectedContent.image_url || getContentImage(selectedContent.content_type)}
+                          alt={selectedContent.title}
+                          className={`w-full rounded-lg ${!isContentUnlocked(selectedContent) ? 'blur-sm opacity-60' : ''}`}
+                        />
+                        {!isContentUnlocked(selectedContent) && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg">
+                            <div className="text-center text-white p-6">
+                              <Lock className="h-16 w-16 mx-auto mb-3" />
+                              <p className="text-lg font-semibold mb-2">Unlock Full Content</p>
+                              {selectedContent.tier_requirement !== 'free' && (
+                                <Badge className="bg-primary/90 text-primary-foreground mb-3">
+                                  <Crown className="h-4 w-4 mr-1" />
+                                  Upgrade to {selectedContent.tier_requirement === 'basic' ? 'Basic' : 'Premium'}
+                                </Badge>
+                              )}
+                              {selectedContent.unlock_after_completions > 0 && (
+                                <p className="text-sm">
+                                  Complete {selectedContent.unlock_after_completions} items to unlock
+                                  <br />
+                                  Current progress: {progressStats.completed}/{selectedContent.unlock_after_completions}
+                                </p>
+                              )}
                             </div>
                           </div>
                         )}
-                        
-                        {/* Other Details */}
-                        <div className="flex flex-wrap gap-2">
-                          {selectedContent.cycle_phases?.length > 0 && (
-                            <Badge variant="outline">Phases: {selectedContent.cycle_phases.join(', ')}</Badge>
-                          )}
-                          {selectedContent.difficulty_level && (
-                            <Badge variant="outline">{selectedContent.difficulty_level}</Badge>
-                          )}
-                        </div>
                       </div>
+                    )}
+                    
+                    <div>
+                      <h3 className="font-semibold mb-2">
+                        {isContentUnlocked(selectedContent) ? 'Full Guidance' : 'Preview'}
+                      </h3>
+                      <p className="text-muted-foreground whitespace-pre-wrap">
+                        {isContentUnlocked(selectedContent) 
+                          ? selectedContent.detailed_guidance 
+                          : (selectedContent.preview_content || selectedContent.description || 'Unlock to see full content...')
+                        }
+                      </p>
                     </div>
+                    
+                    {isContentUnlocked(selectedContent) && (
+                      <>
+                        <div className="space-y-3">
+                          {/* Dosha Icons */}
+                          {selectedContent.doshas?.length > 0 && (
+                            <div>
+                              <p className="text-sm text-muted-foreground mb-2">Recommended for Doshas:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {selectedContent.doshas.map((dosha) => (
+                                  <div key={dosha}>
+                                    {getDoshaIcon(dosha)}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Other Details */}
+                          <div className="flex flex-wrap gap-2">
+                            {selectedContent.cycle_phases?.length > 0 && (
+                              <Badge variant="outline">Phases: {selectedContent.cycle_phases.join(', ')}</Badge>
+                            )}
+                            {selectedContent.difficulty_level && (
+                              <Badge variant="outline">{selectedContent.difficulty_level}</Badge>
+                            )}
+                          </div>
+                        </div>
 
-                    {selectedContent.detailed_guidance && (
-                      <div>
-                        <h3 className="font-semibold mb-2">Guidance</h3>
-                        <p className="text-muted-foreground whitespace-pre-wrap">
-                          {selectedContent.detailed_guidance}
-                        </p>
-                      </div>
-                    )}
+                        {selectedContent.benefits?.length > 0 && (
+                          <div>
+                            <h3 className="font-semibold mb-2">Benefits</h3>
+                            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                              {selectedContent.benefits.map((benefit, index) => (
+                                <li key={index}>{benefit}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
 
-                    {selectedContent.benefits?.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold mb-2">Benefits</h3>
-                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                          {selectedContent.benefits.map((benefit, index) => (
-                            <li key={index}>{benefit}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                        {selectedContent.video_url && (
+                          <div>
+                            <h3 className="font-semibold mb-2">Video</h3>
+                            <video controls className="w-full rounded-lg">
+                              <source src={selectedContent.video_url} />
+                            </video>
+                          </div>
+                        )}
 
-                    {selectedContent.video_url && (
-                      <div>
-                        <h3 className="font-semibold mb-2">Video</h3>
-                        <video controls className="w-full rounded-lg">
-                          <source src={selectedContent.video_url} />
-                        </video>
-                      </div>
-                    )}
-
-                    {selectedContent.audio_url && (
-                      <div>
-                        <h3 className="font-semibold mb-2">Audio Guide</h3>
-                        <audio controls className="w-full">
-                          <source src={selectedContent.audio_url} />
-                        </audio>
-                      </div>
+                        {selectedContent.audio_url && (
+                          <div>
+                            <h3 className="font-semibold mb-2">Audio Guide</h3>
+                            <audio controls className="w-full">
+                              <source src={selectedContent.audio_url} />
+                            </audio>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </ScrollArea>
