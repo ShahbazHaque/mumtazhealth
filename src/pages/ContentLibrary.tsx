@@ -338,7 +338,7 @@ const ContentLibrary = () => {
     if (!user) return false;
     
     // Check tier requirement
-    const tierHierarchy: Record<string, number> = { free: 0, basic: 1, premium: 2 };
+    const tierHierarchy: Record<string, number> = { free: 0, basic: 1, standard: 2, premium: 3 };
     const userTierLevel = tierHierarchy[userTier] || 0;
     const requiredTierLevel = tierHierarchy[item.tier_requirement] || 0;
     
@@ -653,7 +653,8 @@ const ContentLibrary = () => {
                         {item.tier_requirement !== 'free' && (
                           <Badge className="bg-primary/90 text-primary-foreground">
                             <Crown className="h-3 w-3 mr-1" />
-                            {item.tier_requirement === 'basic' ? 'Basic' : 'Premium'} Required
+                            {item.tier_requirement === 'basic' ? 'Basic' : 
+                             item.tier_requirement === 'standard' ? 'Standard' : 'Premium'} Required
                           </Badge>
                         )}
                         {item.unlock_after_completions > 0 && (
@@ -816,7 +817,8 @@ const ContentLibrary = () => {
                               {selectedContent.tier_requirement !== 'free' && (
                                 <Badge className="bg-primary/90 text-primary-foreground mb-3">
                                   <Crown className="h-4 w-4 mr-1" />
-                                  Upgrade to {selectedContent.tier_requirement === 'basic' ? 'Basic' : 'Premium'}
+                                  Upgrade to {selectedContent.tier_requirement === 'basic' ? 'Basic' : 
+                                               selectedContent.tier_requirement === 'standard' ? 'Standard' : 'Premium'}
                                 </Badge>
                               )}
                               {selectedContent.unlock_after_completions > 0 && (
