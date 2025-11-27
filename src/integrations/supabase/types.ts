@@ -396,6 +396,7 @@ export type Database = {
           primary_dosha: string | null
           secondary_dosha: string | null
           spiritual_preference: string | null
+          subscription_tier: string | null
           updated_at: string | null
           user_id: string
         }
@@ -414,6 +415,7 @@ export type Database = {
           primary_dosha?: string | null
           secondary_dosha?: string | null
           spiritual_preference?: string | null
+          subscription_tier?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -432,6 +434,7 @@ export type Database = {
           primary_dosha?: string | null
           secondary_dosha?: string | null
           spiritual_preference?: string | null
+          subscription_tier?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -452,11 +455,15 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean | null
+          is_premium: boolean | null
           pregnancy_statuses: string[] | null
           pregnancy_trimesters: number[] | null
+          preview_content: string | null
           spiritual_path: string | null
           tags: string[] | null
+          tier_requirement: string | null
           title: string
+          unlock_after_completions: number | null
           updated_at: string | null
           video_url: string | null
         }
@@ -474,11 +481,15 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          is_premium?: boolean | null
           pregnancy_statuses?: string[] | null
           pregnancy_trimesters?: number[] | null
+          preview_content?: string | null
           spiritual_path?: string | null
           tags?: string[] | null
+          tier_requirement?: string | null
           title: string
+          unlock_after_completions?: number | null
           updated_at?: string | null
           video_url?: string | null
         }
@@ -496,11 +507,15 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          is_premium?: boolean | null
           pregnancy_statuses?: string[] | null
           pregnancy_trimesters?: number[] | null
+          preview_content?: string | null
           spiritual_path?: string | null
           tags?: string[] | null
+          tier_requirement?: string | null
           title?: string
+          unlock_after_completions?: number | null
           updated_at?: string | null
           video_url?: string | null
         }
