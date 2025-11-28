@@ -354,6 +354,24 @@ const ContentLibrary = () => {
     return true;
   };
 
+  const isVideoUnlocked = (item: WellnessContent) => {
+    if (!user) return false;
+    
+    const tierHierarchy: Record<string, number> = { free: 0, basic: 1, standard: 2, premium: 3 };
+    const userTierLevel = tierHierarchy[userTier] || 0;
+    
+    // Basic tier has no video access
+    if (userTierLevel < 2) return false; // Must be Standard (2) or Premium (3)
+    
+    // Standard tier only gets beginner/essential videos
+    if (userTierLevel === 2 && item.difficulty_level !== 'beginner') {
+      return false;
+    }
+    
+    // Premium gets all videos
+    return true;
+  };
+
   const getDoshaIcon = (dosha: string) => {
     switch (dosha.toLowerCase()) {
       case 'pitta':
@@ -801,108 +819,158 @@ const ContentLibrary = () => {
                 </DialogHeader>
                 <ScrollArea className="max-h-[50vh]">
                   <div className="space-y-4">
-                    {/* Content Image */}
-                    {(selectedContent.image_url || getContentImage(selectedContent.content_type)) && (
+                    {/* Video Section - Top Priority */}
+                    {selectedContent.video_url ? (
                       <div className="relative">
-                        <img 
-                          src={selectedContent.image_url || getContentImage(selectedContent.content_type)}
-                          alt={selectedContent.title}
-                          className={`w-full rounded-lg ${!isContentUnlocked(selectedContent) ? 'blur-sm opacity-60' : ''}`}
-                        />
-                        {!isContentUnlocked(selectedContent) && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg">
-                            <div className="text-center text-white p-6">
-                              <Lock className="h-16 w-16 mx-auto mb-3" />
-                              <p className="text-lg font-semibold mb-2">Unlock Full Content</p>
-                              {selectedContent.tier_requirement !== 'free' && (
-                                <Badge className="bg-primary/90 text-primary-foreground mb-3">
-                                  <Crown className="h-4 w-4 mr-1" />
-                                  Upgrade to {selectedContent.tier_requirement === 'basic' ? 'Basic' : 
-                                               selectedContent.tier_requirement === 'standard' ? 'Standard' : 'Premium'}
-                                </Badge>
-                              )}
-                              {selectedContent.unlock_after_completions > 0 && (
-                                <p className="text-sm">
-                                  Complete {selectedContent.unlock_after_completions} items to unlock
-                                  <br />
-                                  Current progress: {progressStats.completed}/{selectedContent.unlock_after_completions}
+                        {isVideoUnlocked(selectedContent) ? (
+                          <div className="space-y-2">
+                            <video controls className="w-full rounded-lg bg-black">
+                              <source src={selectedContent.video_url} type="video/mp4" />
+                              Your browser does not support the video tag.
+                            </video>
+                          </div>
+                        ) : (
+                          <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-black/60 to-black/80 backdrop-blur-sm">
+                              <div className="text-center text-white p-6">
+                                <Lock className="h-12 w-12 mx-auto mb-3 opacity-80" />
+                                <p className="text-lg font-semibold mb-2">Video Locked</p>
+                                <p className="text-sm opacity-90 mb-3">
+                                  {userTier === 'free' || userTier === 'basic' 
+                                    ? 'Upgrade to Standard or Premium to watch videos'
+                                    : userTier === 'standard' && selectedContent.difficulty_level !== 'beginner'
+                                    ? 'Upgrade to Premium for advanced videos'
+                                    : 'Unlock this video with your plan'}
                                 </p>
-                              )}
+                                <Badge className="bg-primary/90 text-primary-foreground">
+                                  <Crown className="h-4 w-4 mr-1" />
+                                  {userTier === 'free' || userTier === 'basic' ? 'Standard+' : 'Premium'}
+                                </Badge>
+                              </div>
                             </div>
                           </div>
                         )}
                       </div>
+                    ) : (
+                      <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
+                        <div className="text-center p-6">
+                          <Sparkles className="h-10 w-10 mx-auto mb-2 text-muted-foreground/50" />
+                          <p className="text-sm text-muted-foreground font-medium">Video coming soon</p>
+                        </div>
+                      </div>
                     )}
-                    
+
+                    {/* Title and Tags Section */}
+                    <div className="space-y-3">
+                      {/* Dosha Icons */}
+                      {selectedContent.doshas?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-2">Recommended for Doshas:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedContent.doshas.map((dosha) => (
+                              <div key={dosha}>
+                                {getDoshaIcon(dosha)}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Category, Phase, and Difficulty Tags */}
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary" className="capitalize">
+                          {selectedContent.content_type}
+                        </Badge>
+                        {selectedContent.cycle_phases?.length > 0 && (
+                          <Badge variant="outline">
+                            {selectedContent.cycle_phases.join(', ')}
+                          </Badge>
+                        )}
+                        {selectedContent.pregnancy_statuses?.length > 0 && (
+                          <Badge variant="outline">
+                            {selectedContent.pregnancy_statuses.join(', ')}
+                          </Badge>
+                        )}
+                        {selectedContent.difficulty_level && (
+                          <Badge variant="outline" className="capitalize">
+                            {selectedContent.difficulty_level}
+                          </Badge>
+                        )}
+                        {selectedContent.duration_minutes && (
+                          <Badge variant="outline">{selectedContent.duration_minutes} min</Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Text Guidance Section */}
                     <div>
                       <h3 className="font-semibold mb-2">
-                        {isContentUnlocked(selectedContent) ? 'Full Guidance' : 'Preview'}
+                        {isContentUnlocked(selectedContent) ? 'Guidance' : 'Preview'}
                       </h3>
-                      <p className="text-muted-foreground whitespace-pre-wrap">
+                      <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
                         {isContentUnlocked(selectedContent) 
                           ? selectedContent.detailed_guidance 
                           : (selectedContent.preview_content || selectedContent.description || 'Unlock to see full content...')
                         }
                       </p>
                     </div>
-                    
-                    {isContentUnlocked(selectedContent) && (
-                      <>
-                        <div className="space-y-3">
-                          {/* Dosha Icons */}
-                          {selectedContent.doshas?.length > 0 && (
-                            <div>
-                              <p className="text-sm text-muted-foreground mb-2">Recommended for Doshas:</p>
-                              <div className="flex flex-wrap gap-2">
-                                {selectedContent.doshas.map((dosha) => (
-                                  <div key={dosha}>
-                                    {getDoshaIcon(dosha)}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
+
+                    {/* Locked Content Overlay for Text */}
+                    {!isContentUnlocked(selectedContent) && (
+                      <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                        <div className="text-center">
+                          <Lock className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
+                          <p className="font-semibold mb-1">Unlock Full Content</p>
+                          {selectedContent.tier_requirement !== 'free' && (
+                            <Badge className="bg-primary/90 text-primary-foreground mb-2">
+                              <Crown className="h-4 w-4 mr-1" />
+                              Upgrade to {selectedContent.tier_requirement === 'basic' ? 'Basic' : 
+                                           selectedContent.tier_requirement === 'standard' ? 'Standard' : 'Premium'}
+                            </Badge>
                           )}
-                          
-                          {/* Other Details */}
-                          <div className="flex flex-wrap gap-2">
-                            {selectedContent.cycle_phases?.length > 0 && (
-                              <Badge variant="outline">Phases: {selectedContent.cycle_phases.join(', ')}</Badge>
-                            )}
-                            {selectedContent.difficulty_level && (
-                              <Badge variant="outline">{selectedContent.difficulty_level}</Badge>
-                            )}
-                          </div>
+                          {selectedContent.unlock_after_completions > 0 && (
+                            <p className="text-sm text-muted-foreground">
+                              Complete {selectedContent.unlock_after_completions} items to unlock
+                              <br />
+                              Progress: {progressStats.completed}/{selectedContent.unlock_after_completions}
+                            </p>
+                          )}
                         </div>
+                      </div>
+                    )}
+                    
+                    {/* Benefits Section - Only show when unlocked */}
+                    {isContentUnlocked(selectedContent) && selectedContent.benefits?.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold mb-2">Benefits</h3>
+                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                          {selectedContent.benefits.map((benefit, index) => (
+                            <li key={index}>{benefit}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
-                        {selectedContent.benefits?.length > 0 && (
-                          <div>
-                            <h3 className="font-semibold mb-2">Benefits</h3>
-                            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                              {selectedContent.benefits.map((benefit, index) => (
-                                <li key={index}>{benefit}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                    {/* Content Image - Supporting Visual */}
+                    {isContentUnlocked(selectedContent) && (selectedContent.image_url || getContentImage(selectedContent.content_type)) && (
+                      <div>
+                        <img 
+                          src={selectedContent.image_url || getContentImage(selectedContent.content_type)}
+                          alt={selectedContent.title}
+                          className="w-full rounded-lg"
+                        />
+                      </div>
+                    )}
 
-                        {selectedContent.video_url && (
-                          <div>
-                            <h3 className="font-semibold mb-2">Video</h3>
-                            <video controls className="w-full rounded-lg">
-                              <source src={selectedContent.video_url} />
-                            </video>
-                          </div>
-                        )}
-
-                        {selectedContent.audio_url && (
-                          <div>
-                            <h3 className="font-semibold mb-2">Audio Guide</h3>
-                            <audio controls className="w-full">
-                              <source src={selectedContent.audio_url} />
-                            </audio>
-                          </div>
-                        )}
-                      </>
+                    {/* Audio Section - Only show when unlocked */}
+                    {isContentUnlocked(selectedContent) && selectedContent.audio_url && (
+                      <div>
+                        <h3 className="font-semibold mb-2">Audio Guide</h3>
+                        <audio controls className="w-full">
+                          <source src={selectedContent.audio_url} type="audio/mpeg" />
+                          Your browser does not support the audio element.
+                        </audio>
+                      </div>
                     )}
                   </div>
                 </ScrollArea>
