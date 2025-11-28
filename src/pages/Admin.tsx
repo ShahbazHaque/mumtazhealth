@@ -5,8 +5,13 @@ import { Session, User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, Video, Upload, Edit, Trash2, Plus } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -23,6 +28,25 @@ interface WellnessEntry {
   daily_practices: any;
 }
 
+interface WellnessContent {
+  id: string;
+  title: string;
+  description: string | null;
+  content_type: string;
+  video_url: string | null;
+  image_url: string | null;
+  tier_requirement: string;
+  difficulty_level: string | null;
+  duration_minutes: number | null;
+  detailed_guidance: string | null;
+  benefits: string[] | null;
+  cycle_phases: string[] | null;
+  doshas: string[] | null;
+  pregnancy_statuses: string[] | null;
+  is_premium: boolean;
+  is_active: boolean;
+}
+
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -31,6 +55,11 @@ export default function Admin() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [entries, setEntries] = useState<WellnessEntry[]>([]);
+  const [contentList, setContentList] = useState<WellnessContent[]>([]);
+  const [selectedContent, setSelectedContent] = useState<WellnessContent | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,6 +109,7 @@ export default function Admin() {
     
     setIsAdmin(true);
     loadProfiles();
+    loadContent();
   };
 
   const loadProfiles = async () => {
@@ -120,6 +150,102 @@ export default function Admin() {
       loadUserEntries(userId);
     } else {
       setEntries([]);
+    }
+  };
+
+  const loadContent = async () => {
+    const { data, error } = await supabase
+      .from('wellness_content')
+      .select('*')
+      .order('title');
+    
+    if (error) {
+      console.error('Error loading content:', error);
+      toast.error('Error loading wellness content');
+      return;
+    }
+    
+    setContentList(data || []);
+  };
+
+  const handleVideoUpload = async (contentId: string) => {
+    if (!videoFile) {
+      toast.error("Please select a video file");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = videoFile.name.split('.').pop();
+      const fileName = `${contentId}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('wellness-videos')
+        .upload(filePath, videoFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('wellness-videos')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('wellness_content')
+        .update({ video_url: publicUrl })
+        .eq('id', contentId);
+
+      if (updateError) throw updateError;
+
+      toast.success('Video uploaded successfully');
+      loadContent();
+      setVideoFile(null);
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      toast.error('Failed to upload video');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleUpdateContent = async (content: Partial<WellnessContent>) => {
+    if (!selectedContent) return;
+
+    try {
+      const { error } = await supabase
+        .from('wellness_content')
+        .update(content)
+        .eq('id', selectedContent.id);
+
+      if (error) throw error;
+
+      toast.success('Content updated successfully');
+      loadContent();
+      setEditDialogOpen(false);
+      setSelectedContent(null);
+    } catch (error) {
+      console.error('Error updating content:', error);
+      toast.error('Failed to update content');
+    }
+  };
+
+  const handleDeleteContent = async (contentId: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this content?');
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('wellness_content')
+        .delete()
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      toast.success('Content deleted successfully');
+      loadContent();
+    } catch (error) {
+      console.error('Error deleting content:', error);
+      toast.error('Failed to delete content');
     }
   };
 
@@ -201,7 +327,7 @@ export default function Admin() {
                 Admin Dashboard
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                View and manage all user wellness entries
+                Manage users and wellness content
               </p>
             </div>
             <Button
@@ -215,7 +341,15 @@ export default function Admin() {
           </CardHeader>
         </Card>
 
-        <Card className="mb-6 border-wellness-taupe/20 shadow-lg">
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="users">User Management</TabsTrigger>
+            <TabsTrigger value="content">Content Management</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="users" className="space-y-6">
+
+        <Card className="border-wellness-taupe/20 shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl text-wellness-taupe">User Management</CardTitle>
           </CardHeader>
@@ -256,9 +390,9 @@ export default function Admin() {
               </div>
             )}
           </CardContent>
-        </Card>
+            </Card>
 
-        {selectedUserId && entries.length > 0 && (
+            {selectedUserId && entries.length > 0 && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-wellness-taupe">Recent Entries (Last 10)</h2>
             {entries.map((entry) => (
@@ -313,15 +447,215 @@ export default function Admin() {
               </Card>
             ))}
           </div>
-        )}
+            )}
 
-        {selectedUserId && entries.length === 0 && (
-          <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
-              No wellness entries found for this user.
-            </CardContent>
-          </Card>
-        )}
+            {selectedUserId && entries.length === 0 && (
+              <Card>
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  No wellness entries found for this user.
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="content" className="space-y-6">
+            <Card className="border-wellness-taupe/20 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-2xl text-wellness-taupe flex items-center gap-2">
+                  <Video className="w-6 h-6" />
+                  Wellness Content Library
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {contentList.map((content) => (
+                    <Card key={content.id} className="border-wellness-sage/20">
+                      <CardContent className="pt-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold text-lg text-wellness-taupe">
+                                {content.title}
+                              </h3>
+                              <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                                {content.tier_requirement}
+                              </span>
+                              <span className="px-2 py-1 bg-wellness-sage/20 text-wellness-taupe text-xs rounded-full">
+                                {content.content_type}
+                              </span>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {content.description}
+                            </p>
+                            {content.video_url ? (
+                              <p className="text-xs text-green-600 flex items-center gap-1">
+                                <Video className="w-3 h-3" />
+                                Video uploaded
+                              </p>
+                            ) : (
+                              <p className="text-xs text-amber-600">No video uploaded</p>
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <Dialog open={editDialogOpen && selectedContent?.id === content.id} 
+                                    onOpenChange={(open) => {
+                                      setEditDialogOpen(open);
+                                      if (!open) setSelectedContent(null);
+                                    }}>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setSelectedContent(content)}
+                                >
+                                  <Edit className="w-4 h-4 mr-1" />
+                                  Edit
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                                <DialogHeader>
+                                  <DialogTitle>Edit Content: {content.title}</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4 py-4">
+                                  <div className="space-y-2">
+                                    <Label htmlFor="video-upload">Upload Video</Label>
+                                    <div className="flex gap-2">
+                                      <Input
+                                        id="video-upload"
+                                        type="file"
+                                        accept="video/mp4,video/webm,video/quicktime"
+                                        onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                                        disabled={uploading}
+                                      />
+                                      <Button
+                                        onClick={() => handleVideoUpload(content.id)}
+                                        disabled={!videoFile || uploading}
+                                        size="sm"
+                                      >
+                                        <Upload className="w-4 h-4 mr-1" />
+                                        {uploading ? 'Uploading...' : 'Upload'}
+                                      </Button>
+                                    </div>
+                                    {content.video_url && (
+                                      <p className="text-xs text-muted-foreground">
+                                        Current: {content.video_url.split('/').pop()}
+                                      </p>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="space-y-2">
+                                    <Label htmlFor="title">Title</Label>
+                                    <Input
+                                      id="title"
+                                      defaultValue={content.title}
+                                      onChange={(e) => {
+                                        if (selectedContent) {
+                                          setSelectedContent({...selectedContent, title: e.target.value});
+                                        }
+                                      }}
+                                    />
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    <Label htmlFor="description">Description</Label>
+                                    <Textarea
+                                      id="description"
+                                      defaultValue={content.description || ''}
+                                      onChange={(e) => {
+                                        if (selectedContent) {
+                                          setSelectedContent({...selectedContent, description: e.target.value});
+                                        }
+                                      }}
+                                    />
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    <Label htmlFor="guidance">Detailed Guidance</Label>
+                                    <Textarea
+                                      id="guidance"
+                                      defaultValue={content.detailed_guidance || ''}
+                                      rows={6}
+                                      onChange={(e) => {
+                                        if (selectedContent) {
+                                          setSelectedContent({...selectedContent, detailed_guidance: e.target.value});
+                                        }
+                                      }}
+                                    />
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                      <Label htmlFor="tier">Tier Requirement</Label>
+                                      <Select
+                                        defaultValue={content.tier_requirement}
+                                        onValueChange={(value) => {
+                                          if (selectedContent) {
+                                            setSelectedContent({...selectedContent, tier_requirement: value});
+                                          }
+                                        }}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="free">Free</SelectItem>
+                                          <SelectItem value="basic">Basic</SelectItem>
+                                          <SelectItem value="standard">Standard</SelectItem>
+                                          <SelectItem value="premium">Premium</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label htmlFor="difficulty">Difficulty</Label>
+                                      <Select
+                                        defaultValue={content.difficulty_level || 'beginner'}
+                                        onValueChange={(value) => {
+                                          if (selectedContent) {
+                                            setSelectedContent({...selectedContent, difficulty_level: value});
+                                          }
+                                        }}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="beginner">Beginner</SelectItem>
+                                          <SelectItem value="intermediate">Intermediate</SelectItem>
+                                          <SelectItem value="advanced">Advanced</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  </div>
+
+                                  <Button
+                                    onClick={() => handleUpdateContent(selectedContent!)}
+                                    className="w-full"
+                                  >
+                                    Save Changes
+                                  </Button>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteContent(content.id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
