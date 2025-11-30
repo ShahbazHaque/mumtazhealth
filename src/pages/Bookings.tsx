@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ArrowLeft, Calendar, Clock, Users, Check, Filter, X } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 
 interface Service {
   id: string;
@@ -311,7 +312,8 @@ export default function Bookings() {
 
   return (
     <div className="min-h-screen bg-wellness-beige">
-      <div className="max-w-6xl mx-auto p-4 pb-8">
+      <Navigation />
+      <div className="max-w-6xl mx-auto p-4 pb-8 pt-24">
         {/* Header */}
         <Card className="mb-6 bg-wellness-warm border-wellness-taupe/20 shadow-lg">
           <CardHeader>

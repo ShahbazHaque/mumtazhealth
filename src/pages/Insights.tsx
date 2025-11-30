@@ -9,6 +9,7 @@ import { ArrowLeft, Sparkles, TrendingUp, Calendar, Activity, Loader2, AlertCirc
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Navigation } from "@/components/Navigation";
 
 interface Insight {
   title: string;
@@ -128,7 +129,8 @@ export default function Insights() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <Navigation />
+      <div className="container mx-auto px-4 py-8 pt-24 max-w-6xl">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/tracker">
