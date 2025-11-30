@@ -19,11 +19,12 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        wellness: {
-          lilac: "hsl(var(--wellness-lilac))",
-          sage: "hsl(var(--wellness-sage))",
-          "lilac-light": "hsl(var(--wellness-lilac-light))",
-          "sage-light": "hsl(var(--wellness-sage-light))",
+        mumtaz: {
+          lilac: "hsl(var(--mumtaz-lilac))",
+          sage: "hsl(var(--mumtaz-sage))",
+          plum: "hsl(var(--mumtaz-plum))",
+          sand: "hsl(var(--mumtaz-sand))",
+          "warm-white": "hsl(var(--mumtaz-warm-white))",
         },
         dosha: {
           pitta: "hsl(var(--dosha-pitta))",
@@ -68,6 +69,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        body: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        accent: ['Nunito', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

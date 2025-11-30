@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Logo } from "@/components/Logo";
 
 const emailSchema = z.string().trim().email({ message: "Please enter a valid email" });
 const passwordSchema = z.string().min(6, { message: "Password must be at least 6 characters" });
@@ -109,13 +110,14 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-wellness-beige p-4">
-      <Card className="w-full max-w-md border-wellness-taupe/20 shadow-lg">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold text-wellness-taupe">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md border-mumtaz-lilac/20 shadow-xl">
+        <CardHeader className="space-y-4 text-center pt-8">
+          <Logo size="md" className="mx-auto" />
+          <CardTitle className="text-3xl font-bold text-mumtaz-plum">
             {isResetPassword ? "Reset Password" : isAdminLogin ? "Admin Access" : isLogin ? "Welcome Back" : "Create Account"}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="font-accent">
             {isResetPassword 
               ? "Enter your email to receive a password reset link"
               : isAdminLogin

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info, HelpCircle, Activity, ArrowLeft, ArrowRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import DoshaAssessment from "@/components/DoshaAssessment";
+import { Logo } from "@/components/Logo";
 
 type OnboardingStep = "welcome" | "lifeStage" | "cycle" | "dosha" | "doshaResults" | "spiritual" | "pregnancy" | "preferences" | "complete";
 
@@ -139,17 +140,15 @@ export default function Onboarding() {
 
   if (step === "welcome") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
-        <Card className="w-full max-w-2xl border-none shadow-lg bg-card/95 backdrop-blur-sm">
-          <CardHeader className="text-center space-y-6 pb-8">
-            <div className="flex justify-center">
-              <Sparkles className="w-20 h-20 text-accent" />
-            </div>
-            <CardTitle className="text-4xl font-bold text-foreground leading-tight">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <Card className="w-full max-w-2xl border-none shadow-xl bg-card/95 backdrop-blur-sm">
+          <CardHeader className="text-center space-y-8 pb-8 pt-12">
+            <Logo size="xl" className="mx-auto" />
+            <CardTitle className="text-4xl font-bold text-mumtaz-plum leading-tight font-accent">
               Empowering You Through Each Phase of Womanhood
             </CardTitle>
             {userName && (
-              <p className="text-xl text-muted-foreground">
+              <p className="text-xl text-muted-foreground font-accent">
                 Welcome, {userName}! 
               </p>
             )}

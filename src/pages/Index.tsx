@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { format, subDays, parseISO, differenceInCalendarDays } from "date-fns";
 import founderPortrait from "@/assets/founder-portrait.jpeg";
+import { Logo } from "@/components/Logo";
 
 interface UserProfile {
   username: string;
@@ -148,28 +149,32 @@ const Index = () => {
   // If user has completed onboarding, show dashboard
   if (!loading && wellnessProfile?.onboarding_completed) {
     return (
-      <div className="min-h-screen bg-wellness-sage-light">
+      <div className="min-h-screen bg-background">
+        {/* Watermark */}
+        <div className="watermark-lotus">
+          <Logo size="xl" showText={false} />
+        </div>
+        
         <div className="container mx-auto px-6 py-12 space-y-8">
-          {/* Welcome Header */}
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center gap-3">
-              <Sprout className="h-8 w-8 text-primary" />
+          {/* Logo and Welcome Header */}
+          <div className="text-center space-y-6">
+            <Logo size="md" className="mx-auto" />
+            <div className="space-y-2">
               <h1 className="text-4xl font-bold text-foreground">
                 Welcome back, {userProfile?.username || "Friend"}!
               </h1>
-              <Heart className="h-8 w-8 text-accent" />
+              <p className="text-lg text-muted-foreground font-accent">
+                Your personalized wellness journey continues today
+              </p>
             </div>
-            <p className="text-lg text-muted-foreground">
-              Your personalized wellness journey continues today
-            </p>
           </div>
 
           {/* Profile Summary Cards */}
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <Card className="bg-card/95 backdrop-blur-sm border-accent/20">
+            <Card className="bg-card backdrop-blur-sm border-mumtaz-lilac/20 shadow-md hover:shadow-lg transition-shadow">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <User className="h-5 w-5 text-accent" />
+                <CardTitle className="text-lg flex items-center gap-2 text-mumtaz-plum">
+                  <User className="h-5 w-5 text-mumtaz-lilac" />
                   Life Stage
                 </CardTitle>
               </CardHeader>
@@ -180,10 +185,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-card/95 backdrop-blur-sm border-accent/20">
+            <Card className="bg-card backdrop-blur-sm border-mumtaz-lilac/20 shadow-md hover:shadow-lg transition-shadow">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-accent" />
+                <CardTitle className="text-lg flex items-center gap-2 text-mumtaz-plum">
+                  <Sparkles className="h-5 w-5 text-mumtaz-lilac" />
                   Dosha Type
                 </CardTitle>
               </CardHeader>
@@ -193,7 +198,7 @@ const Index = () => {
                     {getDoshaDisplay(wellnessProfile.primary_dosha)}
                   </p>
                   {wellnessProfile.secondary_dosha && (
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-xs bg-mumtaz-sand text-mumtaz-plum">
                       Secondary: {getDoshaDisplay(wellnessProfile.secondary_dosha)}
                     </Badge>
                   )}
@@ -201,10 +206,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-card/95 backdrop-blur-sm border-accent/20">
+            <Card className="bg-card backdrop-blur-sm border-mumtaz-lilac/20 shadow-md hover:shadow-lg transition-shadow">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-accent" />
+                <CardTitle className="text-lg flex items-center gap-2 text-mumtaz-plum">
+                  <Heart className="h-5 w-5 text-mumtaz-lilac" />
                   Spiritual Path
                 </CardTitle>
               </CardHeader>
@@ -219,7 +224,7 @@ const Index = () => {
           </div>
 
           {/* Progress Tracker */}
-          <Card className="max-w-5xl mx-auto bg-gradient-to-br from-accent/20 to-primary/20 border-accent/40 shadow-lg">
+          <Card className="max-w-5xl mx-auto bg-gradient-to-br from-mumtaz-lilac/20 to-mumtaz-sage/20 border-mumtaz-lilac/40 shadow-lg">
             <CardHeader>
               <CardTitle className="text-center flex items-center justify-center gap-3 text-2xl">
                 <Activity className="h-7 w-7 text-accent" />
