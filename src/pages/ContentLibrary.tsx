@@ -17,6 +17,7 @@ import meditationImage from "@/assets/wellness-meditation.jpg";
 import nutritionImage from "@/assets/wellness-nutrition.jpg";
 import articleImage from "@/assets/wellness-article.jpg";
 import lockedImage from "@/assets/locked-content.jpg";
+import { Navigation } from "@/components/Navigation";
 
 interface WellnessContent {
   id: string;
@@ -402,7 +403,8 @@ const ContentLibrary = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <Navigation />
+      <div className="container mx-auto px-4 py-8 pt-24 max-w-7xl">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Button

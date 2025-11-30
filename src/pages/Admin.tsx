@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ArrowLeft, Calendar, Video, Upload, Edit, Trash2, Plus } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 
 interface Profile {
   id: string;
@@ -319,7 +320,8 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-wellness-beige">
-      <div className="max-w-6xl mx-auto p-4">
+      <Navigation />
+      <div className="max-w-6xl mx-auto p-4 pt-24">
         <Card className="mb-6 bg-wellness-warm border-wellness-taupe/20 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>

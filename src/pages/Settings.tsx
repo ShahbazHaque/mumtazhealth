@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Heart, User } from "lucide-react";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { NotificationSettings } from "@/components/NotificationSettings";
+import { Navigation } from "@/components/Navigation";
 
 const lifeStages = [
   { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling" },
@@ -108,7 +109,8 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-wellness-lilac-light via-background to-wellness-sage-light p-4">
-      <div className="max-w-4xl mx-auto py-8">
+      <Navigation />
+      <div className="max-w-4xl mx-auto py-8 pt-24">
         <Button
           variant="ghost"
           onClick={() => navigate("/tracker")}

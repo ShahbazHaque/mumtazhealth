@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { format, subDays, parseISO, differenceInCalendarDays } from "date-fns";
 import founderPortrait from "@/assets/founder-portrait.jpeg";
 import { Logo } from "@/components/Logo";
+import { Navigation } from "@/components/Navigation";
 
 interface UserProfile {
   username: string;
@@ -150,12 +151,13 @@ const Index = () => {
   if (!loading && wellnessProfile?.onboarding_completed) {
     return (
       <div className="min-h-screen bg-background">
+        <Navigation />
         {/* Watermark */}
         <div className="watermark-lotus">
           <Logo size="xl" showText={false} />
         </div>
         
-        <div className="container mx-auto px-6 py-12 space-y-8">
+        <div className="container mx-auto px-6 py-12 pt-24 space-y-8">
           {/* Logo and Welcome Header */}
           <div className="text-center space-y-6">
             <Logo size="md" className="mx-auto" />
