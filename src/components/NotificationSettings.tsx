@@ -74,6 +74,17 @@ export function NotificationSettings() {
   const handleEnableNotifications = async () => {
     setLoading(true);
     try {
+      // Check browser permission status first
+      if (Notification.permission === "denied") {
+        toast({
+          title: "Notifications are blocked",
+          description: "Please enable notifications in your browser settings, then refresh this page.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       await requestNotificationPermission();
       const subscription = await subscribeUserToPush();
       await saveSubscription(subscription);
@@ -84,6 +95,7 @@ export function NotificationSettings() {
         description: "You'll receive wellness reminders from Mumtaz.",
       });
     } catch (error: any) {
+      console.error("Notification error:", error);
       toast({
         title: "Failed to enable notifications",
         description: error.message,
