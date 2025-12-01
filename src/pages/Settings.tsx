@@ -10,6 +10,7 @@ import { ArrowLeft, Heart, User } from "lucide-react";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { Navigation } from "@/components/Navigation";
+import { DarkModeToggle } from "@/components/DarkModeToggle";
 
 const lifeStages = [
   { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling" },
@@ -176,6 +177,8 @@ export default function Settings() {
         </Card>
 
         <NotificationSettings />
+        
+        <DarkModeToggle />
       </div>
     </div>
   );
