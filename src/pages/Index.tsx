@@ -9,6 +9,7 @@ import { format, subDays, parseISO, differenceInCalendarDays } from "date-fns";
 import founderPortrait from "@/assets/founder-portrait.jpeg";
 import { Logo } from "@/components/Logo";
 import { Navigation } from "@/components/Navigation";
+import { OnboardingTour } from "@/components/OnboardingTour";
 
 interface UserProfile {
   username: string;
@@ -42,6 +43,7 @@ const Index = () => {
   const [totalCheckIns, setTotalCheckIns] = useState(0);
   const [totalVisits, setTotalVisits] = useState(0);
   const [scrollY, setScrollY] = useState(0);
+  const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,7 +56,21 @@ const Index = () => {
 
   useEffect(() => {
     checkUserProfile();
+    checkOnboardingStatus();
   }, []);
+
+  const checkOnboardingStatus = async () => {
+    const tourCompleted = localStorage.getItem('mumtaz_tour_completed');
+    if (!tourCompleted) {
+      // Delay tour start slightly to ensure page is fully rendered
+      setTimeout(() => setShowTour(true), 1000);
+    }
+  };
+
+  const handleTourComplete = () => {
+    setShowTour(false);
+    localStorage.setItem('mumtaz_tour_completed', 'true');
+  };
 
   const calculateTotals = (entries: WellnessEntry[]) => {
     if (entries.length === 0) return { checkIns: 0, visits: 0 };
@@ -162,6 +178,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
+        <OnboardingTour run={showTour} onComplete={handleTourComplete} />
         {/* Watermark */}
         <div className="watermark-lotus">
           <Logo size="xl" showText={false} />
@@ -187,7 +204,7 @@ const Index = () => {
           </div>
 
           {/* Profile Summary Cards */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto" data-tour="profile-summary">
             <Card className="bg-card backdrop-blur-sm border-mumtaz-lilac/20 shadow-md hover:shadow-lg transition-shadow">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2 text-mumtaz-plum">
@@ -241,7 +258,7 @@ const Index = () => {
           </div>
 
           {/* Progress Tracker */}
-          <Card className="max-w-5xl mx-auto bg-gradient-to-br from-mumtaz-lilac/20 to-mumtaz-sage/20 border-mumtaz-lilac/40 shadow-lg">
+          <Card className="max-w-5xl mx-auto bg-gradient-to-br from-mumtaz-lilac/20 to-mumtaz-sage/20 border-mumtaz-lilac/40 shadow-lg" data-tour="progress-tracker">
             <CardHeader>
               <CardTitle className="text-center flex items-center justify-center gap-3 text-2xl">
                 <Activity className="h-7 w-7 text-accent" />
@@ -348,6 +365,7 @@ const Index = () => {
                 variant="cta"
                 className="h-32 flex-col gap-3"
                 size="lg"
+                data-tour="daily-tracker"
               >
                 <Calendar className="h-8 w-8" />
                 <span className="text-lg font-semibold">Daily Tracker</span>
@@ -358,6 +376,7 @@ const Index = () => {
                 onClick={() => navigate("/condition-tracker")}
                 className="h-32 flex-col gap-3 bg-mumtaz-sage hover:bg-mumtaz-sage/90 text-white"
                 size="lg"
+                data-tour="symptom-tracker"
               >
                 <Activity className="h-8 w-8" />
                 <span className="text-lg font-semibold">Symptom Tracker</span>
@@ -368,6 +387,7 @@ const Index = () => {
                 onClick={() => navigate("/insights")}
                 className="h-32 flex-col gap-3 bg-primary hover:bg-primary/90 text-primary-foreground"
                 size="lg"
+                data-tour="insights"
               >
                 <BarChart3 className="h-8 w-8" />
                 <span className="text-lg font-semibold">Insights</span>
@@ -379,6 +399,7 @@ const Index = () => {
                 variant="cta"
                 className="h-32 flex-col gap-3"
                 size="lg"
+                data-tour="content-library"
               >
                 <BookOpen className="h-8 w-8" />
                 <span className="text-lg font-semibold">Content Library</span>

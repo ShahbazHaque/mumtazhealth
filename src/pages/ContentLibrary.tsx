@@ -560,20 +560,34 @@ const ContentLibrary = () => {
         )}
 
         {/* Filters */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                <CardTitle>Filters</CardTitle>
-              </div>
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
-                Clear All
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="grid w-full grid-cols-6 mb-6">
+            <TabsTrigger value="all">All Content</TabsTrigger>
+            <TabsTrigger value="saved" className="flex items-center gap-2">
+              <Heart className="h-4 w-4" />
+              Favorites
+            </TabsTrigger>
+            <TabsTrigger value="yoga">Yoga</TabsTrigger>
+            <TabsTrigger value="meditation">Meditation</TabsTrigger>
+            <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
+            <TabsTrigger value="article">Articles</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="all" className="space-y-6">
+            <Card className="mb-6">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-5 w-5" />
+                    <CardTitle>Filters</CardTitle>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={clearFilters}>
+                    Clear All
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Content Type</label>
                 <Select value={selectedType} onValueChange={setSelectedType}>
@@ -652,15 +666,15 @@ const ContentLibrary = () => {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Content Grid */}
-        {loading ? (
-          <ContentGridSkeleton count={6} />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Content Grid */}
+            {loading ? (
+              <ContentGridSkeleton count={6} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredContent.map((item) => {
             const isLocked = !isContentUnlocked(item);
             
@@ -805,6 +819,256 @@ const ContentLibrary = () => {
             </p>
           </Card>
         )}
+          </TabsContent>
+
+          <TabsContent value="saved" className="space-y-6">
+            {loading ? (
+              <ContentGridSkeleton count={6} />
+            ) : savedContentIds.size === 0 ? (
+              <Card className="p-12 text-center">
+                <Heart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-xl font-semibold mb-2">No Favorites Yet</h3>
+                <p className="text-muted-foreground">
+                  Start saving content by clicking the heart icon on any wellness item.
+                </p>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {content
+                  .filter(item => savedContentIds.has(item.id))
+                  .map((item) => {
+                  const isLocked = !isContentUnlocked(item);
+                  
+                  return (
+                    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
+                      <div className="h-48 overflow-hidden bg-muted relative">
+                        <img 
+                          src={item.image_url || getContentImage(item.content_type)}
+                          alt={item.title}
+                          className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
+                        />
+                        {isLocked && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                            <div className="text-center text-white p-4">
+                              <Lock className="h-12 w-12 mx-auto mb-2" />
+                              <p className="text-sm font-semibold">Locked Content</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <CardHeader>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2 flex-1">
+                            {getContentIcon(item.content_type)}
+                            <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {user && completedContentIds.has(item.id) && (
+                              <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                                <CheckCircle2 className="h-3 w-3" />
+                              </Badge>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => toggleSaveContent(item.id)}
+                            >
+                              <Heart className="h-5 w-5 fill-primary text-primary" />
+                            </Button>
+                          </div>
+                        </div>
+                        <CardDescription className="line-clamp-2">
+                          {item.description}
+                        </CardDescription>
+                      </CardHeader>
+                      
+                      <CardContent>
+                        <div className="space-y-3 mb-4">
+                          {item.doshas && item.doshas.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {item.doshas.map((dosha) => (
+                                <div key={dosha}>{getDoshaIcon(dosha)}</div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="secondary" className="capitalize">
+                              {item.content_type}
+                            </Badge>
+                            {item.difficulty_level && (
+                              <Badge variant="outline">{item.difficulty_level}</Badge>
+                            )}
+                            {item.duration_minutes && (
+                              <Badge variant="outline">{item.duration_minutes} min</Badge>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button 
+                            className="flex-1" 
+                            onClick={() => openContentDetail(item)}
+                            disabled={isLocked}
+                          >
+                            {isLocked ? (
+                              <>
+                                <Lock className="h-4 w-4 mr-2" />
+                                View Preview
+                              </>
+                            ) : (
+                              'View Details'
+                            )}
+                          </Button>
+                          {user && !isLocked && (
+                            <Button
+                              variant={completedContentIds.has(item.id) ? "default" : "outline"}
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleCompletion(item.id);
+                              }}
+                              title={completedContentIds.has(item.id) ? "Mark as not completed" : "Mark as completed"}
+                            >
+                              {completedContentIds.has(item.id) ? (
+                                <CheckCircle2 className="h-4 w-4" />
+                              ) : (
+                                <Circle className="h-4 w-4" />
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+
+          {['yoga', 'meditation', 'nutrition', 'article'].map((type) => (
+            <TabsContent key={type} value={type} className="space-y-6">
+              {loading ? (
+                <ContentGridSkeleton count={6} />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredContent
+                    .filter(item => item.content_type === type)
+                    .map((item) => {
+                    const isLocked = !isContentUnlocked(item);
+                    
+                    return (
+                      <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
+                        <div className="h-48 overflow-hidden bg-muted relative">
+                          <img 
+                            src={item.image_url || getContentImage(item.content_type)}
+                            alt={item.title}
+                            className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
+                          />
+                          {isLocked && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                              <div className="text-center text-white p-4">
+                                <Lock className="h-12 w-12 mx-auto mb-2" />
+                                <p className="text-sm font-semibold">Locked Content</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <CardHeader>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 flex-1">
+                              {getContentIcon(item.content_type)}
+                              <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {user && completedContentIds.has(item.id) && (
+                                <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                                  <CheckCircle2 className="h-3 w-3" />
+                                </Badge>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => toggleSaveContent(item.id)}
+                              >
+                                <Heart 
+                                  className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
+                                />
+                              </Button>
+                            </div>
+                          </div>
+                          <CardDescription className="line-clamp-2">
+                            {item.description}
+                          </CardDescription>
+                        </CardHeader>
+                        
+                        <CardContent>
+                          <div className="space-y-3 mb-4">
+                            {item.doshas && item.doshas.length > 0 && (
+                              <div className="flex flex-wrap gap-2">
+                                {item.doshas.map((dosha) => (
+                                  <div key={dosha}>{getDoshaIcon(dosha)}</div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            <div className="flex flex-wrap gap-2">
+                              <Badge variant="secondary" className="capitalize">
+                                {item.content_type}
+                              </Badge>
+                              {item.difficulty_level && (
+                                <Badge variant="outline">{item.difficulty_level}</Badge>
+                              )}
+                              {item.duration_minutes && (
+                                <Badge variant="outline">{item.duration_minutes} min</Badge>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <Button 
+                              className="flex-1" 
+                              onClick={() => openContentDetail(item)}
+                              disabled={isLocked}
+                            >
+                              {isLocked ? (
+                                <>
+                                  <Lock className="h-4 w-4 mr-2" />
+                                  View Preview
+                                </>
+                              ) : (
+                                'View Details'
+                              )}
+                            </Button>
+                            {user && !isLocked && (
+                              <Button
+                                variant={completedContentIds.has(item.id) ? "default" : "outline"}
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleCompletion(item.id);
+                                }}
+                                title={completedContentIds.has(item.id) ? "Mark as not completed" : "Mark as completed"}
+                              >
+                                {completedContentIds.has(item.id) ? (
+                                  <CheckCircle2 className="h-4 w-4" />
+                                ) : (
+                                  <Circle className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
 
         {/* Content Detail Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
