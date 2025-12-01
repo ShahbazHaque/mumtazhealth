@@ -18,6 +18,7 @@ import nutritionImage from "@/assets/wellness-nutrition.jpg";
 import articleImage from "@/assets/wellness-article.jpg";
 import lockedImage from "@/assets/locked-content.jpg";
 import { Navigation } from "@/components/Navigation";
+import { ContentGridSkeleton } from "@/components/ContentSkeleton";
 
 interface WellnessContent {
   id: string;
@@ -49,6 +50,7 @@ const ContentLibrary = () => {
   const [content, setContent] = useState<WellnessContent[]>([]);
   const [filteredContent, setFilteredContent] = useState<WellnessContent[]>([]);
   const [selectedContent, setSelectedContent] = useState<WellnessContent | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [savedContentIds, setSavedContentIds] = useState<Set<string>>(new Set());
   const [completedContentIds, setCompletedContentIds] = useState<Set<string>>(new Set());
@@ -109,6 +111,7 @@ const ContentLibrary = () => {
   }, [content, selectedDosha, selectedLifePhase, selectedPregnancyStatus, selectedType, selectedCompletion, completedContentIds]);
 
   const loadContent = async () => {
+    setLoading(true);
     const { data, error } = await supabase
       .from('wellness_content')
       .select('*')
@@ -118,10 +121,12 @@ const ContentLibrary = () => {
     if (error) {
       console.error('Error loading content:', error);
       toast.error('Failed to load content');
+      setLoading(false);
       return;
     }
 
     setContent(data || []);
+    setLoading(false);
   };
 
   const loadSavedContent = async () => {
@@ -652,8 +657,11 @@ const ContentLibrary = () => {
         </Card>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredContent.map((item) => {
+        {loading ? (
+          <ContentGridSkeleton count={6} />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredContent.map((item) => {
             const isLocked = !isContentUnlocked(item);
             
             return (
@@ -786,10 +794,11 @@ const ContentLibrary = () => {
                 </CardContent>
               </Card>
             );
-          })}
-        </div>
+            })}
+          </div>
+        )}
 
-        {filteredContent.length === 0 && (
+        {!loading && filteredContent.length === 0 && (
           <Card className="p-12 text-center">
             <p className="text-muted-foreground">
               No content matches your filters. Try adjusting your selection.

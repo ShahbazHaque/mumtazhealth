@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Flame, Trophy, Award, Download, Users, Flower2, Activity } from "lucide-react";
@@ -41,6 +41,16 @@ const Index = () => {
   const [recentEntries, setRecentEntries] = useState<WellnessEntry[]>([]);
   const [totalCheckIns, setTotalCheckIns] = useState(0);
   const [totalVisits, setTotalVisits] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     checkUserProfile();
@@ -158,10 +168,15 @@ const Index = () => {
         </div>
         
         <div className="container mx-auto px-6 py-12 pt-24 space-y-8">
-          {/* Logo and Welcome Header */}
-          <div className="text-center space-y-6">
-            <Logo size="md" className="mx-auto" />
-            <div className="space-y-2">
+          {/* Logo and Welcome Header with Parallax */}
+          <div 
+            className="text-center space-y-6 transition-transform duration-300 ease-out"
+            style={{
+              transform: `translateY(${scrollY * 0.15}px)`
+            }}
+          >
+            <Logo size="md" className="mx-auto animate-fade-in-up" />
+            <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <h1 className="text-4xl font-bold text-foreground">
                 Welcome back, {userProfile?.username || "Friend"}!
               </h1>
@@ -311,7 +326,8 @@ const Index = () => {
                   </p>
                   <Button
                     onClick={() => navigate("/tracker")}
-                    className="mt-3 bg-accent hover:bg-accent/90"
+                    variant="cta"
+                    className="mt-3"
                     size="sm"
                   >
                     Begin Tracking
@@ -329,7 +345,8 @@ const Index = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Button
                 onClick={() => navigate("/tracker")}
-                className="h-32 flex-col gap-3 bg-accent hover:bg-accent/90 text-accent-foreground"
+                variant="cta"
+                className="h-32 flex-col gap-3"
                 size="lg"
               >
                 <Calendar className="h-8 w-8" />
@@ -359,7 +376,8 @@ const Index = () => {
 
               <Button
                 onClick={() => navigate("/content-library")}
-                className="h-32 flex-col gap-3 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                variant="cta"
+                className="h-32 flex-col gap-3"
                 size="lg"
               >
                 <BookOpen className="h-8 w-8" />
