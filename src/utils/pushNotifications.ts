@@ -11,13 +11,23 @@ export async function requestNotificationPermission() {
     throw new Error("Service workers are not supported");
   }
 
-  const permission = await Notification.requestPermission();
-  
-  if (permission !== "granted") {
-    throw new Error("Notification permission denied");
+  // Check if permission is already denied
+  if (Notification.permission === "denied") {
+    throw new Error("Notifications are blocked. Please enable them in your browser settings.");
   }
 
-  return permission;
+  // Request permission if not already granted
+  if (Notification.permission !== "granted") {
+    const permission = await Notification.requestPermission();
+    
+    if (permission !== "granted") {
+      throw new Error("Please allow notifications to receive wellness reminders.");
+    }
+    
+    return permission;
+  }
+
+  return Notification.permission;
 }
 
 export async function subscribeUserToPush() {

@@ -356,7 +356,7 @@ const Index = () => {
 
               <Button
                 onClick={() => navigate("/condition-tracker")}
-                className="h-32 flex-col gap-3 bg-wellness-lilac hover:bg-wellness-lilac/90 text-white"
+                className="h-32 flex-col gap-3 bg-mumtaz-sage hover:bg-mumtaz-sage/90 text-white"
                 size="lg"
               >
                 <Activity className="h-8 w-8" />
