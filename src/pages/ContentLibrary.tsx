@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import yogaImage from "@/assets/wellness-yoga.jpg";
@@ -17,9 +17,18 @@ import meditationImage from "@/assets/wellness-meditation.jpg";
 import nutritionImage from "@/assets/wellness-nutrition.jpg";
 import articleImage from "@/assets/wellness-article.jpg";
 import lockedImage from "@/assets/locked-content.jpg";
+import jointCareChairYoga from "@/assets/joint-care-chair-yoga.jpg";
+import jointCareWallYoga from "@/assets/joint-care-wall-yoga.jpg";
+import jointCareBedMobility from "@/assets/joint-care-bed-mobility.jpg";
+import jointCareAbhyanga from "@/assets/joint-care-abhyanga.jpg";
+import jointCareGoldenMilk from "@/assets/joint-care-golden-milk.jpg";
+import jointCareKitchari from "@/assets/joint-care-kitchari.jpg";
+import jointCareBoneSoup from "@/assets/joint-care-bone-soup.jpg";
+import jointCareBreathwork from "@/assets/joint-care-breathwork.jpg";
+import jointCareFunctional from "@/assets/joint-care-functional.jpg";
 import { Navigation } from "@/components/Navigation";
 import { ContentGridSkeleton } from "@/components/ContentSkeleton";
-
+import { DailyReminderButton } from "@/components/DailyReminderButton";
 interface WellnessContent {
   id: string;
   title: string;
@@ -329,7 +338,36 @@ const ContentLibrary = () => {
     }
   };
 
-  const getContentImage = (type: string) => {
+  const getContentImage = (type: string, tags?: string[]) => {
+    // Check for joint care specific images based on tags
+    if (tags?.some(tag => ['chair-yoga', 'senior-friendly'].includes(tag))) {
+      return jointCareChairYoga;
+    }
+    if (tags?.includes('wall-yoga')) {
+      return jointCareWallYoga;
+    }
+    if (tags?.includes('bed-yoga')) {
+      return jointCareBedMobility;
+    }
+    if (tags?.includes('abhyanga') || tags?.includes('self-massage')) {
+      return jointCareAbhyanga;
+    }
+    if (tags?.includes('golden-milk') || tags?.includes('turmeric')) {
+      return jointCareGoldenMilk;
+    }
+    if (tags?.includes('kitchari')) {
+      return jointCareKitchari;
+    }
+    if (tags?.includes('soup') || tags?.includes('bone-health')) {
+      return jointCareBoneSoup;
+    }
+    if (tags?.includes('breathwork') || tags?.includes('grounding') || tags?.includes('gratitude')) {
+      return jointCareBreathwork;
+    }
+    if (tags?.includes('functional-movement')) {
+      return jointCareFunctional;
+    }
+    
     switch (type) {
       case 'yoga': return yogaImage;
       case 'meditation': return meditationImage;
@@ -687,7 +725,7 @@ const ContentLibrary = () => {
                 {/* Content Image with Lock Overlay */}
                 <div className="h-48 overflow-hidden bg-muted relative">
                   <img 
-                    src={item.image_url || getContentImage(item.content_type)}
+                    src={item.image_url || getContentImage(item.content_type, item.tags)}
                     alt={item.title}
                     className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
                   />
@@ -847,7 +885,7 @@ const ContentLibrary = () => {
                     <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
                       <div className="h-48 overflow-hidden bg-muted relative">
                         <img 
-                          src={item.image_url || getContentImage(item.content_type)}
+                          src={item.image_url || getContentImage(item.content_type, item.tags)}
                           alt={item.title}
                           className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
                         />
@@ -996,7 +1034,7 @@ const ContentLibrary = () => {
                     <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
                       <div className="h-48 overflow-hidden bg-muted relative">
                         <img 
-                          src={item.image_url || getContentImage(item.content_type)}
+                          src={item.image_url || getContentImage(item.content_type, item.tags)}
                           alt={item.title}
                           className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
                         />
@@ -1150,7 +1188,7 @@ const ContentLibrary = () => {
                       <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
                         <div className="h-48 overflow-hidden bg-muted relative">
                           <img 
-                            src={item.image_url || getContentImage(item.content_type)}
+                            src={item.image_url || getContentImage(item.content_type, item.tags)}
                             alt={item.title}
                             className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
                           />
@@ -1415,10 +1453,10 @@ const ContentLibrary = () => {
                     )}
 
                     {/* Content Image - Supporting Visual */}
-                    {isContentUnlocked(selectedContent) && (selectedContent.image_url || getContentImage(selectedContent.content_type)) && (
+                    {isContentUnlocked(selectedContent) && (selectedContent.image_url || getContentImage(selectedContent.content_type, selectedContent.tags)) && (
                       <div>
                         <img 
-                          src={selectedContent.image_url || getContentImage(selectedContent.content_type)}
+                          src={selectedContent.image_url || getContentImage(selectedContent.content_type, selectedContent.tags)}
                           alt={selectedContent.title}
                           className="w-full rounded-lg"
                         />
@@ -1433,6 +1471,17 @@ const ContentLibrary = () => {
                           <source src={selectedContent.audio_url} type="audio/mpeg" />
                           Your browser does not support the audio element.
                         </audio>
+                      </div>
+                    )}
+
+                    {/* Daily Reminder Button */}
+                    {isContentUnlocked(selectedContent) && (
+                      <div className="pt-4 border-t border-border">
+                        <DailyReminderButton 
+                          contentId={selectedContent.id}
+                          contentTitle={selectedContent.title}
+                          userId={user?.id || null}
+                        />
                       </div>
                     )}
                   </div>

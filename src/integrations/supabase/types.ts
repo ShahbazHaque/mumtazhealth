@@ -118,6 +118,47 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_practice_reminders: {
+        Row: {
+          content_id: string
+          created_at: string
+          days_of_week: number[]
+          id: string
+          is_active: boolean
+          reminder_time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          days_of_week?: number[]
+          id?: string
+          is_active?: boolean
+          reminder_time?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          days_of_week?: number[]
+          id?: string
+          is_active?: boolean
+          reminder_time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_practice_reminders_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "wellness_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_recommendations: {
         Row: {
           content_ids: string[]
