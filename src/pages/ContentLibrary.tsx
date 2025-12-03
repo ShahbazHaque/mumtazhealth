@@ -561,16 +561,20 @@ const ContentLibrary = () => {
 
         {/* Filters */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-6">
-            <TabsTrigger value="all">All Content</TabsTrigger>
-            <TabsTrigger value="saved" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 mb-6 h-auto gap-1 p-1">
+            <TabsTrigger value="all" className="text-sm md:text-base py-2.5">All Content</TabsTrigger>
+            <TabsTrigger value="saved" className="flex items-center gap-2 text-sm md:text-base py-2.5">
               <Heart className="h-4 w-4" />
               Favorites
             </TabsTrigger>
-            <TabsTrigger value="yoga">Yoga</TabsTrigger>
-            <TabsTrigger value="meditation">Meditation</TabsTrigger>
-            <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
-            <TabsTrigger value="article">Articles</TabsTrigger>
+            <TabsTrigger value="yoga" className="text-sm md:text-base py-2.5">Yoga</TabsTrigger>
+            <TabsTrigger value="meditation" className="text-sm md:text-base py-2.5">Meditation</TabsTrigger>
+            <TabsTrigger value="nutrition" className="text-sm md:text-base py-2.5">Nutrition</TabsTrigger>
+            <TabsTrigger value="article" className="text-sm md:text-base py-2.5">Articles</TabsTrigger>
+            <TabsTrigger value="joint-care" className="flex items-center gap-2 text-sm md:text-base py-2.5 col-span-2 md:col-span-1 bg-wellness-sage-light/50 data-[state=active]:bg-primary">
+              <Flower2 className="h-4 w-4" />
+              Joint Care
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-6">
@@ -591,15 +595,15 @@ const ContentLibrary = () => {
               <div>
                 <label className="text-sm font-medium mb-2 block">Content Type</label>
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-base">
                     <SelectValue placeholder="All types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="yoga">Yoga</SelectItem>
-                    <SelectItem value="meditation">Meditation</SelectItem>
-                    <SelectItem value="nutrition">Nutrition</SelectItem>
-                    <SelectItem value="article">Articles</SelectItem>
+                    <SelectItem value="all" className="text-base py-2">All Types</SelectItem>
+                    <SelectItem value="yoga" className="text-base py-2">Yoga</SelectItem>
+                    <SelectItem value="meditation" className="text-base py-2">Meditation</SelectItem>
+                    <SelectItem value="nutrition" className="text-base py-2">Nutrition</SelectItem>
+                    <SelectItem value="article" className="text-base py-2">Articles</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -944,6 +948,190 @@ const ContentLibrary = () => {
                   );
                 })}
               </div>
+            )}
+          </TabsContent>
+
+          {/* Joint Care Tab - Arthritis, Mobility & Joint Health Section */}
+          <TabsContent value="joint-care" className="space-y-6">
+            {/* Joint Care Hero Banner */}
+            <Card className="bg-gradient-to-br from-wellness-sage-light via-background to-wellness-lilac-light border-wellness-sage/30 overflow-hidden">
+              <CardContent className="p-8">
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <div className="p-4 bg-primary/20 rounded-full">
+                    <Flower2 className="h-12 w-12 text-primary" />
+                  </div>
+                  <div className="text-center md:text-left flex-1">
+                    <h2 className="text-2xl md:text-3xl font-semibold mb-2">Arthritis, Mobility & Joint Care</h2>
+                    <p className="text-lg text-muted-foreground max-w-2xl">
+                      Gentle practices designed for post-menopause and beyond. Calming, inclusive, and accessible for all ages.
+                    </p>
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
+                      <Badge variant="secondary" className="text-sm py-1 px-3">Chair Yoga</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3">Wall-Supported</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3">Bed Exercises</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3">Joint Nutrition</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3">Emotional Support</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {loading ? (
+              <ContentGridSkeleton count={6} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {content
+                  .filter(item => 
+                    item.tags?.some(tag => 
+                      ['arthritis', 'joint-care', 'mobility', 'chair-yoga', 'wall-yoga', 'bed-yoga', 'senior-friendly', 'accessible'].includes(tag)
+                    ) || 
+                    item.cycle_phases?.includes('post-menopause') ||
+                    item.cycle_phases?.includes('menopause')
+                  )
+                  .map((item) => {
+                  const isLocked = !isContentUnlocked(item);
+                  
+                  return (
+                    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
+                      <div className="h-48 overflow-hidden bg-muted relative">
+                        <img 
+                          src={item.image_url || getContentImage(item.content_type)}
+                          alt={item.title}
+                          className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
+                        />
+                        {isLocked && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                            <div className="text-center text-white p-4">
+                              <Lock className="h-12 w-12 mx-auto mb-2" />
+                              <p className="text-base font-semibold">Locked Content</p>
+                              <p className="text-sm mt-1">Upgrade to access</p>
+                            </div>
+                          </div>
+                        )}
+                        {/* Accessibility-friendly tags */}
+                        {item.tags?.some(tag => ['chair-yoga', 'wall-yoga', 'bed-yoga', 'accessible'].includes(tag)) && (
+                          <Badge className="absolute top-2 left-2 bg-wellness-sage text-white text-sm">
+                            Accessible
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2 flex-1">
+                            {getContentIcon(item.content_type)}
+                            <CardTitle className="text-lg md:text-xl line-clamp-2">{item.title}</CardTitle>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {user && completedContentIds.has(item.id) && (
+                              <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                                <CheckCircle2 className="h-4 w-4" />
+                              </Badge>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => toggleSaveContent(item.id)}
+                              className="h-10 w-10"
+                            >
+                              <Heart 
+                                className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
+                              />
+                            </Button>
+                          </div>
+                        </div>
+                        <CardDescription className="line-clamp-2 text-base">
+                          {item.description}
+                        </CardDescription>
+                      </CardHeader>
+                      
+                      <CardContent>
+                        <div className="space-y-3 mb-4">
+                          {item.doshas && item.doshas.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {item.doshas.map((dosha) => (
+                                <div key={dosha}>{getDoshaIcon(dosha)}</div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="secondary" className="capitalize text-sm">
+                              {item.content_type}
+                            </Badge>
+                            {item.difficulty_level && (
+                              <Badge variant="outline" className="text-sm">{item.difficulty_level}</Badge>
+                            )}
+                            {item.duration_minutes && (
+                              <Badge variant="outline" className="text-sm">{item.duration_minutes} min</Badge>
+                            )}
+                          </div>
+
+                          {/* Benefits preview */}
+                          {item.benefits && item.benefits.length > 0 && (
+                            <div className="text-sm text-muted-foreground">
+                              <span className="font-medium">Benefits: </span>
+                              {item.benefits.slice(0, 2).join(', ')}
+                              {item.benefits.length > 2 && '...'}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button 
+                            className="flex-1 text-base py-5" 
+                            size="lg"
+                            onClick={() => openContentDetail(item)}
+                            disabled={isLocked}
+                          >
+                            {isLocked ? (
+                              <>
+                                <Lock className="h-4 w-4 mr-2" />
+                                View Preview
+                              </>
+                            ) : (
+                              'View Details'
+                            )}
+                          </Button>
+                          {user && !isLocked && (
+                            <Button
+                              variant={completedContentIds.has(item.id) ? "default" : "outline"}
+                              size="lg"
+                              className="px-4"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleCompletion(item.id);
+                              }}
+                              title={completedContentIds.has(item.id) ? "Mark as not completed" : "Mark as completed"}
+                            >
+                              {completedContentIds.has(item.id) ? (
+                                <CheckCircle2 className="h-5 w-5" />
+                              ) : (
+                                <Circle className="h-5 w-5" />
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+
+            {!loading && content.filter(item => 
+              item.tags?.some(tag => 
+                ['arthritis', 'joint-care', 'mobility', 'chair-yoga', 'wall-yoga', 'bed-yoga', 'senior-friendly', 'accessible'].includes(tag)
+              )
+            ).length === 0 && (
+              <Card className="p-12 text-center">
+                <Flower2 className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-xl font-semibold mb-2">Joint Care Content Coming Soon</h3>
+                <p className="text-muted-foreground text-lg">
+                  Gentle practices for arthritis and mobility are being prepared with care.
+                </p>
+              </Card>
             )}
           </TabsContent>
 
