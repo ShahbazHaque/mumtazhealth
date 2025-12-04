@@ -76,3 +76,6 @@ verify_jwt = false
 
 [functions.send-push-notification]
 verify_jwt = false
+
+[functions.send-daily-practice-reminders]
+verify_jwt = false
