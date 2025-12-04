@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Flame, Trophy, Award, Download, Users, Flower2, Activity } from "lucide-react";
+import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Flame, Trophy, Award, Download, Users, Flower2, Activity, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -359,7 +359,7 @@ const Index = () => {
             <h2 className="text-2xl font-bold text-foreground mb-6 text-center">
               Quick Access
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Button
                 onClick={() => navigate("/tracker")}
                 variant="cta"
@@ -404,6 +404,16 @@ const Index = () => {
                 <BookOpen className="h-8 w-8" />
                 <span className="text-lg font-semibold">Content Library</span>
                 <span className="text-xs opacity-80">Explore practices</span>
+              </Button>
+
+              <Button
+                onClick={() => navigate("/my-daily-practice")}
+                className="h-32 flex-col gap-3 bg-mumtaz-sage hover:bg-mumtaz-sage/90 text-white"
+                size="lg"
+              >
+                <Clock className="h-8 w-8" />
+                <span className="text-lg font-semibold">My Practice</span>
+                <span className="text-xs opacity-80">Daily reminders</span>
               </Button>
 
               <Button
