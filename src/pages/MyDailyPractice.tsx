@@ -7,6 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Clock, 
@@ -18,7 +29,9 @@ import {
   BellOff,
   Play,
   Heart,
-  Sparkles
+  Sparkles,
+  Pencil,
+  Save
 } from "lucide-react";
 
 // Import joint care images
@@ -51,6 +64,7 @@ interface DailyReminder {
 }
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const dayValues = [1, 2, 3, 4, 5, 6, 7]; // Sunday=1, Monday=2, etc.
 
 const getContentImage = (content: DailyReminder['content']) => {
   if (!content) return null;
@@ -99,6 +113,10 @@ export default function MyDailyPractice() {
   const [reminders, setReminders] = useState<DailyReminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [editingReminder, setEditingReminder] = useState<DailyReminder | null>(null);
+  const [editTime, setEditTime] = useState("");
+  const [editDays, setEditDays] = useState<number[]>([]);
+  const [saving, setSaving] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -211,6 +229,66 @@ export default function MyDailyPractice() {
     }
   };
 
+  const openEditDialog = (reminder: DailyReminder) => {
+    setEditingReminder(reminder);
+    setEditTime(reminder.reminder_time.substring(0, 5)); // HH:MM format
+    setEditDays(reminder.days_of_week);
+  };
+
+  const toggleDay = (dayValue: number) => {
+    setEditDays(prev => 
+      prev.includes(dayValue)
+        ? prev.filter(d => d !== dayValue)
+        : [...prev, dayValue].sort((a, b) => a - b)
+    );
+  };
+
+  const saveReminderChanges = async () => {
+    if (!editingReminder || editDays.length === 0) {
+      toast({
+        title: "Please select at least one day",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("daily_practice_reminders")
+        .update({
+          reminder_time: editTime + ":00",
+          days_of_week: editDays,
+        })
+        .eq("id", editingReminder.id);
+
+      if (error) throw error;
+
+      setReminders(prev =>
+        prev.map(r =>
+          r.id === editingReminder.id
+            ? { ...r, reminder_time: editTime + ":00", days_of_week: editDays }
+            : r
+        )
+      );
+
+      toast({
+        title: "Reminder updated",
+        description: "Your practice schedule has been saved",
+      });
+
+      setEditingReminder(null);
+    } catch (error) {
+      console.error("Error updating reminder:", error);
+      toast({
+        title: "Error saving changes",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Group reminders by time of day
   const groupedReminders = reminders.reduce((acc, reminder) => {
     const label = getTimeOfDayLabel(reminder.reminder_time);
@@ -225,7 +303,7 @@ export default function MyDailyPractice() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-wellness-lavender/20 to-background">
         <Navigation />
-        <main className="container mx-auto px-4 py-8 max-w-4xl">
+        <main className="container mx-auto px-4 py-8 pt-24 max-w-4xl">
           <div className="space-y-6">
             <Skeleton className="h-12 w-64" />
             <Skeleton className="h-48 w-full" />
@@ -240,7 +318,7 @@ export default function MyDailyPractice() {
     <div className="min-h-screen bg-gradient-to-b from-wellness-lavender/20 to-background">
       <Navigation />
       
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-8 pt-24 max-w-4xl">
         {/* Header */}
         <div className="mb-8 animate-fade-in">
           <div className="flex items-center gap-3 mb-2">
@@ -377,6 +455,14 @@ export default function MyDailyPractice() {
                               <Button
                                 variant="ghost"
                                 size="sm"
+                                onClick={() => openEditDialog(reminder)}
+                                className="text-primary hover:text-primary hover:bg-primary/10"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => deleteReminder(reminder.id)}
                                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
                               >
@@ -409,6 +495,78 @@ export default function MyDailyPractice() {
           </div>
         )}
       </main>
+
+      {/* Edit Reminder Dialog */}
+      <Dialog open={!!editingReminder} onOpenChange={() => setEditingReminder(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Reminder</DialogTitle>
+            <DialogDescription>
+              Change when you'd like to be reminded for "{editingReminder?.content?.title}"
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Time Input */}
+            <div className="space-y-2">
+              <Label htmlFor="reminder-time" className="text-base font-medium">
+                Reminder Time
+              </Label>
+              <Input
+                id="reminder-time"
+                type="time"
+                value={editTime}
+                onChange={(e) => setEditTime(e.target.value)}
+                className="text-lg h-12"
+              />
+            </div>
+
+            {/* Days Selection */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Days of the Week</Label>
+              <div className="flex flex-wrap gap-2">
+                {dayNames.map((day, index) => {
+                  const dayValue = index + 1;
+                  const isSelected = editDays.includes(dayValue);
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => toggleDay(dayValue)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        isSelected
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                      }`}
+                    >
+                      {day}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Select the days you want to practice
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingReminder(null)}>
+              Cancel
+            </Button>
+            <Button onClick={saveReminderChanges} disabled={saving}>
+              {saving ? (
+                "Saving..."
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
