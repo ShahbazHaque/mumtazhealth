@@ -18,6 +18,24 @@ interface WeeklySummaryRequest {
   userName: string;
 }
 
+const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const formatTime = (time: string) => {
+  const [hours, minutes] = time.split(':');
+  const hour = parseInt(hours);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const displayHour = hour % 12 || 12;
+  return `${displayHour}:${minutes.substring(0, 2)} ${ampm}`;
+};
+
+const formatDays = (daysOfWeek: number[]) => {
+  if (daysOfWeek.length === 7) return "Every day";
+  if (daysOfWeek.length === 5 && !daysOfWeek.includes(1) && !daysOfWeek.includes(7)) {
+    return "Weekdays";
+  }
+  return daysOfWeek.map(d => dayNames[d - 1]).join(", ");
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -49,6 +67,59 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (error) {
       throw error;
+    }
+
+    // Fetch daily practice reminders
+    const { data: reminders } = await supabase
+      .from("daily_practice_reminders")
+      .select(`
+        id,
+        reminder_time,
+        days_of_week,
+        is_active,
+        wellness_content (
+          title
+        )
+      `)
+      .eq("user_id", userId)
+      .eq("is_active", true);
+
+    // Fetch completed practices for the week
+    const { data: completedProgress } = await supabase
+      .from("user_content_progress")
+      .select("id, completed_at")
+      .eq("user_id", userId)
+      .eq("completed", true)
+      .gte("completed_at", startDate.toISOString())
+      .lte("completed_at", endDate.toISOString());
+
+    // Calculate practice statistics
+    const completedPractices = completedProgress?.length || 0;
+    
+    // Calculate scheduled practices for the week
+    let scheduledPractices = 0;
+    const upcomingReminders: { title: string; time: string; days: string }[] = [];
+    
+    if (reminders) {
+      reminders.forEach((reminder: any) => {
+        const daysCount = reminder.days_of_week?.length || 0;
+        scheduledPractices += daysCount;
+        
+        const content = reminder.wellness_content;
+        if (content && Array.isArray(content) && content.length > 0) {
+          upcomingReminders.push({
+            title: content[0].title || "Practice",
+            time: formatTime(reminder.reminder_time),
+            days: formatDays(reminder.days_of_week || []),
+          });
+        } else if (content && typeof content === 'object' && 'title' in content) {
+          upcomingReminders.push({
+            title: (content as any).title || "Practice",
+            time: formatTime(reminder.reminder_time),
+            days: formatDays(reminder.days_of_week || []),
+          });
+        }
+      });
     }
 
     // Calculate statistics
@@ -109,6 +180,12 @@ const handler = async (req: Request): Promise<Response> => {
     if (Number(avgMoodScore) >= 4) {
       insights.push("Your emotional wellbeing is thriving!");
     }
+    if (completedPractices > 0 && scheduledPractices > 0) {
+      const completionRate = Math.round((completedPractices / scheduledPractices) * 100);
+      if (completionRate >= 80) {
+        insights.push(`Amazing dedication! You completed ${completionRate}% of your scheduled practices.`);
+      }
+    }
     if (insights.length === 0) {
       insights.push("Every journey begins with a single step. Keep going!");
     }
@@ -125,13 +202,16 @@ const handler = async (req: Request): Promise<Response> => {
         avgMoodScore: Number(avgMoodScore),
         topPractices,
         insights,
+        completedPractices,
+        scheduledPractices,
+        upcomingReminders: upcomingReminders.slice(0, 5), // Limit to 5 reminders
       })
     );
 
     const emailResponse = await resend.emails.send({
-      from: "Holistic Wellness <onboarding@resend.dev>",
+      from: "Mumtaz Health <onboarding@resend.dev>",
       to: [userEmail],
-      subject: "Your Weekly Wellness Summary 🌟",
+      subject: "🌸 Your Weekly Wellness Summary",
       html,
     });
 

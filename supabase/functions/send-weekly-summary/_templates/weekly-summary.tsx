@@ -10,6 +10,12 @@ import {
 } from 'https://esm.sh/@react-email/components@0.0.15'
 import * as React from 'https://esm.sh/react@18.3.1'
 
+interface PracticeReminder {
+  title: string;
+  time: string;
+  days: string;
+}
+
 interface WeeklySummaryEmailProps {
   userName: string
   weekStart: string
@@ -21,6 +27,9 @@ interface WeeklySummaryEmailProps {
   avgMoodScore: number
   topPractices: string[]
   insights: string[]
+  completedPractices: number
+  scheduledPractices: number
+  upcomingReminders: PracticeReminder[]
 }
 
 export const WeeklySummaryEmail = ({
@@ -34,13 +43,16 @@ export const WeeklySummaryEmail = ({
   avgMoodScore,
   topPractices,
   insights,
+  completedPractices = 0,
+  scheduledPractices = 0,
+  upcomingReminders = [],
 }: WeeklySummaryEmailProps) => (
   <Html>
     <Head />
     <Preview>Your wellness summary for {weekStart} - {weekEnd}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>🌟 Your Weekly Wellness Summary</Heading>
+        <Heading style={h1}>🌸 Your Weekly Wellness Summary</Heading>
         <Text style={text}>Hi {userName},</Text>
         <Text style={text}>
           Here's a recap of your wellness journey from {weekStart} to {weekEnd}:
@@ -75,6 +87,47 @@ export const WeeklySummaryEmail = ({
           </div>
         </Section>
 
+        {/* Daily Practice Summary */}
+        {scheduledPractices > 0 && (
+          <Section style={practiceBox}>
+            <Text style={practiceHeading}>🧘 Daily Practice Summary</Text>
+            
+            <div style={statRow}>
+              <Text style={statLabel}>Completed Practices</Text>
+              <Text style={statValue}>{completedPractices}</Text>
+            </div>
+            
+            <div style={statRow}>
+              <Text style={statLabel}>Scheduled This Week</Text>
+              <Text style={statValue}>{scheduledPractices}</Text>
+            </div>
+            
+            {completedPractices > 0 && scheduledPractices > 0 && (
+              <div style={statRow}>
+                <Text style={statLabel}>Completion Rate</Text>
+                <Text style={statValue}>
+                  {Math.round((completedPractices / scheduledPractices) * 100)}%
+                </Text>
+              </div>
+            )}
+          </Section>
+        )}
+
+        {/* Upcoming Reminders */}
+        {upcomingReminders.length > 0 && (
+          <Section style={remindersBox}>
+            <Text style={reminderHeading}>⏰ Your Upcoming Practice Reminders</Text>
+            {upcomingReminders.map((reminder, index) => (
+              <div key={index} style={reminderItem}>
+                <Text style={reminderTitle}>{reminder.title}</Text>
+                <Text style={reminderDetails}>
+                  {reminder.time} • {reminder.days}
+                </Text>
+              </div>
+            ))}
+          </Section>
+        )}
+
         {topPractices.length > 0 && (
           <Section style={insightsBox}>
             <Text style={insightHeading}>💫 Your Top Practices</Text>
@@ -85,8 +138,8 @@ export const WeeklySummaryEmail = ({
         )}
 
         {insights.length > 0 && (
-          <Section style={insightsBox}>
-            <Text style={insightHeading}>✨ Insights & Encouragement</Text>
+          <Section style={encouragementBox}>
+            <Text style={encouragementHeading}>✨ Insights & Encouragement</Text>
             {insights.map((insight, index) => (
               <Text key={index} style={insightItem}>• {insight}</Text>
             ))}
@@ -100,7 +153,7 @@ export const WeeklySummaryEmail = ({
         <Text style={footer}>
           With gratitude and encouragement,
           <br />
-          <strong>Holistic Wellness Team</strong>
+          <strong>Mumtaz Health</strong>
         </Text>
       </Container>
     </Body>
@@ -110,7 +163,7 @@ export const WeeklySummaryEmail = ({
 export default WeeklySummaryEmail
 
 const main = {
-  backgroundColor: '#f6f9fc',
+  backgroundColor: '#faf5f0',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
 }
 
@@ -123,7 +176,7 @@ const container = {
 }
 
 const h1 = {
-  color: '#333',
+  color: '#5D3F6A',
   fontSize: '28px',
   fontWeight: 'bold',
   margin: '40px 0 20px',
@@ -138,15 +191,15 @@ const text = {
 }
 
 const statsBox = {
-  backgroundColor: '#f0f9ff',
+  backgroundColor: '#F5F0F7',
   borderRadius: '8px',
   padding: '24px',
   margin: '24px 0',
-  border: '1px solid #bae6fd',
+  border: '1px solid #C9A7DD',
 }
 
 const statHeading = {
-  color: '#0369a1',
+  color: '#5D3F6A',
   fontSize: '18px',
   fontWeight: '600',
   margin: '0 0 16px',
@@ -157,7 +210,7 @@ const statRow = {
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '8px 0',
-  borderBottom: '1px solid #e0f2fe',
+  borderBottom: '1px solid #E8D5F0',
 }
 
 const statLabel = {
@@ -167,21 +220,86 @@ const statLabel = {
 }
 
 const statValue = {
-  color: '#0369a1',
+  color: '#5D3F6A',
   fontSize: '16px',
   fontWeight: '700',
 }
 
-const insightsBox = {
-  backgroundColor: '#fef3f2',
+const practiceBox = {
+  backgroundColor: '#F0F5F2',
   borderRadius: '8px',
   padding: '24px',
   margin: '24px 0',
-  border: '1px solid #fecaca',
+  border: '1px solid #98A98F',
+}
+
+const practiceHeading = {
+  color: '#5A6B52',
+  fontSize: '18px',
+  fontWeight: '600',
+  margin: '0 0 16px',
+}
+
+const remindersBox = {
+  backgroundColor: '#FFF8F0',
+  borderRadius: '8px',
+  padding: '24px',
+  margin: '24px 0',
+  border: '1px solid #E8C9A0',
+}
+
+const reminderHeading = {
+  color: '#8B6914',
+  fontSize: '18px',
+  fontWeight: '600',
+  margin: '0 0 16px',
+}
+
+const reminderItem = {
+  padding: '12px',
+  backgroundColor: '#FFFCF5',
+  borderRadius: '6px',
+  marginBottom: '8px',
+}
+
+const reminderTitle = {
+  color: '#333',
+  fontSize: '15px',
+  fontWeight: '600',
+  margin: '0 0 4px',
+}
+
+const reminderDetails = {
+  color: '#666',
+  fontSize: '13px',
+  margin: '0',
+}
+
+const insightsBox = {
+  backgroundColor: '#F5F0F7',
+  borderRadius: '8px',
+  padding: '24px',
+  margin: '24px 0',
+  border: '1px solid #C9A7DD',
 }
 
 const insightHeading = {
-  color: '#b91c1c',
+  color: '#5D3F6A',
+  fontSize: '18px',
+  fontWeight: '600',
+  margin: '0 0 12px',
+}
+
+const encouragementBox = {
+  backgroundColor: '#F0F5F2',
+  borderRadius: '8px',
+  padding: '24px',
+  margin: '24px 0',
+  border: '1px solid #98A98F',
+}
+
+const encouragementHeading = {
+  color: '#5A6B52',
   fontSize: '18px',
   fontWeight: '600',
   margin: '0 0 12px',
