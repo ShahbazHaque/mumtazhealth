@@ -13,9 +13,10 @@ const corsHeaders = {
 };
 
 interface WeeklySummaryRequest {
-  userId: string;
-  userEmail: string;
-  userName: string;
+  userId?: string;
+  userEmail?: string;
+  userName?: string;
+  sendToAll?: boolean;
 }
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -36,20 +37,14 @@ const formatDays = (daysOfWeek: number[]) => {
   return daysOfWeek.map(d => dayNames[d - 1]).join(", ");
 };
 
-const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+const sendSummaryForUser = async (
+  supabase: any,
+  userId: string,
+  userEmail: string,
+  userName: string
+): Promise<{ success: boolean; error?: string }> => {
   try {
-    const { userId, userEmail, userName }: WeeklySummaryRequest = await req.json();
-
     console.log("Generating weekly summary for user:", userId);
-
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Calculate date range (last 7 days)
     const endDate = new Date();
@@ -65,9 +60,7 @@ const handler = async (req: Request): Promise<Response> => {
       .lte("entry_date", endDate.toISOString().split("T")[0])
       .order("entry_date", { ascending: false });
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     // Fetch daily practice reminders
     const { data: reminders } = await supabase
@@ -132,7 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
     let moodCount = 0;
     const practicesCount: Record<string, number> = {};
 
-    entries?.forEach((entry) => {
+    entries?.forEach((entry: any) => {
       if (entry.yoga_practice && typeof entry.yoga_practice === "object") {
         yogaSessions++;
       }
@@ -204,7 +197,7 @@ const handler = async (req: Request): Promise<Response> => {
         insights,
         completedPractices,
         scheduledPractices,
-        upcomingReminders: upcomingReminders.slice(0, 5), // Limit to 5 reminders
+        upcomingReminders: upcomingReminders.slice(0, 5),
       })
     );
 
@@ -215,15 +208,109 @@ const handler = async (req: Request): Promise<Response> => {
       html,
     });
 
-    console.log("Weekly summary sent successfully:", emailResponse);
+    console.log("Weekly summary sent successfully to:", userEmail);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error sending summary to user:", userId, error);
+    return { success: false, error: error.message };
+  }
+};
 
-    return new Response(JSON.stringify(emailResponse), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
+const handler = async (req: Request): Promise<Response> => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const body = await req.json().catch(() => ({}));
+    const { userId, userEmail, userName, sendToAll } = body as WeeklySummaryRequest;
+
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // If sendToAll is true (from cron job), fetch all users and send summaries
+    if (sendToAll) {
+      console.log("Sending weekly summaries to all users...");
+
+      // Get all users with notification preferences enabled
+      const { data: preferences, error: prefError } = await supabase
+        .from("notification_preferences")
+        .select("user_id")
+        .eq("enabled", true);
+
+      if (prefError) {
+        console.error("Error fetching notification preferences:", prefError);
+        throw prefError;
+      }
+
+      const userIds = preferences?.map(p => p.user_id) || [];
+      console.log(`Found ${userIds.length} users with notifications enabled`);
+
+      // Get profiles for these users
+      const { data: profiles, error: profileError } = await supabase
+        .from("profiles")
+        .select("user_id, username")
+        .in("user_id", userIds);
+
+      if (profileError) {
+        console.error("Error fetching profiles:", profileError);
+      }
+
+      // Get emails from auth.users (using service role)
+      const results: { userId: string; success: boolean; error?: string }[] = [];
+
+      for (const uid of userIds) {
+        // Get user email from auth
+        const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(uid);
+        
+        if (userError || !user?.email) {
+          console.error("Error fetching user:", uid, userError);
+          results.push({ userId: uid, success: false, error: "Could not fetch user email" });
+          continue;
+        }
+
+        const profile = profiles?.find(p => p.user_id === uid);
+        const name = profile?.username || "there";
+
+        const result = await sendSummaryForUser(supabase, uid, user.email, name);
+        results.push({ userId: uid, ...result });
+      }
+
+      const successCount = results.filter(r => r.success).length;
+      console.log(`Weekly summaries sent: ${successCount}/${userIds.length}`);
+
+      return new Response(
+        JSON.stringify({ 
+          message: `Weekly summaries sent to ${successCount}/${userIds.length} users`,
+          results 
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // Single user mode (original behavior)
+    if (!userId || !userEmail || !userName) {
+      throw new Error("userId, userEmail, and userName are required for single user mode");
+    }
+
+    const result = await sendSummaryForUser(supabase, userId, userEmail, userName);
+
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+
+    return new Response(
+      JSON.stringify({ message: "Weekly summary sent successfully" }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
   } catch (error: any) {
     console.error("Error in send-weekly-summary function:", error);
     return new Response(JSON.stringify({ error: error.message }), {

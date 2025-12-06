@@ -31,7 +31,9 @@ import {
   Heart,
   Sparkles,
   Pencil,
-  Save
+  Save,
+  Check,
+  CheckCircle2
 } from "lucide-react";
 
 // Import joint care images
@@ -61,6 +63,7 @@ interface DailyReminder {
     doshas: string[] | null;
     tags: string[] | null;
   };
+  completedToday?: boolean;
 }
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -137,6 +140,7 @@ export default function MyDailyPractice() {
   const fetchReminders = async (userId: string) => {
     setLoading(true);
     try {
+      // Fetch reminders
       const { data, error } = await supabase
         .from("daily_practice_reminders")
         .select(`
@@ -161,9 +165,22 @@ export default function MyDailyPractice() {
 
       if (error) throw error;
 
+      // Check today's completions
+      const today = new Date().toISOString().split('T')[0];
+      const { data: progressData } = await supabase
+        .from("user_content_progress")
+        .select("content_id, completed_at")
+        .eq("user_id", userId)
+        .eq("completed", true)
+        .gte("completed_at", today + "T00:00:00")
+        .lte("completed_at", today + "T23:59:59");
+
+      const completedContentIds = new Set(progressData?.map(p => p.content_id) || []);
+
       const formattedReminders = (data || []).map(item => ({
         ...item,
-        content: item.wellness_content as DailyReminder['content']
+        content: item.wellness_content as DailyReminder['content'],
+        completedToday: completedContentIds.has(item.content_id)
       }));
 
       setReminders(formattedReminders);
@@ -289,6 +306,70 @@ export default function MyDailyPractice() {
     }
   };
 
+  const markAsComplete = async (reminder: DailyReminder) => {
+    if (!user || !reminder.content_id) return;
+
+    try {
+      // Check if already completed today
+      const today = new Date().toISOString().split('T')[0];
+      const { data: existing } = await supabase
+        .from("user_content_progress")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("content_id", reminder.content_id)
+        .gte("completed_at", today + "T00:00:00")
+        .maybeSingle();
+
+      if (existing) {
+        // Uncomplete - delete the progress record
+        await supabase
+          .from("user_content_progress")
+          .delete()
+          .eq("id", existing.id);
+
+        setReminders(prev =>
+          prev.map(r =>
+            r.id === reminder.id ? { ...r, completedToday: false } : r
+          )
+        );
+
+        toast({
+          title: "Practice unmarked",
+          description: "You can mark it complete again anytime",
+        });
+      } else {
+        // Mark as complete
+        const { error } = await supabase
+          .from("user_content_progress")
+          .insert({
+            user_id: user.id,
+            content_id: reminder.content_id,
+            completed: true,
+            completed_at: new Date().toISOString(),
+          });
+
+        if (error) throw error;
+
+        setReminders(prev =>
+          prev.map(r =>
+            r.id === reminder.id ? { ...r, completedToday: true } : r
+          )
+        );
+
+        toast({
+          title: "Practice completed! 🎉",
+          description: "Great job on completing your practice",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating progress:", error);
+      toast({
+        title: "Error updating progress",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Group reminders by time of day
   const groupedReminders = reminders.reduce((acc, reminder) => {
     const label = getTimeOfDayLabel(reminder.reminder_time);
@@ -374,7 +455,7 @@ export default function MyDailyPractice() {
                     key={reminder.id} 
                     className={`overflow-hidden transition-all duration-300 hover:shadow-md ${
                       !reminder.is_active ? 'opacity-60' : ''
-                    }`}
+                    } ${reminder.completedToday ? 'ring-2 ring-green-500/50 bg-green-50/30 dark:bg-green-950/20' : ''}`}
                   >
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row">
@@ -397,9 +478,14 @@ export default function MyDailyPractice() {
                         <div className="flex-1 p-4">
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
-                              <h3 className="text-lg font-semibold text-foreground mb-1">
-                                {reminder.content?.title || 'Unknown Practice'}
-                              </h3>
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="text-lg font-semibold text-foreground">
+                                  {reminder.content?.title || 'Unknown Practice'}
+                                </h3>
+                                {reminder.completedToday && (
+                                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+                                )}
+                              </div>
                               <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                                 {reminder.content?.description}
                               </p>
@@ -441,6 +527,25 @@ export default function MyDailyPractice() {
 
                             {/* Actions */}
                             <div className="flex flex-col items-end gap-2">
+                              {/* Mark Complete Button */}
+                              <Button
+                                variant={reminder.completedToday ? "secondary" : "default"}
+                                size="sm"
+                                onClick={() => markAsComplete(reminder)}
+                                className={reminder.completedToday ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400" : ""}
+                              >
+                                {reminder.completedToday ? (
+                                  <>
+                                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                                    Done
+                                  </>
+                                ) : (
+                                  <>
+                                    <Check className="h-4 w-4 mr-1" />
+                                    Mark Done
+                                  </>
+                                )}
+                              </Button>
                               <div className="flex items-center gap-2">
                                 {reminder.is_active ? (
                                   <Bell className="h-4 w-4 text-primary" />
