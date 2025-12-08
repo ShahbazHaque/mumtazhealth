@@ -7,12 +7,16 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info, HelpCircle, Activity, ArrowLeft, ArrowRight } from "lucide-react";
+import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info, HelpCircle, Activity, ArrowLeft, ArrowRight, Leaf, Sun, BookOpen, Users, Shield, Compass } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import DoshaAssessment from "@/components/DoshaAssessment";
 import { Logo } from "@/components/Logo";
 
-type OnboardingStep = "welcome" | "lifeStage" | "cycle" | "dosha" | "doshaResults" | "spiritual" | "pregnancy" | "preferences" | "complete";
+type OnboardingStep = 
+  | "intro1" | "intro2" | "intro3" | "intro4" | "intro5" 
+  | "intro6" | "intro7" | "intro8" | "intro9" | "intro10" | "intro11"
+  | "welcome" | "lifeStage" | "cycle" | "dosha" | "doshaResults" 
+  | "spiritual" | "pregnancy" | "preferences" | "complete";
 
 const ProgressIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => (
   <div className="mb-6">
@@ -29,25 +33,77 @@ const ProgressIndicator = ({ currentStep, totalSteps }: { currentStep: number; t
   </div>
 );
 
+const IntroScreen = ({ 
+  icon, 
+  title, 
+  children, 
+  onNext, 
+  onBack,
+  showBack = true,
+  nextLabel = "Continue"
+}: { 
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+  onNext: () => void;
+  onBack?: () => void;
+  showBack?: boolean;
+  nextLabel?: string;
+}) => (
+  <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+    <Card className="w-full max-w-2xl border-none shadow-xl bg-card/95 backdrop-blur-sm animate-fade-in">
+      <CardHeader className="text-center space-y-6 pb-4 pt-10">
+        <div className="flex justify-center">
+          <div className="p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20">
+            {icon}
+          </div>
+        </div>
+        <CardTitle className="text-2xl md:text-3xl font-bold text-mumtaz-plum leading-tight font-accent">
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6 pb-10">
+        <div className="text-center space-y-4 text-muted-foreground leading-relaxed">
+          {children}
+        </div>
+        <div className="flex justify-between pt-6">
+          {showBack && onBack ? (
+            <Button variant="ghost" onClick={onBack} className="gap-2">
+              <ArrowLeft className="h-4 w-4" /> Back
+            </Button>
+          ) : (
+            <div />
+          )}
+          <Button onClick={onNext} className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground">
+            {nextLabel} <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+);
+
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<OnboardingStep>("welcome");
+  const [step, setStep] = useState<OnboardingStep>("intro1");
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
 
   const getStepInfo = () => {
     const stepMap: Record<OnboardingStep, number> = {
-      welcome: 0,
-      lifeStage: 1,
-      cycle: 2,
-      dosha: 3,
-      doshaResults: 4,
-      spiritual: 5,
-      pregnancy: 6,
-      preferences: 7,
-      complete: 8,
+      intro1: 0, intro2: 0, intro3: 0, intro4: 0, intro5: 0,
+      intro6: 0, intro7: 0, intro8: 0, intro9: 0, intro10: 0, intro11: 0,
+      welcome: 1,
+      lifeStage: 2,
+      cycle: 3,
+      dosha: 4,
+      doshaResults: 5,
+      spiritual: 6,
+      pregnancy: 7,
+      preferences: 8,
+      complete: 9,
     };
-    return { current: stepMap[step], total: 8 };
+    return { current: stepMap[step], total: 9 };
   };
 
   // Profile data
@@ -138,6 +194,363 @@ export default function Onboarding() {
     }
   };
 
+  // Intro Screen 1: Welcome
+  if (step === "intro1") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <Card className="w-full max-w-2xl border-none shadow-xl bg-card/95 backdrop-blur-sm animate-fade-in">
+          <CardHeader className="text-center space-y-8 pb-6 pt-12">
+            <Logo size="xl" className="mx-auto" />
+            <CardTitle className="text-3xl md:text-4xl font-bold text-mumtaz-plum leading-tight font-accent">
+              Welcome to Mumtaz Health
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-8 pb-12">
+            <p className="text-center text-lg text-muted-foreground leading-relaxed">
+              A gentle space created to support women through every phase of life — with care, compassion, and wisdom.
+            </p>
+            <div className="flex justify-center pt-4">
+              <Button 
+                onClick={() => setStep("intro2")} 
+                size="lg"
+                className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-8"
+              >
+                Begin <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Intro Screen 2: What This App Is
+  if (step === "intro2") {
+    return (
+      <IntroScreen
+        icon={<Heart className="h-10 w-10 text-wellness-lilac" />}
+        title="A holistic approach to women's wellbeing"
+        onNext={() => setStep("intro3")}
+        onBack={() => setStep("intro1")}
+      >
+        <p className="text-lg">This app brings together</p>
+        <p className="text-xl font-medium text-foreground">
+          Yoga · Ayurveda · Nutrition · Spiritual Support
+        </p>
+        <p>
+          to help you understand your body, support your health, and move through life with more ease and confidence.
+        </p>
+        <p className="pt-4 italic">
+          Everything here is designed to feel supportive, not overwhelming.
+        </p>
+      </IntroScreen>
+    );
+  }
+
+  // Intro Screen 3: Why Ayurveda
+  if (step === "intro3") {
+    return (
+      <IntroScreen
+        icon={<Leaf className="h-10 w-10 text-wellness-sage" />}
+        title="Your body is unique — and your care should be too"
+        onNext={() => setStep("intro4")}
+        onBack={() => setStep("intro2")}
+      >
+        <p>
+          Ayurveda helps you understand your natural constitution, or <strong className="text-foreground">dosha</strong> (Vata, Pitta, Kapha).
+        </p>
+        <p>This awareness helps guide:</p>
+        <ul className="space-y-2 text-left max-w-md mx-auto">
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>movement that suits your body</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>food that supports you</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>routines that bring balance</span>
+          </li>
+        </ul>
+        <p className="pt-4 italic">
+          There is no "one-size-fits-all" here — only personalised support.
+        </p>
+      </IntroScreen>
+    );
+  }
+
+  // Intro Screen 4: Yoga, Movement & Care
+  if (step === "intro4") {
+    return (
+      <IntroScreen
+        icon={<Activity className="h-10 w-10 text-wellness-lilac" />}
+        title="Movement adapted for every stage of womanhood"
+        onNext={() => setStep("intro5")}
+        onBack={() => setStep("intro3")}
+      >
+        <p>
+          Yoga and movement in this app are gentle, accessible, and adaptable.
+        </p>
+        <p>Whether you are:</p>
+        <ul className="space-y-2 text-left max-w-md mx-auto">
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>menstruating</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>pregnant or post-pregnancy</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>navigating menopause</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>managing arthritis or mobility challenges</span>
+          </li>
+        </ul>
+        <p className="pt-4 italic">
+          You will always find options that meet you where you are.
+        </p>
+      </IntroScreen>
+    );
+  }
+
+  // Intro Screen 5: Nutrition & Daily Support
+  if (step === "intro5") {
+    return (
+      <IntroScreen
+        icon={<Sun className="h-10 w-10 text-wellness-sage" />}
+        title="Nourishment for real life"
+        onNext={() => setStep("intro6")}
+        onBack={() => setStep("intro4")}
+      >
+        <p>Nutrition guidance here is:</p>
+        <ul className="space-y-2 text-left max-w-md mx-auto">
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>simple</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>nourishing</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>culturally sensitive</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>easy to prepare</span>
+          </li>
+        </ul>
+        <p className="pt-4">
+          It's designed to support digestion, strength, hormones, and long-term health — without pressure or perfection.
+        </p>
+      </IntroScreen>
+    );
+  }
+
+  // Intro Screen 6: Spiritual & Emotional Wellbeing
+  if (step === "intro6") {
+    return (
+      <IntroScreen
+        icon={<Moon className="h-10 w-10 text-wellness-lilac" />}
+        title="Care for the whole of you"
+        onNext={() => setStep("intro7")}
+        onBack={() => setStep("intro5")}
+      >
+        <p>
+          Alongside the body, this app supports emotional and spiritual wellbeing through:
+        </p>
+        <ul className="space-y-2 text-left max-w-md mx-auto">
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>breathwork</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>reflection</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>grounding practices</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>moments of stillness</span>
+          </li>
+        </ul>
+        <p className="pt-4 italic">
+          These practices offer calm, resilience, and connection — whatever your background or beliefs.
+        </p>
+      </IntroScreen>
+    );
+  }
+
+  // Intro Screen 7: Who This App Is For
+  if (step === "intro7") {
+    return (
+      <IntroScreen
+        icon={<Users className="h-10 w-10 text-wellness-sage" />}
+        title="Created by a woman, for women"
+        onNext={() => setStep("intro8")}
+        onBack={() => setStep("intro6")}
+      >
+        <p>
+          This app was created by a woman who has lived through each phase of womanhood herself.
+        </p>
+        <p className="pt-2">The practices you'll find here are shaped by:</p>
+        <ul className="space-y-2 text-left max-w-md mx-auto">
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>lived experience</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>a lifetime of study</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>decades of supporting women in healing spaces</span>
+          </li>
+        </ul>
+        <p className="pt-4 italic">
+          This is not trend-based wellbeing — it is care rooted in wisdom, understanding, and compassion.
+        </p>
+      </IntroScreen>
+    );
+  }
+
+  // Intro Screen 8: Empowerment, Not Pressure
+  if (step === "intro8") {
+    return (
+      <IntroScreen
+        icon={<Sparkles className="h-10 w-10 text-wellness-lilac" />}
+        title="Nothing to fix. Nothing to force."
+        onNext={() => setStep("intro9")}
+        onBack={() => setStep("intro7")}
+      >
+        <div className="space-y-4 text-lg">
+          <p>Healing is not linear.</p>
+          <p>Small, gentle steps matter.</p>
+          <p>You are allowed to move at your own pace.</p>
+        </div>
+        <p className="pt-6 italic">
+          This app exists to support you — not to judge or control you.
+        </p>
+      </IntroScreen>
+    );
+  }
+
+  // Intro Screen 9: Gentle Disclaimer
+  if (step === "intro9") {
+    return (
+      <IntroScreen
+        icon={<Shield className="h-10 w-10 text-wellness-sage" />}
+        title="Please read"
+        onNext={() => setStep("intro10")}
+        onBack={() => setStep("intro8")}
+      >
+        <p>
+          This app offers guidance, education, and supportive suggestions.
+          It does not replace medical advice or professional healthcare.
+        </p>
+        <p className="pt-4">Please:</p>
+        <ul className="space-y-2 text-left max-w-md mx-auto">
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>listen to your body</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>seek medical clearance from your doctor or qualified healthcare provider when needed</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-sage">•</span>
+            <span>take responsibility for your own health decisions</span>
+          </li>
+        </ul>
+        <p className="pt-4 italic">
+          You are always encouraged to work alongside appropriate practitioners.
+        </p>
+      </IntroScreen>
+    );
+  }
+
+  // Intro Screen 10: Personal Journey Begins
+  if (step === "intro10") {
+    return (
+      <IntroScreen
+        icon={<BookOpen className="h-10 w-10 text-wellness-lilac" />}
+        title="Your journey is personal"
+        onNext={() => setStep("intro11")}
+        onBack={() => setStep("intro9")}
+      >
+        <p>You'll now be invited to:</p>
+        <ul className="space-y-2 text-left max-w-md mx-auto">
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>create your profile</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>tell us where you are in life</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="text-wellness-lilac">•</span>
+            <span>choose what you'd like support with</span>
+          </li>
+        </ul>
+        <p className="pt-4 italic">
+          This allows the app to gently guide you with what may be most helpful for you.
+        </p>
+      </IntroScreen>
+    );
+  }
+
+  // Intro Screen 11: Invitation (Final intro screen)
+  if (step === "intro11") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <Card className="w-full max-w-2xl border-none shadow-xl bg-card/95 backdrop-blur-sm animate-fade-in">
+          <CardHeader className="text-center space-y-6 pb-4 pt-12">
+            <div className="flex justify-center">
+              <div className="p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20">
+                <Compass className="h-10 w-10 text-mumtaz-plum" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl md:text-3xl font-bold text-mumtaz-plum leading-tight font-accent">
+              You are supported here
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-8 pb-12">
+            <div className="text-center space-y-4 text-lg text-muted-foreground leading-relaxed">
+              <p>Move gently.</p>
+              <p>Learn at your own pace.</p>
+              <p className="italic">We are honoured to walk alongside you.</p>
+            </div>
+            <div className="flex justify-between pt-6">
+              <Button variant="ghost" onClick={() => setStep("intro10")} className="gap-2">
+                <ArrowLeft className="h-4 w-4" /> Back
+              </Button>
+              <Button 
+                onClick={() => setStep("welcome")} 
+                size="lg"
+                className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-8"
+              >
+                Let's begin your journey <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (step === "welcome") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -154,6 +567,7 @@ export default function Onboarding() {
             )}
           </CardHeader>
           <CardContent className="space-y-8">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
             <div className="space-y-4">
               <Label htmlFor="name" className="text-base font-medium text-foreground">
                 What should we call you?
@@ -171,14 +585,19 @@ export default function Onboarding() {
               <p className="text-2xl font-semibold text-foreground mb-6">
                 Where are you today?
               </p>
-              <Button
-                onClick={() => setStep("lifeStage")}
-                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                size="lg"
-                disabled={!userName.trim()}
-              >
-                Continue
-              </Button>
+              <div className="flex justify-between">
+                <Button variant="ghost" onClick={() => setStep("intro11")} className="gap-2">
+                  <ArrowLeft className="h-4 w-4" /> Back
+                </Button>
+                <Button
+                  onClick={() => setStep("lifeStage")}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                  size="lg"
+                  disabled={!userName.trim()}
+                >
+                  Continue
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -309,20 +728,24 @@ export default function Onboarding() {
                 </div>
               )}
 
-              <Button
-                onClick={() => {
-                  // Skip menstrual cycle questions for non-menstrual life stages
-                  if (lifeStage === 'menstrual_cycle') {
-                    setStep("cycle");
-                  } else {
-                    setStep("dosha");
-                  }
-                }}
-                disabled={!lifeStage}
-                className="w-full"
-              >
-                Continue
-              </Button>
+              <div className="flex justify-between pt-4">
+                <Button variant="outline" onClick={() => setStep("welcome")}>
+                  <ArrowLeft className="h-4 w-4 mr-2" /> Back
+                </Button>
+                <Button
+                  onClick={() => {
+                    // Skip menstrual cycle questions for non-menstrual life stages
+                    if (lifeStage === 'menstrual_cycle') {
+                      setStep("cycle");
+                    } else {
+                      setStep("dosha");
+                    }
+                  }}
+                  disabled={!lifeStage}
+                >
+                  Continue
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TooltipProvider>
@@ -746,19 +1169,19 @@ export default function Onboarding() {
                       <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
                         <RadioGroupItem value="not_pregnant" id="not_pregnant" />
                         <Label htmlFor="not_pregnant" className="flex-1 cursor-pointer flex items-center gap-2">
-                          Tracking my cycle for wellness
+                          Not currently pregnant or trying to conceive
                           <HelpCircle className="h-3 w-3 text-muted-foreground" />
                         </Label>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-sm p-4">
-                      <p className="font-semibold mb-2">Not Pregnant:</p>
+                      <p className="font-semibold mb-2">General Wellness Focus:</p>
                       <ul className="text-sm space-y-1 list-disc list-inside">
-                        <li>Focus on understanding your natural cycle patterns</li>
-                        <li>Track energy levels, mood, and physical symptoms</li>
-                        <li>Build sustainable wellness habits aligned with hormonal changes</li>
-                        <li>Optimize nutrition, exercise, and self-care for each phase</li>
-                        <li>Expect: personalized recommendations for cycle syncing</li>
+                        <li>Focus on cycle tracking and hormonal balance</li>
+                        <li>General yoga, fitness, and movement practices</li>
+                        <li>Nutrition and lifestyle for overall wellbeing</li>
+                        <li>Stress management and emotional support</li>
+                        <li>Expect: personalized daily routines and self-care</li>
                       </ul>
                     </TooltipContent>
                   </Tooltip>
@@ -766,21 +1189,21 @@ export default function Onboarding() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
-                        <RadioGroupItem value="trying_to_conceive" id="trying_to_conceive" />
-                        <Label htmlFor="trying_to_conceive" className="flex-1 cursor-pointer flex items-center gap-2">
-                          Preparing for pregnancy
+                        <RadioGroupItem value="trying" id="trying" />
+                        <Label htmlFor="trying" className="flex-1 cursor-pointer flex items-center gap-2">
+                          Trying to conceive
                           <HelpCircle className="h-3 w-3 text-muted-foreground" />
                         </Label>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-sm p-4">
-                      <p className="font-semibold mb-2">Trying to Conceive:</p>
+                      <p className="font-semibold mb-2">Fertility Support:</p>
                       <ul className="text-sm space-y-1 list-disc list-inside">
-                        <li>Optimize fertility through cycle awareness and timing</li>
-                        <li>Nourishing practices to prepare your body for conception</li>
-                        <li>Stress management and emotional support during this journey</li>
-                        <li>Track ovulation patterns and fertile window</li>
-                        <li>Expect: fertility-focused nutrition, yoga, and wellness tips</li>
+                        <li>Fertility-focused yoga and gentle movements</li>
+                        <li>Nutrition for hormonal balance and conception</li>
+                        <li>Stress reduction and emotional support</li>
+                        <li>Cycle awareness and fertility window tracking</li>
+                        <li>Expect: gentle practices to support your fertility journey</li>
                       </ul>
                     </TooltipContent>
                   </Tooltip>
@@ -796,7 +1219,7 @@ export default function Onboarding() {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-sm p-4">
-                      <p className="font-semibold mb-2">Pregnancy:</p>
+                      <p className="font-semibold mb-2">Pregnancy Support:</p>
                       <ul className="text-sm space-y-1 list-disc list-inside">
                         <li>Trimester-specific guidance as your body changes</li>
                         <li>Safe pregnancy yoga, movements, and exercises</li>
