@@ -39,47 +39,67 @@ const IntroScreen = ({
   children, 
   onNext, 
   onBack,
+  onSkip,
   showBack = true,
-  nextLabel = "Continue"
+  nextLabel = "Continue",
+  animationKey
 }: { 
   icon: React.ReactNode;
   title: string;
   children: React.ReactNode;
   onNext: () => void;
   onBack?: () => void;
+  onSkip?: () => void;
   showBack?: boolean;
   nextLabel?: string;
+  animationKey?: string;
 }) => (
   <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-    <Card className="w-full max-w-2xl border-none shadow-xl bg-card/95 backdrop-blur-sm animate-fade-in">
-      <CardHeader className="text-center space-y-6 pb-4 pt-10">
-        <div className="flex justify-center">
-          <div className="p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20">
-            {icon}
-          </div>
-        </div>
-        <CardTitle className="text-2xl md:text-3xl font-bold text-mumtaz-plum leading-tight font-accent">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6 pb-10">
-        <div className="text-center space-y-4 text-muted-foreground leading-relaxed">
-          {children}
-        </div>
-        <div className="flex justify-between pt-6">
-          {showBack && onBack ? (
-            <Button variant="ghost" onClick={onBack} className="gap-2">
-              <ArrowLeft className="h-4 w-4" /> Back
-            </Button>
-          ) : (
-            <div />
+    <div 
+      key={animationKey}
+      className="w-full max-w-2xl animate-in fade-in slide-in-from-right-4 duration-500"
+    >
+      <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm">
+        <CardHeader className="text-center space-y-6 pb-4 pt-10">
+          {onSkip && (
+            <div className="absolute top-4 right-4">
+              <Button 
+                variant="ghost" 
+                onClick={onSkip} 
+                className="text-muted-foreground hover:text-foreground text-sm"
+              >
+                Skip to Profile Setup
+              </Button>
+            </div>
           )}
-          <Button onClick={onNext} className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground">
-            {nextLabel} <ArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+          <div className="flex justify-center">
+            <div className="p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20 transition-transform duration-300 hover:scale-105">
+              {icon}
+            </div>
+          </div>
+          <CardTitle className="text-2xl md:text-3xl font-bold text-mumtaz-plum leading-tight font-accent">
+            {title}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6 pb-10">
+          <div className="text-center space-y-4 text-muted-foreground leading-relaxed">
+            {children}
+          </div>
+          <div className="flex justify-between pt-6">
+            {showBack && onBack ? (
+              <Button variant="ghost" onClick={onBack} className="gap-2 transition-all duration-200 hover:-translate-x-1">
+                <ArrowLeft className="h-4 w-4" /> Back
+              </Button>
+            ) : (
+              <div />
+            )}
+            <Button onClick={onNext} className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-200 hover:translate-x-1">
+              {nextLabel} <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   </div>
 );
 
@@ -194,32 +214,45 @@ export default function Onboarding() {
     }
   };
 
+  const skipToProfile = () => setStep("welcome");
+
   // Intro Screen 1: Welcome
   if (step === "intro1") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-        <Card className="w-full max-w-2xl border-none shadow-xl bg-card/95 backdrop-blur-sm animate-fade-in">
-          <CardHeader className="text-center space-y-8 pb-6 pt-12">
-            <Logo size="xl" className="mx-auto" />
-            <CardTitle className="text-3xl md:text-4xl font-bold text-mumtaz-plum leading-tight font-accent">
-              Welcome to Mumtaz Health
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-8 pb-12">
-            <p className="text-center text-lg text-muted-foreground leading-relaxed">
-              A gentle space created to support women through every phase of life — with care, compassion, and wisdom.
-            </p>
-            <div className="flex justify-center pt-4">
+        <div key="intro1" className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm relative">
+            <div className="absolute top-4 right-4">
               <Button 
-                onClick={() => setStep("intro2")} 
-                size="lg"
-                className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-8"
+                variant="ghost" 
+                onClick={skipToProfile} 
+                className="text-muted-foreground hover:text-foreground text-sm"
               >
-                Begin <ArrowRight className="h-4 w-4" />
+                Skip to Profile Setup
               </Button>
             </div>
-          </CardContent>
-        </Card>
+            <CardHeader className="text-center space-y-8 pb-6 pt-12">
+              <Logo size="xl" className="mx-auto" />
+              <CardTitle className="text-3xl md:text-4xl font-bold text-mumtaz-plum leading-tight font-accent">
+                Welcome to Mumtaz Health
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-8 pb-12">
+              <p className="text-center text-lg text-muted-foreground leading-relaxed">
+                A gentle space created to support women through every phase of life — with care, compassion, and wisdom.
+              </p>
+              <div className="flex justify-center pt-4">
+                <Button 
+                  onClick={() => setStep("intro2")} 
+                  size="lg"
+                  className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-8 transition-all duration-200 hover:translate-x-1"
+                >
+                  Begin <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -228,10 +261,12 @@ export default function Onboarding() {
   if (step === "intro2") {
     return (
       <IntroScreen
+        animationKey="intro2"
         icon={<Heart className="h-10 w-10 text-wellness-lilac" />}
         title="A holistic approach to women's wellbeing"
         onNext={() => setStep("intro3")}
         onBack={() => setStep("intro1")}
+        onSkip={skipToProfile}
       >
         <p className="text-lg">This app brings together</p>
         <p className="text-xl font-medium text-foreground">
@@ -251,10 +286,12 @@ export default function Onboarding() {
   if (step === "intro3") {
     return (
       <IntroScreen
+        animationKey="intro3"
         icon={<Leaf className="h-10 w-10 text-wellness-sage" />}
         title="Your body is unique — and your care should be too"
         onNext={() => setStep("intro4")}
         onBack={() => setStep("intro2")}
+        onSkip={skipToProfile}
       >
         <p>
           Ayurveda helps you understand your natural constitution, or <strong className="text-foreground">dosha</strong> (Vata, Pitta, Kapha).
@@ -285,10 +322,12 @@ export default function Onboarding() {
   if (step === "intro4") {
     return (
       <IntroScreen
+        animationKey="intro4"
         icon={<Activity className="h-10 w-10 text-wellness-lilac" />}
         title="Movement adapted for every stage of womanhood"
         onNext={() => setStep("intro5")}
         onBack={() => setStep("intro3")}
+        onSkip={skipToProfile}
       >
         <p>
           Yoga and movement in this app are gentle, accessible, and adaptable.
@@ -323,10 +362,12 @@ export default function Onboarding() {
   if (step === "intro5") {
     return (
       <IntroScreen
+        animationKey="intro5"
         icon={<Sun className="h-10 w-10 text-wellness-sage" />}
         title="Nourishment for real life"
         onNext={() => setStep("intro6")}
         onBack={() => setStep("intro4")}
+        onSkip={skipToProfile}
       >
         <p>Nutrition guidance here is:</p>
         <ul className="space-y-2 text-left max-w-md mx-auto">
@@ -358,10 +399,12 @@ export default function Onboarding() {
   if (step === "intro6") {
     return (
       <IntroScreen
+        animationKey="intro6"
         icon={<Moon className="h-10 w-10 text-wellness-lilac" />}
         title="Care for the whole of you"
         onNext={() => setStep("intro7")}
         onBack={() => setStep("intro5")}
+        onSkip={skipToProfile}
       >
         <p>
           Alongside the body, this app supports emotional and spiritual wellbeing through:
@@ -395,10 +438,12 @@ export default function Onboarding() {
   if (step === "intro7") {
     return (
       <IntroScreen
+        animationKey="intro7"
         icon={<Users className="h-10 w-10 text-wellness-sage" />}
         title="Created by a woman, for women"
         onNext={() => setStep("intro8")}
         onBack={() => setStep("intro6")}
+        onSkip={skipToProfile}
       >
         <p>
           This app was created by a woman who has lived through each phase of womanhood herself.
@@ -429,10 +474,12 @@ export default function Onboarding() {
   if (step === "intro8") {
     return (
       <IntroScreen
+        animationKey="intro8"
         icon={<Sparkles className="h-10 w-10 text-wellness-lilac" />}
         title="Nothing to fix. Nothing to force."
         onNext={() => setStep("intro9")}
         onBack={() => setStep("intro7")}
+        onSkip={skipToProfile}
       >
         <div className="space-y-4 text-lg">
           <p>Healing is not linear.</p>
@@ -450,10 +497,12 @@ export default function Onboarding() {
   if (step === "intro9") {
     return (
       <IntroScreen
+        animationKey="intro9"
         icon={<Shield className="h-10 w-10 text-wellness-sage" />}
         title="Please read"
         onNext={() => setStep("intro10")}
         onBack={() => setStep("intro8")}
+        onSkip={skipToProfile}
       >
         <p>
           This app offers guidance, education, and supportive suggestions.
@@ -485,10 +534,12 @@ export default function Onboarding() {
   if (step === "intro10") {
     return (
       <IntroScreen
+        animationKey="intro10"
         icon={<BookOpen className="h-10 w-10 text-wellness-lilac" />}
         title="Your journey is personal"
         onNext={() => setStep("intro11")}
         onBack={() => setStep("intro9")}
+        onSkip={skipToProfile}
       >
         <p>You'll now be invited to:</p>
         <ul className="space-y-2 text-left max-w-md mx-auto">
@@ -516,37 +567,39 @@ export default function Onboarding() {
   if (step === "intro11") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-        <Card className="w-full max-w-2xl border-none shadow-xl bg-card/95 backdrop-blur-sm animate-fade-in">
-          <CardHeader className="text-center space-y-6 pb-4 pt-12">
-            <div className="flex justify-center">
-              <div className="p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20">
-                <Compass className="h-10 w-10 text-mumtaz-plum" />
+        <div key="intro11" className="w-full max-w-2xl animate-in fade-in slide-in-from-right-4 duration-500">
+          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm">
+            <CardHeader className="text-center space-y-6 pb-4 pt-12">
+              <div className="flex justify-center">
+                <div className="p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20 transition-transform duration-300 hover:scale-105">
+                  <Compass className="h-10 w-10 text-mumtaz-plum" />
+                </div>
               </div>
-            </div>
-            <CardTitle className="text-2xl md:text-3xl font-bold text-mumtaz-plum leading-tight font-accent">
-              You are supported here
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-8 pb-12">
-            <div className="text-center space-y-4 text-lg text-muted-foreground leading-relaxed">
-              <p>Move gently.</p>
-              <p>Learn at your own pace.</p>
-              <p className="italic">We are honoured to walk alongside you.</p>
-            </div>
-            <div className="flex justify-between pt-6">
-              <Button variant="ghost" onClick={() => setStep("intro10")} className="gap-2">
-                <ArrowLeft className="h-4 w-4" /> Back
-              </Button>
-              <Button 
-                onClick={() => setStep("welcome")} 
-                size="lg"
-                className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-8"
-              >
-                Let's begin your journey <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <CardTitle className="text-2xl md:text-3xl font-bold text-mumtaz-plum leading-tight font-accent">
+                You are supported here
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-8 pb-12">
+              <div className="text-center space-y-4 text-lg text-muted-foreground leading-relaxed">
+                <p>Move gently.</p>
+                <p>Learn at your own pace.</p>
+                <p className="italic">We are honoured to walk alongside you.</p>
+              </div>
+              <div className="flex justify-between pt-6">
+                <Button variant="ghost" onClick={() => setStep("intro10")} className="gap-2 transition-all duration-200 hover:-translate-x-1">
+                  <ArrowLeft className="h-4 w-4" /> Back
+                </Button>
+                <Button 
+                  onClick={() => setStep("welcome")} 
+                  size="lg"
+                  className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-8 transition-all duration-200 hover:translate-x-1"
+                >
+                  Let's begin your journey <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
