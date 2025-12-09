@@ -412,23 +412,26 @@ export default function Onboarding() {
         <ul className="space-y-2 text-left max-w-md mx-auto">
           <li className="flex items-center gap-3">
             <span className="text-wellness-lilac">•</span>
-            <span>breathwork</span>
+            <span>breathwork & deep relaxation</span>
           </li>
           <li className="flex items-center gap-3">
             <span className="text-wellness-lilac">•</span>
-            <span>reflection</span>
+            <span>reflection & journaling</span>
           </li>
           <li className="flex items-center gap-3">
             <span className="text-wellness-lilac">•</span>
-            <span>grounding practices</span>
+            <span>grounding & mindfulness practices</span>
           </li>
           <li className="flex items-center gap-3">
             <span className="text-wellness-lilac">•</span>
-            <span>moments of stillness</span>
+            <span>moments of stillness & gratitude</span>
           </li>
         </ul>
-        <p className="pt-4 italic">
-          These practices offer calm, resilience, and connection — whatever your background or beliefs.
+        <p className="pt-4">
+          Whether you find peace through <strong className="text-foreground">Islamic practices</strong> like dhikr, du'a, and Quranic reflection, or through <strong className="text-foreground">universal mindfulness</strong> and meditation — you are welcome here.
+        </p>
+        <p className="pt-2 italic">
+          This space honours all paths to inner peace and connection.
         </p>
       </IntroScreen>
     );
