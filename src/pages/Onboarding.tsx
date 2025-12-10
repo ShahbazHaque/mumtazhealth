@@ -399,6 +399,25 @@ export default function Onboarding() {
             </Collapsible>
           </div>
 
+          {/* Quiz Prompt */}
+          <div className="bg-wellness-sage/10 rounded-xl p-4 text-center space-y-3">
+            <div className="flex items-center justify-center gap-2">
+              <HelpCircle className="h-5 w-5 text-wellness-sage" />
+              <p className="font-medium text-foreground">Not sure which sounds like you?</p>
+            </div>
+            <p className="text-sm">
+              Don't worry — later in setup, you'll take a simple quiz to help discover your unique balance.
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setStep("dosha")}
+              className="border-wellness-sage/30 hover:bg-wellness-sage/10 text-foreground"
+            >
+              Skip ahead to the quiz
+            </Button>
+          </div>
+
           {/* Reassurance */}
           <div className="bg-wellness-lilac/10 rounded-xl p-4 space-y-2 text-left">
             <p className="font-medium text-foreground">A gentle reminder:</p>
