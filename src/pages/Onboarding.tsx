@@ -7,7 +7,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info, HelpCircle, Activity, ArrowLeft, ArrowRight, Leaf, Sun, BookOpen, Users, Shield, Compass } from "lucide-react";
+import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info, HelpCircle, Activity, ArrowLeft, ArrowRight, Leaf, Sun, BookOpen, Users, Shield, Compass, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import DoshaAssessment from "@/components/DoshaAssessment";
 import { Logo } from "@/components/Logo";
@@ -319,44 +320,83 @@ export default function Onboarding() {
           </div>
 
           {/* Three Doshas */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <h3 className="font-semibold text-foreground">The three doshas:</h3>
             
             {/* Vata */}
-            <div className="bg-background/50 border border-border/30 rounded-lg p-4 text-left">
-              <div className="flex items-center gap-2 mb-2">
-                <Wind className="h-5 w-5 text-wellness-lilac" />
-                <span className="font-semibold text-foreground">Vata</span>
-                <span className="text-muted-foreground text-sm">— movement & change</span>
+            <Collapsible className="bg-background/50 border border-border/30 rounded-lg overflow-hidden">
+              <div className="p-4 text-left">
+                <div className="flex items-center gap-2 mb-2">
+                  <Wind className="h-5 w-5 text-wellness-lilac" />
+                  <span className="font-semibold text-foreground">Vata</span>
+                  <span className="text-muted-foreground text-sm">— movement & change</span>
+                </div>
+                <p className="text-sm">
+                  Connected to movement, creativity, and the nervous system. Vata energy is light, quick, and changeable — like the wind.
+                </p>
+                <CollapsibleTrigger className="flex items-center gap-1 text-xs text-wellness-lilac hover:text-wellness-lilac/80 mt-2 transition-colors">
+                  <span>Learn more</span>
+                  <ChevronDown className="h-3 w-3 transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+                </CollapsibleTrigger>
               </div>
-              <p className="text-sm">
-                Connected to movement, creativity, and the nervous system. Vata energy is light, quick, and changeable — like the wind.
-              </p>
-            </div>
+              <CollapsibleContent className="animate-accordion-down">
+                <div className="px-4 pb-4 pt-0 text-sm text-muted-foreground space-y-2 border-t border-border/20 mt-0 pt-3">
+                  <p><strong className="text-foreground">When balanced:</strong> Creative, enthusiastic, flexible, quick-thinking, joyful</p>
+                  <p><strong className="text-foreground">When out of balance:</strong> Anxious, scattered, difficulty sleeping, dry skin, cold hands/feet</p>
+                  <p><strong className="text-foreground">Supportive practices:</strong> Warm, grounding foods • Regular routines • Gentle yoga • Warm baths • Rest and stillness</p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
 
             {/* Pitta */}
-            <div className="bg-background/50 border border-border/30 rounded-lg p-4 text-left">
-              <div className="flex items-center gap-2 mb-2">
-                <Flame className="h-5 w-5 text-wellness-lilac" />
-                <span className="font-semibold text-foreground">Pitta</span>
-                <span className="text-muted-foreground text-sm">— digestion & transformation</span>
+            <Collapsible className="bg-background/50 border border-border/30 rounded-lg overflow-hidden">
+              <div className="p-4 text-left">
+                <div className="flex items-center gap-2 mb-2">
+                  <Flame className="h-5 w-5 text-wellness-lilac" />
+                  <span className="font-semibold text-foreground">Pitta</span>
+                  <span className="text-muted-foreground text-sm">— digestion & transformation</span>
+                </div>
+                <p className="text-sm">
+                  Connected to digestion, focus, and how we process things — physically and mentally. Pitta energy is warm, sharp, and driven.
+                </p>
+                <CollapsibleTrigger className="flex items-center gap-1 text-xs text-wellness-lilac hover:text-wellness-lilac/80 mt-2 transition-colors">
+                  <span>Learn more</span>
+                  <ChevronDown className="h-3 w-3 transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+                </CollapsibleTrigger>
               </div>
-              <p className="text-sm">
-                Connected to digestion, focus, and how we process things — physically and mentally. Pitta energy is warm, sharp, and driven.
-              </p>
-            </div>
+              <CollapsibleContent className="animate-accordion-down">
+                <div className="px-4 pb-4 pt-0 text-sm text-muted-foreground space-y-2 border-t border-border/20 mt-0 pt-3">
+                  <p><strong className="text-foreground">When balanced:</strong> Focused, confident, good digestion, warm, natural leaders</p>
+                  <p><strong className="text-foreground">When out of balance:</strong> Irritable, inflammation, heartburn, overheating, impatient</p>
+                  <p><strong className="text-foreground">Supportive practices:</strong> Cooling foods • Time in nature • Swimming • Avoiding excess heat • Calming breathwork</p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
 
             {/* Kapha */}
-            <div className="bg-background/50 border border-border/30 rounded-lg p-4 text-left">
-              <div className="flex items-center gap-2 mb-2">
-                <Mountain className="h-5 w-5 text-wellness-lilac" />
-                <span className="font-semibold text-foreground">Kapha</span>
-                <span className="text-muted-foreground text-sm">— stability & strength</span>
+            <Collapsible className="bg-background/50 border border-border/30 rounded-lg overflow-hidden">
+              <div className="p-4 text-left">
+                <div className="flex items-center gap-2 mb-2">
+                  <Mountain className="h-5 w-5 text-wellness-lilac" />
+                  <span className="font-semibold text-foreground">Kapha</span>
+                  <span className="text-muted-foreground text-sm">— stability & strength</span>
+                </div>
+                <p className="text-sm">
+                  Connected to stability, nourishment, and calm. Kapha energy is grounding, steady, and nurturing — like the earth.
+                </p>
+                <CollapsibleTrigger className="flex items-center gap-1 text-xs text-wellness-lilac hover:text-wellness-lilac/80 mt-2 transition-colors">
+                  <span>Learn more</span>
+                  <ChevronDown className="h-3 w-3 transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+                </CollapsibleTrigger>
               </div>
-              <p className="text-sm">
-                Connected to stability, nourishment, and calm. Kapha energy is grounding, steady, and nurturing — like the earth.
-              </p>
-            </div>
+              <CollapsibleContent className="animate-accordion-down">
+                <div className="px-4 pb-4 pt-0 text-sm text-muted-foreground space-y-2 border-t border-border/20 mt-0 pt-3">
+                  <p><strong className="text-foreground">When balanced:</strong> Calm, loving, strong, steady, excellent memory, patient</p>
+                  <p><strong className="text-foreground">When out of balance:</strong> Sluggish, heavy, congestion, resistant to change, low motivation</p>
+                  <p><strong className="text-foreground">Supportive practices:</strong> Light, warming foods • Regular movement • Stimulating activities • Variety in routine • Energising breathwork</p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
 
           {/* Reassurance */}
