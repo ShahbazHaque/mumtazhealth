@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Navigation } from "@/components/Navigation";
+import { DoshaLearningJourney } from "@/components/DoshaLearningJourney";
 
 interface Insight {
   title: string;
@@ -272,6 +273,11 @@ export default function Insights() {
             )}
           </div>
         )}
+
+        {/* Dosha Learning Journey Section */}
+        <div className="mt-8">
+          <DoshaLearningJourney />
+        </div>
       </div>
     </div>
   );
