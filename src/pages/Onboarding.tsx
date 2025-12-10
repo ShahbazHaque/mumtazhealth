@@ -34,6 +34,73 @@ const ProgressIndicator = ({ currentStep, totalSteps }: { currentStep: number; t
   </div>
 );
 
+const IntroProgressIndicator = ({ current, total }: { current: number; total: number }) => (
+  <div className="flex items-center justify-center gap-1.5 mb-4">
+    {Array.from({ length: total }, (_, i) => (
+      <div
+        key={i}
+        className={`h-1.5 rounded-full transition-all duration-300 ${
+          i + 1 === current 
+            ? 'w-6 bg-wellness-lilac' 
+            : i + 1 < current 
+              ? 'w-2 bg-wellness-sage' 
+              : 'w-2 bg-muted'
+        }`}
+      />
+    ))}
+    <span className="ml-2 text-xs text-muted-foreground">{current}/{total}</span>
+  </div>
+);
+
+const DoshaVisualDiagram = () => (
+  <div className="relative py-6">
+    {/* Central circle representing YOU */}
+    <div className="flex items-center justify-center">
+      <div className="relative">
+        {/* Outer animated ring */}
+        <div className="absolute inset-0 rounded-full border-2 border-dashed border-wellness-lilac/30 animate-[spin_20s_linear_infinite]" style={{ width: '180px', height: '180px', margin: '-10px' }} />
+        
+        {/* Main circle with doshas */}
+        <div className="relative w-40 h-40 rounded-full bg-gradient-to-br from-wellness-lilac/10 via-background to-wellness-sage/10 flex items-center justify-center border border-border/30">
+          <span className="text-sm font-medium text-foreground">You</span>
+          
+          {/* Vata - Top */}
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex flex-col items-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="p-2.5 rounded-full bg-blue-100 dark:bg-blue-900/30 shadow-md hover:scale-110 transition-transform">
+              <Wind className="h-5 w-5 text-blue-500" />
+            </div>
+            <span className="text-xs font-medium mt-1 text-foreground">Vata</span>
+            <span className="text-[10px] text-muted-foreground">Air & Space</span>
+          </div>
+          
+          {/* Pitta - Bottom Left */}
+          <div className="absolute -bottom-1 -left-4 flex flex-col items-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="p-2.5 rounded-full bg-orange-100 dark:bg-orange-900/30 shadow-md hover:scale-110 transition-transform">
+              <Flame className="h-5 w-5 text-orange-500" />
+            </div>
+            <span className="text-xs font-medium mt-1 text-foreground">Pitta</span>
+            <span className="text-[10px] text-muted-foreground">Fire & Water</span>
+          </div>
+          
+          {/* Kapha - Bottom Right */}
+          <div className="absolute -bottom-1 -right-4 flex flex-col items-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <div className="p-2.5 rounded-full bg-green-100 dark:bg-green-900/30 shadow-md hover:scale-110 transition-transform">
+              <Mountain className="h-5 w-5 text-green-600" />
+            </div>
+            <span className="text-xs font-medium mt-1 text-foreground">Kapha</span>
+            <span className="text-[10px] text-muted-foreground">Earth & Water</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {/* Caption */}
+    <p className="text-center text-xs text-muted-foreground mt-4 italic">
+      All three energies flow through you — in your own unique balance
+    </p>
+  </div>
+);
+
 const IntroScreen = ({ 
   icon, 
   title, 
@@ -43,7 +110,9 @@ const IntroScreen = ({
   onSkip,
   showBack = true,
   nextLabel = "Continue",
-  animationKey
+  animationKey,
+  currentIntro,
+  totalIntros
 }: { 
   icon: React.ReactNode;
   title: string;
@@ -54,12 +123,17 @@ const IntroScreen = ({
   showBack?: boolean;
   nextLabel?: string;
   animationKey?: string;
+  currentIntro?: number;
+  totalIntros?: number;
 }) => (
   <div className="min-h-screen flex items-center justify-center p-4 bg-background">
     <div 
       key={animationKey}
       className="w-full max-w-2xl animate-in fade-in slide-in-from-right-4 duration-500"
     >
+      {currentIntro && totalIntros && (
+        <IntroProgressIndicator current={currentIntro} total={totalIntros} />
+      )}
       <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm">
         <CardHeader className="text-center space-y-6 pb-4 pt-10">
           {onSkip && (
@@ -222,6 +296,7 @@ export default function Onboarding() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background">
         <div key="intro1" className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <IntroProgressIndicator current={1} total={11} />
           <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm relative">
             <div className="absolute top-4 right-4">
               <Button 
@@ -268,6 +343,8 @@ export default function Onboarding() {
         onNext={() => setStep("intro3")}
         onBack={() => setStep("intro1")}
         onSkip={skipToProfile}
+        currentIntro={2}
+        totalIntros={11}
       >
         <p className="text-lg">This app brings together</p>
         <p className="text-xl font-medium text-foreground">
@@ -293,6 +370,8 @@ export default function Onboarding() {
         onNext={() => setStep("intro4")}
         onBack={() => setStep("intro2")}
         onSkip={skipToProfile}
+        currentIntro={3}
+        totalIntros={11}
       >
         <div className="space-y-6 max-w-lg mx-auto">
           {/* Simple Ayurveda Explanation */}
@@ -318,6 +397,9 @@ export default function Onboarding() {
               <strong className="text-foreground">Everyone has all three doshas</strong> — they are not labels or boxes. One or two may be more dominant in you, and this can change over time due to age, stress, pregnancy, menopause, health, or lifestyle.
             </p>
           </div>
+
+          {/* Visual Dosha Diagram */}
+          <DoshaVisualDiagram />
 
           {/* Three Doshas */}
           <div className="space-y-3">
@@ -448,6 +530,8 @@ export default function Onboarding() {
         onNext={() => setStep("intro5")}
         onBack={() => setStep("intro3")}
         onSkip={skipToProfile}
+        currentIntro={4}
+        totalIntros={11}
       >
         <p>
           Yoga and movement in this app are gentle, accessible, and adaptable.
@@ -488,6 +572,8 @@ export default function Onboarding() {
         onNext={() => setStep("intro6")}
         onBack={() => setStep("intro4")}
         onSkip={skipToProfile}
+        currentIntro={5}
+        totalIntros={11}
       >
         <p>Nutrition guidance here is:</p>
         <ul className="space-y-2 text-left max-w-md mx-auto">
@@ -525,6 +611,8 @@ export default function Onboarding() {
         onNext={() => setStep("intro7")}
         onBack={() => setStep("intro5")}
         onSkip={skipToProfile}
+        currentIntro={6}
+        totalIntros={11}
       >
         <p>
           Alongside the body, this app supports emotional and spiritual wellbeing through:
@@ -567,6 +655,8 @@ export default function Onboarding() {
         onNext={() => setStep("intro8")}
         onBack={() => setStep("intro6")}
         onSkip={skipToProfile}
+        currentIntro={7}
+        totalIntros={11}
       >
         <p>
           This app was created by a woman who has lived through each phase of womanhood herself.
@@ -603,6 +693,8 @@ export default function Onboarding() {
         onNext={() => setStep("intro9")}
         onBack={() => setStep("intro7")}
         onSkip={skipToProfile}
+        currentIntro={8}
+        totalIntros={11}
       >
         <div className="space-y-4 text-lg">
           <p>Healing is not linear.</p>
@@ -626,6 +718,8 @@ export default function Onboarding() {
         onNext={() => setStep("intro10")}
         onBack={() => setStep("intro8")}
         onSkip={skipToProfile}
+        currentIntro={9}
+        totalIntros={11}
       >
         <p>
           This app offers guidance, education, and supportive suggestions.
@@ -663,6 +757,8 @@ export default function Onboarding() {
         onNext={() => setStep("intro11")}
         onBack={() => setStep("intro9")}
         onSkip={skipToProfile}
+        currentIntro={10}
+        totalIntros={11}
       >
         <p>You'll now be invited to:</p>
         <ul className="space-y-2 text-left max-w-md mx-auto">
@@ -691,6 +787,7 @@ export default function Onboarding() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background">
         <div key="intro11" className="w-full max-w-2xl animate-in fade-in slide-in-from-right-4 duration-500">
+          <IntroProgressIndicator current={11} total={11} />
           <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm">
             <CardHeader className="text-center space-y-6 pb-4 pt-12">
               <div className="flex justify-center">
