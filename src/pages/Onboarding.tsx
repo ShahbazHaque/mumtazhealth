@@ -288,32 +288,93 @@ export default function Onboarding() {
       <IntroScreen
         animationKey="intro3"
         icon={<Leaf className="h-10 w-10 text-wellness-sage" />}
-        title="Your body is unique — and your care should be too"
+        title="Understanding Your Unique Nature"
         onNext={() => setStep("intro4")}
         onBack={() => setStep("intro2")}
         onSkip={skipToProfile}
       >
-        <p>
-          Ayurveda helps you understand your natural constitution, or <strong className="text-foreground">dosha</strong> (Vata, Pitta, Kapha).
-        </p>
-        <p>This awareness helps guide:</p>
-        <ul className="space-y-2 text-left max-w-md mx-auto">
-          <li className="flex items-center gap-3">
-            <span className="text-wellness-sage">•</span>
-            <span>movement that suits your body</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="text-wellness-sage">•</span>
-            <span>food that supports you</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="text-wellness-sage">•</span>
-            <span>routines that bring balance</span>
-          </li>
-        </ul>
-        <p className="pt-4 italic">
-          There is no "one-size-fits-all" here — only personalised support.
-        </p>
+        <div className="space-y-6 max-w-lg mx-auto">
+          {/* Simple Ayurveda Explanation */}
+          <div className="space-y-3">
+            <p className="text-lg">
+              <strong className="text-foreground">Ayurveda</strong> is an ancient approach to wellbeing that recognises something simple but powerful:
+            </p>
+            <p className="text-foreground font-medium">
+              Every woman is unique, and our needs change throughout life.
+            </p>
+            <p>
+              It helps guide how we eat, move, rest, and care for ourselves — without rigid rules or pressure. Just gentle awareness.
+            </p>
+          </div>
+
+          {/* What are Doshas */}
+          <div className="bg-muted/30 rounded-xl p-4 space-y-3">
+            <h3 className="font-semibold text-foreground text-lg">What are doshas?</h3>
+            <p>
+              Doshas are natural energy patterns that describe how your body and mind tend to work. Think of them as your personal tendencies.
+            </p>
+            <p className="text-sm">
+              <strong className="text-foreground">Everyone has all three doshas</strong> — they are not labels or boxes. One or two may be more dominant in you, and this can change over time due to age, stress, pregnancy, menopause, health, or lifestyle.
+            </p>
+          </div>
+
+          {/* Three Doshas */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground">The three doshas:</h3>
+            
+            {/* Vata */}
+            <div className="bg-background/50 border border-border/30 rounded-lg p-4 text-left">
+              <div className="flex items-center gap-2 mb-2">
+                <Wind className="h-5 w-5 text-wellness-lilac" />
+                <span className="font-semibold text-foreground">Vata</span>
+                <span className="text-muted-foreground text-sm">— movement & change</span>
+              </div>
+              <p className="text-sm">
+                Connected to movement, creativity, and the nervous system. Vata energy is light, quick, and changeable — like the wind.
+              </p>
+            </div>
+
+            {/* Pitta */}
+            <div className="bg-background/50 border border-border/30 rounded-lg p-4 text-left">
+              <div className="flex items-center gap-2 mb-2">
+                <Flame className="h-5 w-5 text-wellness-lilac" />
+                <span className="font-semibold text-foreground">Pitta</span>
+                <span className="text-muted-foreground text-sm">— digestion & transformation</span>
+              </div>
+              <p className="text-sm">
+                Connected to digestion, focus, and how we process things — physically and mentally. Pitta energy is warm, sharp, and driven.
+              </p>
+            </div>
+
+            {/* Kapha */}
+            <div className="bg-background/50 border border-border/30 rounded-lg p-4 text-left">
+              <div className="flex items-center gap-2 mb-2">
+                <Mountain className="h-5 w-5 text-wellness-lilac" />
+                <span className="font-semibold text-foreground">Kapha</span>
+                <span className="text-muted-foreground text-sm">— stability & strength</span>
+              </div>
+              <p className="text-sm">
+                Connected to stability, nourishment, and calm. Kapha energy is grounding, steady, and nurturing — like the earth.
+              </p>
+            </div>
+          </div>
+
+          {/* Reassurance */}
+          <div className="bg-wellness-lilac/10 rounded-xl p-4 space-y-2 text-left">
+            <p className="font-medium text-foreground">A gentle reminder:</p>
+            <ul className="space-y-1 text-sm">
+              <li>• There is nothing "wrong" with any dosha</li>
+              <li>• Balance changes naturally throughout life</li>
+              <li>• It's normal to need different support at different times</li>
+              <li>• This app adapts with you</li>
+            </ul>
+          </div>
+
+          {/* Closing */}
+          <p className="italic text-center pt-2">
+            You don't need to memorise this — the app will guide you gently as you go.
+          </p>
+        </div>
       </IntroScreen>
     );
   }
