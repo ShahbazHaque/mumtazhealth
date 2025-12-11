@@ -10,6 +10,7 @@ import founderPortrait from "@/assets/founder-portrait.jpeg";
 import { Logo } from "@/components/Logo";
 import { Navigation } from "@/components/Navigation";
 import { OnboardingTour } from "@/components/OnboardingTour";
+import { QuickCheckIn } from "@/components/QuickCheckIn";
 
 interface UserProfile {
   username: string;
@@ -56,16 +57,14 @@ const Index = () => {
 
   useEffect(() => {
     checkUserProfile();
-    checkOnboardingStatus();
-  }, []);
-
-  const checkOnboardingStatus = async () => {
-    const tourCompleted = localStorage.getItem('mumtaz_tour_completed');
-    if (!tourCompleted) {
-      // Delay tour start slightly to ensure page is fully rendered
-      setTimeout(() => setShowTour(true), 1000);
+    
+    // Check if tour was triggered from Settings
+    const triggerTour = localStorage.getItem('mumtaz_trigger_tour');
+    if (triggerTour === 'true') {
+      localStorage.removeItem('mumtaz_trigger_tour');
+      setTimeout(() => setShowTour(true), 500);
     }
-  };
+  }, []);
 
   const handleTourComplete = () => {
     setShowTour(false);
@@ -255,6 +254,11 @@ const Index = () => {
                 </p>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Quick Check-In */}
+          <div className="max-w-5xl mx-auto">
+            <QuickCheckIn username={userProfile?.username} />
           </div>
 
           {/* Progress Tracker */}
