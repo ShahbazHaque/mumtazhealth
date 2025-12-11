@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Heart, User } from "lucide-react";
+import { ArrowLeft, Heart, User, HelpCircle } from "lucide-react";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { Navigation } from "@/components/Navigation";
@@ -106,6 +106,13 @@ export default function Settings() {
     }
   };
 
+  const handleRestartTour = () => {
+    localStorage.setItem('mumtaz_trigger_tour', 'true');
+    localStorage.removeItem('mumtaz_tour_completed');
+    toast.success("Tour will start when you return to the dashboard");
+    navigate("/");
+  };
+
   const hasChanges = lifeStage !== initialLifeStage;
 
   return (
@@ -179,6 +186,28 @@ export default function Settings() {
         <NotificationSettings />
         
         <DarkModeToggle />
+
+        {/* Tour Section */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-primary" />
+              App Tour
+            </CardTitle>
+            <CardDescription>
+              Retake the guided tour to learn about app features
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              variant="outline" 
+              onClick={handleRestartTour}
+              className="w-full"
+            >
+              Restart App Tour
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
