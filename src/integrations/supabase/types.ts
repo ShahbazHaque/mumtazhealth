@@ -282,6 +282,30 @@ export type Database = {
         }
         Relationships: []
       }
+      quick_checkin_logs: {
+        Row: {
+          created_at: string
+          feeling_id: string
+          feeling_label: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feeling_id: string
+          feeling_label: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feeling_id?: string
+          feeling_label?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           category: string
@@ -367,6 +391,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_favorite_feelings: {
+        Row: {
+          created_at: string
+          feeling_id: string
+          feeling_label: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feeling_id: string
+          feeling_label: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feeling_id?: string
+          feeling_label?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
