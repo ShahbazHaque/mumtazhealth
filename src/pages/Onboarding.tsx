@@ -1442,7 +1442,7 @@ export default function Onboarding() {
                       <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
                         <RadioGroupItem value="not_pregnant" id="not_pregnant" />
                         <Label htmlFor="not_pregnant" className="flex-1 cursor-pointer flex items-center gap-2">
-                          Not currently pregnant or trying to conceive
+                          Tracking my overall health
                           <HelpCircle className="h-3 w-3 text-muted-foreground" />
                         </Label>
                       </div>
