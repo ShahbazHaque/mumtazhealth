@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Navigation } from "@/components/Navigation";
 import { DoshaLearningJourney } from "@/components/DoshaLearningJourney";
+import { FeelingPatterns } from "@/components/FeelingPatterns";
 
 interface Insight {
   title: string;
@@ -273,6 +274,11 @@ export default function Insights() {
             )}
           </div>
         )}
+
+        {/* Feeling Patterns Section */}
+        <div className="mt-8">
+          <FeelingPatterns />
+        </div>
 
         {/* Dosha Learning Journey Section */}
         <div className="mt-8">

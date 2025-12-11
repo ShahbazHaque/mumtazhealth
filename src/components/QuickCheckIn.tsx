@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Sparkles, ArrowRight } from "lucide-react";
+import { Heart, X, Sparkles, ArrowRight, Star, StarOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const feelingOptions = [
   { id: "tired", label: "Tired", emoji: "😴" },
@@ -123,13 +125,104 @@ interface QuickCheckInProps {
   username?: string;
 }
 
+interface FavoriteFeeling {
+  id: string;
+  feeling_id: string;
+  feeling_label: string;
+}
+
 export function QuickCheckIn({ username }: QuickCheckInProps) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFeeling, setSelectedFeeling] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<FavoriteFeeling[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleFeelingSelect = (feelingId: string) => {
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUserId(user.id);
+      fetchFavorites(user.id);
+    }
+  };
+
+  const fetchFavorites = async (uid: string) => {
+    const { data, error } = await supabase
+      .from("user_favorite_feelings")
+      .select("id, feeling_id, feeling_label")
+      .eq("user_id", uid);
+    
+    if (!error && data) {
+      setFavorites(data);
+    }
+  };
+
+  const handleFeelingSelect = async (feelingId: string) => {
     setSelectedFeeling(feelingId);
+    
+    // Log the check-in to database
+    if (userId) {
+      const feeling = feelingOptions.find(f => f.id === feelingId);
+      if (feeling) {
+        await supabase.from("quick_checkin_logs").insert({
+          user_id: userId,
+          feeling_id: feelingId,
+          feeling_label: feeling.label
+        });
+      }
+    }
+  };
+
+  const toggleFavorite = async (feelingId: string) => {
+    if (!userId) {
+      toast.error("Please log in to save favorites");
+      return;
+    }
+
+    setLoading(true);
+    const feeling = feelingOptions.find(f => f.id === feelingId);
+    const isFavorite = favorites.some(f => f.feeling_id === feelingId);
+
+    try {
+      if (isFavorite) {
+        // Remove from favorites
+        await supabase
+          .from("user_favorite_feelings")
+          .delete()
+          .eq("user_id", userId)
+          .eq("feeling_id", feelingId);
+        
+        setFavorites(prev => prev.filter(f => f.feeling_id !== feelingId));
+        toast.success("Removed from favorites");
+      } else {
+        // Add to favorites
+        const { data, error } = await supabase
+          .from("user_favorite_feelings")
+          .insert({
+            user_id: userId,
+            feeling_id: feelingId,
+            feeling_label: feeling?.label || feelingId
+          })
+          .select()
+          .single();
+        
+        if (error) throw error;
+        if (data) {
+          setFavorites(prev => [...prev, data]);
+          toast.success("Added to favorites");
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      toast.error("Failed to update favorites");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -138,6 +231,16 @@ export function QuickCheckIn({ username }: QuickCheckInProps) {
   };
 
   const currentSuggestions = selectedFeeling ? suggestions[selectedFeeling] : null;
+  const isFavorite = (feelingId: string) => favorites.some(f => f.feeling_id === feelingId);
+
+  // Sort feelings: favorites first, then others
+  const sortedFeelings = [...feelingOptions].sort((a, b) => {
+    const aIsFav = isFavorite(a.id);
+    const bIsFav = isFavorite(b.id);
+    if (aIsFav && !bIsFav) return -1;
+    if (!aIsFav && bIsFav) return 1;
+    return 0;
+  });
 
   if (!isOpen) {
     return (
@@ -179,22 +282,51 @@ export function QuickCheckIn({ username }: QuickCheckInProps) {
         </div>
         <p className="text-sm text-muted-foreground">
           Select what resonates with you right now
+          {favorites.length > 0 && " • Your favorites appear first"}
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
         {!selectedFeeling ? (
-          <div className="flex flex-wrap gap-2">
-            {feelingOptions.map((feeling) => (
-              <Badge
-                key={feeling.id}
-                variant="outline"
-                className="px-4 py-2 text-sm cursor-pointer hover:bg-mumtaz-lilac/20 hover:border-mumtaz-lilac transition-all"
-                onClick={() => handleFeelingSelect(feeling.id)}
-              >
-                <span className="mr-2">{feeling.emoji}</span>
-                {feeling.label}
-              </Badge>
-            ))}
+          <div className="space-y-4">
+            {favorites.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <Star className="h-3 w-3 text-yellow-500" /> Your Favorites
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {sortedFeelings.filter(f => isFavorite(f.id)).map((feeling) => (
+                    <Badge
+                      key={feeling.id}
+                      variant="outline"
+                      className="px-4 py-2 text-sm cursor-pointer bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-all"
+                      onClick={() => handleFeelingSelect(feeling.id)}
+                    >
+                      <span className="mr-2">{feeling.emoji}</span>
+                      {feeling.label}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              {favorites.length > 0 && (
+                <p className="text-xs font-medium text-muted-foreground">All Options</p>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {sortedFeelings.filter(f => !isFavorite(f.id)).map((feeling) => (
+                  <Badge
+                    key={feeling.id}
+                    variant="outline"
+                    className="px-4 py-2 text-sm cursor-pointer hover:bg-mumtaz-lilac/20 hover:border-mumtaz-lilac transition-all"
+                    onClick={() => handleFeelingSelect(feeling.id)}
+                  >
+                    <span className="mr-2">{feeling.emoji}</span>
+                    {feeling.label}
+                  </Badge>
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
           <div className="space-y-4 animate-fade-in">
@@ -210,6 +342,25 @@ export function QuickCheckIn({ username }: QuickCheckInProps) {
                 className="text-xs"
               >
                 Change
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleFavorite(selectedFeeling)}
+                disabled={loading}
+                className="text-xs ml-auto"
+              >
+                {isFavorite(selectedFeeling) ? (
+                  <>
+                    <Star className="h-3 w-3 mr-1 text-yellow-500 fill-yellow-500" />
+                    Favorited
+                  </>
+                ) : (
+                  <>
+                    <StarOff className="h-3 w-3 mr-1" />
+                    Add to Favorites
+                  </>
+                )}
               </Button>
             </div>
 
