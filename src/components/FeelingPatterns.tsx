@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
-import { TrendingUp, Calendar, Heart } from "lucide-react";
+import { TrendingUp, Calendar, Heart, Sparkles, Moon } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const feelingEmojis: Record<string, string> = {
@@ -36,6 +36,23 @@ const feelingColors: Record<string, string> = {
   "neck-shoulder": "hsl(var(--primary))",
 };
 
+const cyclePhaseLabels: Record<string, string> = {
+  menstrual: "Menstrual Phase",
+  follicular: "Follicular Phase",
+  ovulatory: "Ovulatory Phase",
+  luteal: "Luteal Phase",
+};
+
+const lifeStageLabels: Record<string, string> = {
+  menstrual: "Menstrual",
+  fertility: "Fertility Journey",
+  pregnancy: "Pregnancy",
+  postpartum: "Postpartum",
+  perimenopause: "Perimenopause",
+  menopause: "Menopause",
+  post_menopause: "Post-Menopause",
+};
+
 interface CheckInLog {
   id: string;
   feeling_id: string;
@@ -49,17 +66,26 @@ interface FeelingCount {
   count: number;
 }
 
+interface Correlation {
+  phase: string;
+  phaseLabel: string;
+  feelings: { feeling_id: string; feeling_label: string; count: number }[];
+  total: number;
+}
+
 export function FeelingPatterns() {
   const [logs, setLogs] = useState<CheckInLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [topFeelings, setTopFeelings] = useState<FeelingCount[]>([]);
   const [weeklyData, setWeeklyData] = useState<{ day: string; count: number }[]>([]);
+  const [cycleCorrelations, setCycleCorrelations] = useState<Correlation[]>([]);
+  const [lifeStage, setLifeStage] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchLogs();
+    fetchData();
   }, []);
 
-  const fetchLogs = async () => {
+  const fetchData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -67,24 +93,98 @@ export function FeelingPatterns() {
       // Fetch last 30 days of check-ins
       const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
       
-      const { data, error } = await supabase
-        .from("quick_checkin_logs")
-        .select("*")
-        .eq("user_id", user.id)
-        .gte("created_at", thirtyDaysAgo)
-        .order("created_at", { ascending: false });
+      // Fetch check-ins, wellness entries, and user profile in parallel
+      const [checkInsResult, entriesResult, profileResult] = await Promise.all([
+        supabase
+          .from("quick_checkin_logs")
+          .select("*")
+          .eq("user_id", user.id)
+          .gte("created_at", thirtyDaysAgo)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("wellness_entries")
+          .select("entry_date, cycle_phase")
+          .eq("user_id", user.id)
+          .gte("entry_date", format(subDays(new Date(), 30), "yyyy-MM-dd")),
+        supabase
+          .from("user_wellness_profiles")
+          .select("life_stage")
+          .eq("user_id", user.id)
+          .single()
+      ]);
 
-      if (error) throw error;
+      if (checkInsResult.error) throw checkInsResult.error;
 
-      if (data) {
-        setLogs(data);
-        calculatePatterns(data);
-      }
+      const checkIns = checkInsResult.data || [];
+      const entries = entriesResult.data || [];
+      const profile = profileResult.data;
+
+      setLogs(checkIns);
+      setLifeStage(profile?.life_stage || null);
+      calculatePatterns(checkIns);
+      calculateCorrelations(checkIns, entries);
     } catch (error) {
-      console.error("Error fetching check-in logs:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateCorrelations = (checkIns: CheckInLog[], entries: { entry_date: string; cycle_phase: string | null }[]) => {
+    // Create a map of dates to cycle phases
+    const dateToPhase: Record<string, string> = {};
+    entries.forEach(entry => {
+      if (entry.cycle_phase) {
+        dateToPhase[entry.entry_date] = entry.cycle_phase;
+      }
+    });
+
+    // Group check-ins by cycle phase
+    const phaseGroups: Record<string, { feeling_id: string; feeling_label: string }[]> = {};
+    
+    checkIns.forEach(log => {
+      const logDate = format(new Date(log.created_at), "yyyy-MM-dd");
+      const phase = dateToPhase[logDate];
+      
+      if (phase) {
+        if (!phaseGroups[phase]) {
+          phaseGroups[phase] = [];
+        }
+        phaseGroups[phase].push({
+          feeling_id: log.feeling_id,
+          feeling_label: log.feeling_label
+        });
+      }
+    });
+
+    // Calculate correlations
+    const correlations: Correlation[] = [];
+    
+    Object.entries(phaseGroups).forEach(([phase, feelings]) => {
+      const feelingCounts: Record<string, { feeling_id: string; feeling_label: string; count: number }> = {};
+      
+      feelings.forEach(f => {
+        if (!feelingCounts[f.feeling_id]) {
+          feelingCounts[f.feeling_id] = { ...f, count: 0 };
+        }
+        feelingCounts[f.feeling_id].count++;
+      });
+
+      const sortedFeelings = Object.values(feelingCounts)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 3);
+
+      if (sortedFeelings.length > 0) {
+        correlations.push({
+          phase,
+          phaseLabel: cyclePhaseLabels[phase] || phase,
+          feelings: sortedFeelings,
+          total: feelings.length
+        });
+      }
+    });
+
+    setCycleCorrelations(correlations.sort((a, b) => b.total - a.total));
   };
 
   const calculatePatterns = (data: CheckInLog[]) => {
@@ -170,9 +270,58 @@ export function FeelingPatterns() {
         </CardTitle>
         <CardDescription>
           Your check-in patterns from the last 30 days ({logs.length} check-ins)
+          {lifeStage && (
+            <span className="block mt-1">
+              Life stage: <Badge variant="outline" className="ml-1">{lifeStageLabels[lifeStage] || lifeStage}</Badge>
+            </span>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Cycle Phase Correlations */}
+        {cycleCorrelations.length > 0 && (
+          <div className="space-y-3 p-4 bg-background/50 rounded-lg border border-border/50">
+            <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Moon className="h-4 w-4 text-mumtaz-sage" />
+              Feelings by Cycle Phase
+            </h4>
+            <p className="text-xs text-muted-foreground">
+              Understanding how your cycle affects how you feel
+            </p>
+            <div className="space-y-3">
+              {cycleCorrelations.map((correlation) => (
+                <div key={correlation.phase} className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{correlation.phaseLabel}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {correlation.total} check-ins
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {correlation.feelings.map((feeling) => (
+                      <Badge 
+                        key={feeling.feeling_id}
+                        variant="outline" 
+                        className="text-xs"
+                        style={{ 
+                          borderColor: feelingColors[feeling.feeling_id] || "hsl(var(--border))",
+                          backgroundColor: `${feelingColors[feeling.feeling_id]?.replace(')', '/0.1)') || 'transparent'}`
+                        }}
+                      >
+                        {feelingEmojis[feeling.feeling_id] || "❓"} {feeling.feeling_label} ({feeling.count})
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground italic mt-2">
+              <Sparkles className="h-3 w-3 inline mr-1" />
+              Tip: Log your cycle phase daily in the tracker to see more accurate correlations
+            </p>
+          </div>
+        )}
+
         {/* Weekly Check-in Chart */}
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
@@ -217,7 +366,7 @@ export function FeelingPatterns() {
               Most Common Feelings
             </h4>
             <div className="space-y-2">
-              {topFeelings.map((feeling, index) => (
+              {topFeelings.map((feeling) => (
                 <div 
                   key={feeling.feeling_id}
                   className="flex items-center gap-3"
