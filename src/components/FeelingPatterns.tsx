@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { format, subDays, startOfDay, endOfDay } from "date-fns";
-import { TrendingUp, Calendar, Heart, Sparkles, Moon } from "lucide-react";
+import { format, subDays, startOfDay, endOfDay, subMonths } from "date-fns";
+import { TrendingUp, TrendingDown, Minus, Calendar, Heart, Sparkles, Moon, Info } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const feelingEmojis: Record<string, string> = {
   tired: "😴",
@@ -53,6 +54,39 @@ const lifeStageLabels: Record<string, string> = {
   post_menopause: "Post-Menopause",
 };
 
+// Educational insights explaining why feelings are common during specific phases
+const cyclePhaseInsights: Record<string, Record<string, string>> = {
+  menstrual: {
+    tired: "Fatigue is common as your body sheds the uterine lining and iron levels may dip.",
+    pain: "Prostaglandins cause uterine contractions, leading to cramps and discomfort.",
+    exhausted: "Low estrogen and progesterone during menstruation can leave you feeling drained.",
+    emotional: "Hormone levels are at their lowest, which can affect mood regulation.",
+    bloated: "Water retention from hormonal shifts often causes bloating during your period.",
+    "back-ache": "Prostaglandins can cause referred pain in the lower back during menstruation.",
+  },
+  follicular: {
+    restless: "Rising estrogen can boost energy but may also cause restlessness.",
+    emotional: "Estrogen fluctuations as your body prepares for ovulation can affect mood.",
+    "cant-sleep": "Increasing hormones may temporarily disrupt your sleep pattern.",
+  },
+  ovulatory: {
+    hormonal: "Estrogen peaks and LH surges during ovulation, causing hormonal sensitivity.",
+    bloated: "Some women experience mild bloating around ovulation due to fluid retention.",
+    pain: "Mittelschmerz — mild ovulation pain — affects about 20% of women.",
+  },
+  luteal: {
+    tired: "Progesterone rises significantly, naturally causing fatigue and sleepiness.",
+    exhausted: "Your body is working hard to prepare the uterine lining, using extra energy.",
+    hormonal: "The dramatic hormone shifts in the luteal phase trigger PMS symptoms.",
+    emotional: "Progesterone and estrogen fluctuations can intensify emotional responses.",
+    bloated: "Progesterone causes water retention and digestive slowdown.",
+    "cant-sleep": "Despite feeling tired, progesterone can paradoxically disrupt sleep quality.",
+    pain: "Breast tenderness and headaches are common as hormones shift.",
+    "back-ache": "Hormonal changes can increase muscle tension and lower back discomfort.",
+    digestive: "Progesterone slows digestion, often causing constipation or discomfort.",
+  },
+};
+
 interface CheckInLog {
   id: string;
   feeling_id: string;
@@ -73,6 +107,15 @@ interface Correlation {
   total: number;
 }
 
+interface TrendData {
+  feeling_id: string;
+  feeling_label: string;
+  currentCount: number;
+  previousCount: number;
+  trend: "up" | "down" | "same";
+  percentChange: number;
+}
+
 export function FeelingPatterns() {
   const [logs, setLogs] = useState<CheckInLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,6 +123,7 @@ export function FeelingPatterns() {
   const [weeklyData, setWeeklyData] = useState<{ day: string; count: number }[]>([]);
   const [cycleCorrelations, setCycleCorrelations] = useState<Correlation[]>([]);
   const [lifeStage, setLifeStage] = useState<string | null>(null);
+  const [trendData, setTrendData] = useState<TrendData[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -90,8 +134,8 @@ export function FeelingPatterns() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Fetch last 30 days of check-ins
-      const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
+      // Fetch last 60 days for trend comparison (current month vs previous month)
+      const sixtyDaysAgo = subDays(new Date(), 60).toISOString();
       
       // Fetch check-ins, wellness entries, and user profile in parallel
       const [checkInsResult, entriesResult, profileResult] = await Promise.all([
@@ -99,13 +143,13 @@ export function FeelingPatterns() {
           .from("quick_checkin_logs")
           .select("*")
           .eq("user_id", user.id)
-          .gte("created_at", thirtyDaysAgo)
+          .gte("created_at", sixtyDaysAgo)
           .order("created_at", { ascending: false }),
         supabase
           .from("wellness_entries")
           .select("entry_date, cycle_phase")
           .eq("user_id", user.id)
-          .gte("entry_date", format(subDays(new Date(), 30), "yyyy-MM-dd")),
+          .gte("entry_date", format(subDays(new Date(), 60), "yyyy-MM-dd")),
         supabase
           .from("user_wellness_profiles")
           .select("life_stage")
@@ -115,19 +159,68 @@ export function FeelingPatterns() {
 
       if (checkInsResult.error) throw checkInsResult.error;
 
-      const checkIns = checkInsResult.data || [];
+      const allCheckIns = checkInsResult.data || [];
       const entries = entriesResult.data || [];
       const profile = profileResult.data;
 
-      setLogs(checkIns);
+      // Split into current month and previous month
+      const thirtyDaysAgo = subDays(new Date(), 30);
+      const currentMonthCheckIns = allCheckIns.filter(c => new Date(c.created_at) >= thirtyDaysAgo);
+      const previousMonthCheckIns = allCheckIns.filter(c => new Date(c.created_at) < thirtyDaysAgo);
+
+      setLogs(currentMonthCheckIns);
       setLifeStage(profile?.life_stage || null);
-      calculatePatterns(checkIns);
-      calculateCorrelations(checkIns, entries);
+      calculatePatterns(currentMonthCheckIns);
+      calculateCorrelations(currentMonthCheckIns, entries);
+      calculateTrends(currentMonthCheckIns, previousMonthCheckIns);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateTrends = (currentLogs: CheckInLog[], previousLogs: CheckInLog[]) => {
+    // Count current month feelings
+    const currentCounts: Record<string, { feeling_id: string; feeling_label: string; count: number }> = {};
+    currentLogs.forEach(log => {
+      if (!currentCounts[log.feeling_id]) {
+        currentCounts[log.feeling_id] = { feeling_id: log.feeling_id, feeling_label: log.feeling_label, count: 0 };
+      }
+      currentCounts[log.feeling_id].count++;
+    });
+
+    // Count previous month feelings
+    const previousCounts: Record<string, number> = {};
+    previousLogs.forEach(log => {
+      previousCounts[log.feeling_id] = (previousCounts[log.feeling_id] || 0) + 1;
+    });
+
+    // Calculate trends
+    const trends: TrendData[] = Object.values(currentCounts)
+      .map(current => {
+        const prevCount = previousCounts[current.feeling_id] || 0;
+        const diff = current.count - prevCount;
+        const percentChange = prevCount > 0 ? Math.round((diff / prevCount) * 100) : (current.count > 0 ? 100 : 0);
+        
+        let trend: "up" | "down" | "same" = "same";
+        if (diff > 0) trend = "up";
+        else if (diff < 0) trend = "down";
+
+        return {
+          feeling_id: current.feeling_id,
+          feeling_label: current.feeling_label,
+          currentCount: current.count,
+          previousCount: prevCount,
+          trend,
+          percentChange: Math.abs(percentChange),
+        };
+      })
+      .filter(t => t.currentCount >= 2 || t.previousCount >= 2) // Only show meaningful trends
+      .sort((a, b) => Math.abs(b.percentChange) - Math.abs(a.percentChange))
+      .slice(0, 5);
+
+    setTrendData(trends);
   };
 
   const calculateCorrelations = (checkIns: CheckInLog[], entries: { entry_date: string; cycle_phase: string | null }[]) => {
@@ -278,46 +371,107 @@ export function FeelingPatterns() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Cycle Phase Correlations */}
+        {/* Cycle Phase Correlations with Educational Insights */}
         {cycleCorrelations.length > 0 && (
+          <TooltipProvider>
+            <div className="space-y-3 p-4 bg-background/50 rounded-lg border border-border/50">
+              <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+                <Moon className="h-4 w-4 text-mumtaz-sage" />
+                Feelings by Cycle Phase
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                Understanding how your cycle affects how you feel
+              </p>
+              <div className="space-y-4">
+                {cycleCorrelations.map((correlation) => (
+                  <div key={correlation.phase} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{correlation.phaseLabel}</span>
+                      <Badge variant="secondary" className="text-xs">
+                        {correlation.total} check-ins
+                      </Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {correlation.feelings.map((feeling) => {
+                        const insight = cyclePhaseInsights[correlation.phase]?.[feeling.feeling_id];
+                        return (
+                          <UITooltip key={feeling.feeling_id}>
+                            <TooltipTrigger asChild>
+                              <Badge 
+                                variant="outline" 
+                                className="text-xs cursor-help flex items-center gap-1"
+                                style={{ 
+                                  borderColor: feelingColors[feeling.feeling_id] || "hsl(var(--border))",
+                                  backgroundColor: `${feelingColors[feeling.feeling_id]?.replace(')', '/0.1)') || 'transparent'}`
+                                }}
+                              >
+                                {feelingEmojis[feeling.feeling_id] || "❓"} {feeling.feeling_label} ({feeling.count})
+                                {insight && <Info className="h-3 w-3 ml-0.5 opacity-60" />}
+                              </Badge>
+                            </TooltipTrigger>
+                            {insight && (
+                              <TooltipContent className="max-w-xs text-xs p-3">
+                                <p className="font-medium mb-1">Why this happens:</p>
+                                <p>{insight}</p>
+                              </TooltipContent>
+                            )}
+                          </UITooltip>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground italic mt-2">
+                <Sparkles className="h-3 w-3 inline mr-1" />
+                Hover over feelings with <Info className="h-3 w-3 inline" /> to learn why they're common
+              </p>
+            </div>
+          </TooltipProvider>
+        )}
+
+        {/* Monthly Trends Comparison */}
+        {trendData.length > 0 && (
           <div className="space-y-3 p-4 bg-background/50 rounded-lg border border-border/50">
             <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
-              <Moon className="h-4 w-4 text-mumtaz-sage" />
-              Feelings by Cycle Phase
+              <TrendingUp className="h-4 w-4 text-mumtaz-lilac" />
+              Monthly Trends
             </h4>
             <p className="text-xs text-muted-foreground">
-              Understanding how your cycle affects how you feel
+              Comparing this month to last month
             </p>
-            <div className="space-y-3">
-              {cycleCorrelations.map((correlation) => (
-                <div key={correlation.phase} className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{correlation.phaseLabel}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {correlation.total} check-ins
-                    </Badge>
+            <div className="space-y-2">
+              {trendData.map((trend) => (
+                <div 
+                  key={trend.feeling_id}
+                  className="flex items-center justify-between p-2 rounded-md bg-muted/30"
+                >
+                  <div className="flex items-center gap-2">
+                    <span>{feelingEmojis[trend.feeling_id] || "❓"}</span>
+                    <span className="text-sm">{trend.feeling_label}</span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {correlation.feelings.map((feeling) => (
-                      <Badge 
-                        key={feeling.feeling_id}
-                        variant="outline" 
-                        className="text-xs"
-                        style={{ 
-                          borderColor: feelingColors[feeling.feeling_id] || "hsl(var(--border))",
-                          backgroundColor: `${feelingColors[feeling.feeling_id]?.replace(')', '/0.1)') || 'transparent'}`
-                        }}
-                      >
-                        {feelingEmojis[feeling.feeling_id] || "❓"} {feeling.feeling_label} ({feeling.count})
-                      </Badge>
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {trend.previousCount} → {trend.currentCount}
+                    </span>
+                    <Badge 
+                      variant={trend.trend === "down" ? "default" : trend.trend === "up" ? "destructive" : "secondary"}
+                      className="text-xs flex items-center gap-1"
+                    >
+                      {trend.trend === "up" && <TrendingUp className="h-3 w-3" />}
+                      {trend.trend === "down" && <TrendingDown className="h-3 w-3" />}
+                      {trend.trend === "same" && <Minus className="h-3 w-3" />}
+                      {trend.percentChange > 0 && `${trend.percentChange}%`}
+                      {trend.trend === "up" ? " more" : trend.trend === "down" ? " less" : "stable"}
+                    </Badge>
                   </div>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground italic mt-2">
-              <Sparkles className="h-3 w-3 inline mr-1" />
-              Tip: Log your cycle phase daily in the tracker to see more accurate correlations
+            <p className="text-xs text-muted-foreground">
+              {trendData.some(t => t.trend === "down") 
+                ? "💚 Some feelings are improving — your practices may be helping!"
+                : "Keep tracking to see trends over time"}
             </p>
           </div>
         )}
