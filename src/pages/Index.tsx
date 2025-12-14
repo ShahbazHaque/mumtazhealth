@@ -172,8 +172,12 @@ const Index = () => {
     return milestones;
   };
 
-  // If user has completed onboarding, show dashboard
-  if (!loading && wellnessProfile?.onboarding_completed) {
+  // Check if user did quick check-in
+  const didQuickCheckIn = typeof window !== 'undefined' && localStorage.getItem('mumtaz_quick_checkin_completed') === 'true';
+  const showDashboard = wellnessProfile?.onboarding_completed || (userProfile && didQuickCheckIn);
+
+  // If user has completed onboarding OR quick check-in, show dashboard
+  if (!loading && showDashboard) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -255,6 +259,29 @@ const Index = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Complete Onboarding Prompt - Show if quick check-in done but not full onboarding */}
+          {!wellnessProfile?.onboarding_completed && didQuickCheckIn && (
+            <Card className="max-w-5xl mx-auto bg-gradient-to-r from-wellness-lilac/20 to-wellness-sage/20 border-wellness-lilac/40">
+              <CardContent className="py-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-center sm:text-left">
+                    <h3 className="font-semibold text-foreground mb-1">Ready for deeper guidance?</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Complete your personal onboarding to discover your dosha and receive tailored recommendations
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => navigate("/onboarding?full=true")}
+                    className="bg-wellness-lilac hover:bg-wellness-lilac/90 text-white whitespace-nowrap"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Complete My Personal Onboarding
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Quick Check-In */}
           <div className="max-w-5xl mx-auto">
