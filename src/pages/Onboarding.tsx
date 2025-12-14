@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,8 +12,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import DoshaAssessment from "@/components/DoshaAssessment";
 import { Logo } from "@/components/Logo";
+import { FirstTimeQuickCheckIn } from "@/components/FirstTimeQuickCheckIn";
 
 type OnboardingStep = 
+  | "initial_choice" | "quick_checkin"
   | "intro1" | "intro2" | "intro3" | "intro4" | "intro5" 
   | "intro6" | "intro7" | "intro8" | "intro9" | "intro10" | "intro11"
   | "welcome" | "lifeStage" | "cycle" | "dosha" | "doshaResults" 
@@ -180,12 +182,16 @@ const IntroScreen = ({
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<OnboardingStep>("intro1");
+  const [searchParams] = useSearchParams();
+  const skipToFull = searchParams.get('full') === 'true';
+  const [step, setStep] = useState<OnboardingStep>(skipToFull ? "intro1" : "initial_choice");
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
 
   const getStepInfo = () => {
     const stepMap: Record<OnboardingStep, number> = {
+      initial_choice: 0,
+      quick_checkin: 0,
       intro1: 0, intro2: 0, intro3: 0, intro4: 0, intro5: 0,
       intro6: 0, intro7: 0, intro8: 0, intro9: 0, intro10: 0, intro11: 0,
       welcome: 1,
@@ -290,6 +296,16 @@ export default function Onboarding() {
   };
 
   const skipToProfile = () => setStep("welcome");
+
+  // Initial Choice: Quick Check-In or Full Onboarding
+  if (step === "initial_choice" || step === "quick_checkin") {
+    return (
+      <FirstTimeQuickCheckIn 
+        onComplete={() => navigate("/")}
+        onStartFullOnboarding={() => setStep("intro1")}
+      />
+    );
+  }
 
   // Intro Screen 1: Welcome
   if (step === "intro1") {
