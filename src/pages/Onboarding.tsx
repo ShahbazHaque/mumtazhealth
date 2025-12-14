@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info, HelpCircle, Activity, ArrowLeft, ArrowRight, Leaf, Sun, BookOpen, Users, Shield, Compass, ChevronDown } from "lucide-react";
+import { Sparkles, Heart, Moon, Baby, Flame, Wind, Mountain, Info, HelpCircle, Activity, ArrowLeft, ArrowRight, Leaf, Sun, BookOpen, Users, Shield, Compass, ChevronDown, Armchair } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import DoshaAssessment from "@/components/DoshaAssessment";
@@ -1579,85 +1579,128 @@ export default function Onboarding() {
   }
 
   if (step === "preferences") {
-    const getYogaIcon = (style: string) => {
-      switch (style.toLowerCase()) {
-        case "hatha":
-          return <Activity className="h-5 w-5 text-primary" />;
-        case "vinyasa":
-          return <Wind className="h-5 w-5 text-primary" />;
-        case "yin":
-          return <Mountain className="h-5 w-5 text-primary" />;
-        case "restorative":
-          return <Heart className="h-5 w-5 text-primary" />;
-        case "prenatal":
-          return <Baby className="h-5 w-5 text-primary" />;
-        case "gentle":
-          return <Moon className="h-5 w-5 text-primary" />;
-        default:
-          return <Sparkles className="h-5 w-5 text-muted-foreground" />;
+    const movementOptions = [
+      {
+        value: "gentle",
+        label: "Gentle and slow",
+        description: "Calming, grounding movements with plenty of rest between poses",
+        icon: <Moon className="h-5 w-5 text-primary" />,
+      },
+      {
+        value: "stretchy",
+        label: "Stretchy and fluid",
+        description: "Flowing movements that open and lengthen the body",
+        icon: <Wind className="h-5 w-5 text-primary" />,
+      },
+      {
+        value: "strong",
+        label: "Strong and energising",
+        description: "Dynamic movements that build heat and strength",
+        icon: <Activity className="h-5 w-5 text-primary" />,
+      },
+      {
+        value: "seated",
+        label: "Mostly seated or chair-based",
+        description: "Accessible movements you can do from a chair or seated position",
+        icon: <Armchair className="h-5 w-5 text-primary" />,
+      },
+      {
+        value: "recommend",
+        label: "I'm not sure — recommend for me",
+        description: "We'll suggest movements based on your dosha profile",
+        icon: <Sparkles className="h-5 w-5 text-primary" />,
+      },
+    ];
+
+    // Get dosha-based recommendation when "recommend" is selected
+    const getDoshaRecommendation = () => {
+      if (primaryDosha === "vata") {
+        return {
+          style: "gentle",
+          message: "Based on your Vata constitution, we recommend grounding, slow, stability-focused flows to help you feel calm and centred."
+        };
+      } else if (primaryDosha === "pitta") {
+        return {
+          style: "stretchy",
+          message: "Based on your Pitta constitution, we recommend cooling, fluid, non-competitive sequences to help you release heat and tension."
+        };
+      } else if (primaryDosha === "kapha") {
+        return {
+          style: "strong",
+          message: "Based on your Kapha constitution, we recommend energising, uplifting flows to help you feel motivated and light."
+        };
       }
+      return {
+        style: "gentle",
+        message: "We recommend starting with gentle, grounding movements and adjusting as you learn more about your body."
+      };
     };
 
-    const getYogaTooltip = (style: string) => {
-      const tooltips: Record<string, string> = {
-        hatha: "Hatha yoga is a gentle, foundational practice perfect for beginners. It emphasizes proper alignment, breathing techniques, and holding postures to build strength and flexibility. Great for all fitness levels.",
-        vinyasa: "Vinyasa is a dynamic, flowing style that links breath with movement. Each movement flows smoothly into the next, creating a dance-like quality. Great for building cardiovascular health, strength, and maintaining focus.",
-        yin: "Yin yoga targets deep connective tissues through passive, long-held poses (3-5 minutes each). This meditative practice is excellent for flexibility, joint health, and cultivating mindfulness and patience.",
-        restorative: "Restorative yoga uses props to support the body in restful poses held for 5-20 minutes. Perfect for stress relief, recovery, and deep relaxation. Ideal for anyone needing gentle healing.",
-        prenatal: "Prenatal yoga is specifically designed for pregnancy, focusing on poses that are safe and beneficial for expecting mothers. Helps with strength, flexibility, breathing, and preparing for childbirth.",
-        gentle: "Gentle yoga is a slower-paced, nurturing practice suitable for all levels. Perfect for those new to yoga, recovering from injury, or seeking a calmer practice. Emphasizes relaxation and ease of movement.",
-      };
-      return tooltips[style.toLowerCase()] || "";
-    };
+    const doshaRec = getDoshaRecommendation();
 
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
-        <TooltipProvider>
-          <Card className="w-full max-w-2xl">
-            <CardHeader>
-              <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Preferences</CardTitle>
-              <CardDescription>Help us personalize your experience - hover for details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-              <div className="space-y-2">
-                <Label>Preferred Yoga Style (Optional)</Label>
-                <RadioGroup value={yogaStyle} onValueChange={setYogaStyle}>
-                  <div className="grid grid-cols-2 gap-3">
-                    {["Hatha", "Vinyasa", "Yin", "Restorative", "Prenatal", "Gentle"].map((style) => (
-                      <Tooltip key={style}>
-                        <TooltipTrigger asChild>
-                          <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:border-primary transition-colors cursor-help">
-                            <RadioGroupItem value={style.toLowerCase()} id={style} />
-                            <div className="flex items-center gap-2 flex-1">
-                              {getYogaIcon(style)}
-                              <Label htmlFor={style} className="cursor-pointer flex items-center gap-1">
-                                {style}
-                                <HelpCircle className="h-3 w-3 text-muted-foreground" />
-                              </Label>
-                            </div>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-sm p-4">
-                          <p className="text-sm">{getYogaTooltip(style)}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    ))}
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Movement Preferences</CardTitle>
+            <CardDescription>What kind of movements feel good for you right now?</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+            <RadioGroup value={yogaStyle} onValueChange={setYogaStyle}>
+              <div className="space-y-3">
+                {movementOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    className={`flex items-start space-x-3 p-4 rounded-lg border transition-all duration-200 cursor-pointer hover:shadow-md ${
+                      yogaStyle === option.value
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                    onClick={() => setYogaStyle(option.value)}
+                  >
+                    <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        {option.icon}
+                      </div>
+                      <div className="flex-1">
+                        <Label htmlFor={option.value} className="cursor-pointer font-medium text-base">
+                          {option.label}
+                        </Label>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {option.description}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </RadioGroup>
+                ))}
               </div>
+            </RadioGroup>
 
-              <div className="flex justify-between pt-4">
-                <Button variant="outline" onClick={() => setStep("pregnancy")}>
-                  Back
-                </Button>
-                <Button onClick={() => setStep("complete")}>
-                  Next
-                </Button>
+            {/* Show dosha-based recommendation when "recommend" is selected */}
+            {yogaStyle === "recommend" && primaryDosha && (
+              <div className="p-4 rounded-lg bg-gradient-to-r from-primary/10 to-wellness-sage/10 border border-primary/20 animate-fade-in">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="font-medium text-foreground mb-1">Your Personalised Recommendation</p>
+                    <p className="text-sm text-muted-foreground">{doshaRec.message}</p>
+                  </div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </TooltipProvider>
+            )}
+
+            <div className="flex justify-between pt-4">
+              <Button variant="outline" onClick={() => setStep("pregnancy")}>
+                Back
+              </Button>
+              <Button onClick={() => setStep("complete")}>
+                Next
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
