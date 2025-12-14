@@ -52,10 +52,35 @@ interface WellnessContent {
   unlock_after_completions: number;
 }
 
+// Map movement preferences to content tags
+const movementToTagsMap: Record<string, string[]> = {
+  gentle: ["gentle", "restorative", "relaxation", "calming", "grounding", "slow", "beginner"],
+  stretchy: ["stretchy", "fluid", "flow", "vinyasa", "flexibility", "opening", "yin"],
+  strong: ["strong", "energising", "dynamic", "power", "strength", "active", "challenging"],
+  seated: ["chair-yoga", "seated", "senior-friendly", "accessible", "bed-yoga", "mobility"],
+  recommend: [], // Will be handled based on dosha
+};
+
+// Get recommended tags based on dosha
+const getDoshaMovementTags = (primaryDosha: string | null): string[] => {
+  switch (primaryDosha) {
+    case "vata":
+      return ["grounding", "slow", "stability", "gentle", "calming", "restorative"];
+    case "pitta":
+      return ["cooling", "fluid", "stretchy", "yin", "relaxation", "flow"];
+    case "kapha":
+      return ["energising", "uplifting", "dynamic", "strong", "active", "power"];
+    default:
+      return ["gentle", "beginner"];
+  }
+};
+
 const ContentLibrary = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [userTier, setUserTier] = useState<string>("free");
+  const [userMovementPreference, setUserMovementPreference] = useState<string | null>(null);
+  const [userPrimaryDosha, setUserPrimaryDosha] = useState<string | null>(null);
   const [content, setContent] = useState<WellnessContent[]>([]);
   const [filteredContent, setFilteredContent] = useState<WellnessContent[]>([]);
   const [selectedContent, setSelectedContent] = useState<WellnessContent | null>(null);
@@ -71,6 +96,7 @@ const ContentLibrary = () => {
   const [selectedPregnancyStatus, setSelectedPregnancyStatus] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [selectedCompletion, setSelectedCompletion] = useState<string>("all");
+  const [selectedMovement, setSelectedMovement] = useState<string>("all");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -87,27 +113,29 @@ const ContentLibrary = () => {
   useEffect(() => {
     loadContent();
     if (user) {
-      loadUserTier();
+      loadUserProfile();
       loadSavedContent();
       loadProgress();
     }
   }, [user]);
 
-  const loadUserTier = async () => {
+  const loadUserProfile = async () => {
     if (!user) return;
 
     const { data, error } = await supabase
       .from('user_wellness_profiles')
-      .select('subscription_tier')
+      .select('subscription_tier, preferred_yoga_style, primary_dosha')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      console.error('Error loading user tier:', error);
+      console.error('Error loading user profile:', error);
       return;
     }
 
     setUserTier(data?.subscription_tier || 'free');
+    setUserMovementPreference(data?.preferred_yoga_style || null);
+    setUserPrimaryDosha(data?.primary_dosha || null);
   };
 
   useEffect(() => {
@@ -117,7 +145,7 @@ const ContentLibrary = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [content, selectedDosha, selectedLifePhase, selectedPregnancyStatus, selectedType, selectedCompletion, completedContentIds]);
+  }, [content, selectedDosha, selectedLifePhase, selectedPregnancyStatus, selectedType, selectedCompletion, selectedMovement, completedContentIds, userMovementPreference, userPrimaryDosha]);
 
   const loadContent = async () => {
     setLoading(true);
@@ -209,6 +237,47 @@ const ContentLibrary = () => {
       } else if (selectedCompletion === "not-completed") {
         filtered = filtered.filter(item => !completedContentIds.has(item.id));
       }
+    }
+
+    // Apply movement preference filter
+    if (selectedMovement !== "all") {
+      const movementTags = selectedMovement === "recommend" 
+        ? getDoshaMovementTags(userPrimaryDosha)
+        : movementToTagsMap[selectedMovement] || [];
+      
+      if (movementTags.length > 0) {
+        filtered = filtered.filter(item => {
+          if (!item.tags || item.tags.length === 0) return true;
+          return item.tags.some(tag => 
+            movementTags.some(mTag => tag.toLowerCase().includes(mTag.toLowerCase()))
+          );
+        });
+      }
+    }
+
+    // Sort content to prioritize user's movement preference matches
+    if (userMovementPreference && userMovementPreference !== "recommend") {
+      const preferredTags = movementToTagsMap[userMovementPreference] || [];
+      filtered.sort((a, b) => {
+        const aMatch = a.tags?.some(tag => 
+          preferredTags.some(pTag => tag.toLowerCase().includes(pTag.toLowerCase()))
+        ) ? 1 : 0;
+        const bMatch = b.tags?.some(tag => 
+          preferredTags.some(pTag => tag.toLowerCase().includes(pTag.toLowerCase()))
+        ) ? 1 : 0;
+        return bMatch - aMatch;
+      });
+    } else if (userMovementPreference === "recommend" && userPrimaryDosha) {
+      const doshaMovementTags = getDoshaMovementTags(userPrimaryDosha);
+      filtered.sort((a, b) => {
+        const aMatch = a.tags?.some(tag => 
+          doshaMovementTags.some(dTag => tag.toLowerCase().includes(dTag.toLowerCase()))
+        ) ? 1 : 0;
+        const bMatch = b.tags?.some(tag => 
+          doshaMovementTags.some(dTag => tag.toLowerCase().includes(dTag.toLowerCase()))
+        ) ? 1 : 0;
+        return bMatch - aMatch;
+      });
     }
 
     setFilteredContent(filtered);
@@ -323,6 +392,7 @@ const ContentLibrary = () => {
     setSelectedPregnancyStatus("all");
     setSelectedType("all");
     setSelectedCompletion("all");
+    setSelectedMovement("all");
   };
 
   const getContentIcon = (type: string) => {
@@ -629,7 +699,7 @@ const ContentLibrary = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Content Type</label>
                 <Select value={selectedType} onValueChange={setSelectedType}>
@@ -642,6 +712,23 @@ const ContentLibrary = () => {
                     <SelectItem value="meditation" className="text-base py-2">Meditation</SelectItem>
                     <SelectItem value="nutrition" className="text-base py-2">Nutrition</SelectItem>
                     <SelectItem value="article" className="text-base py-2">Articles</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Movement Style</label>
+                <Select value={selectedMovement} onValueChange={setSelectedMovement}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All styles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Styles</SelectItem>
+                    <SelectItem value="gentle">Gentle & Slow</SelectItem>
+                    <SelectItem value="stretchy">Stretchy & Fluid</SelectItem>
+                    <SelectItem value="strong">Strong & Energising</SelectItem>
+                    <SelectItem value="seated">Seated / Chair-based</SelectItem>
+                    <SelectItem value="recommend">Dosha-Matched</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -709,6 +796,22 @@ const ContentLibrary = () => {
                 </Select>
               </div>
                 </div>
+
+                {/* Show user's movement preference indicator */}
+                {userMovementPreference && (
+                  <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                    <p className="text-sm text-muted-foreground">
+                      <Sparkles className="h-4 w-4 inline mr-1 text-primary" />
+                      Content is prioritised for your preference: <span className="font-medium text-foreground">
+                        {userMovementPreference === "gentle" && "Gentle & Slow"}
+                        {userMovementPreference === "stretchy" && "Stretchy & Fluid"}
+                        {userMovementPreference === "strong" && "Strong & Energising"}
+                        {userMovementPreference === "seated" && "Seated / Chair-based"}
+                        {userMovementPreference === "recommend" && `Dosha-matched (${userPrimaryDosha ? userPrimaryDosha.charAt(0).toUpperCase() + userPrimaryDosha.slice(1) : 'Your dosha'})`}
+                      </span>
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
