@@ -11,6 +11,7 @@ import { Logo } from "@/components/Logo";
 import { Navigation } from "@/components/Navigation";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { QuickCheckIn } from "@/components/QuickCheckIn";
+import { PersonalizedRecommendations } from "@/components/PersonalizedRecommendations";
 
 interface UserProfile {
   username: string;
@@ -286,6 +287,11 @@ const Index = () => {
           {/* Quick Check-In */}
           <div className="max-w-5xl mx-auto">
             <QuickCheckIn username={userProfile?.username} />
+          </div>
+
+          {/* Personalized Recommendations */}
+          <div className="max-w-5xl mx-auto">
+            <PersonalizedRecommendations />
           </div>
 
           {/* Progress Tracker */}
