@@ -9,9 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell, Zap, AlertTriangle } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell, Zap, AlertTriangle, Search, X, Baby, Salad, Brain, Activity } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 import yogaImage from "@/assets/wellness-yoga.jpg";
 import meditationImage from "@/assets/wellness-meditation.jpg";
 import nutritionImage from "@/assets/wellness-nutrition.jpg";
@@ -92,12 +93,49 @@ const ContentLibrary = () => {
   const [progressStats, setProgressStats] = useState({ total: 0, completed: 0 });
   
   // Filters
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedDosha, setSelectedDosha] = useState<string>("all");
   const [selectedLifePhase, setSelectedLifePhase] = useState<string>("all");
-  const [selectedPregnancyStatus, setSelectedPregnancyStatus] = useState<string>("all");
-  const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedMobility, setSelectedMobility] = useState<string>("all");
+  const [selectedConcern, setSelectedConcern] = useState<string>("all");
   const [selectedCompletion, setSelectedCompletion] = useState<string>("all");
-  const [selectedMovement, setSelectedMovement] = useState<string>("all");
+
+  // Category definitions for better organization
+  const categories = [
+    { value: "all", label: "All Content", icon: BookOpen },
+    { value: "yoga", label: "Yoga", icon: Flower2 },
+    { value: "mobility", label: "Mobility & Arthritis", icon: Activity },
+    { value: "ayurveda", label: "Ayurveda Lifestyle", icon: Leaf },
+    { value: "nutrition", label: "Nutrition & Recipes", icon: Salad },
+    { value: "pregnancy", label: "Pregnancy & Postpartum", icon: Baby },
+    { value: "menopause", label: "Menopause & Beyond", icon: Sparkles },
+    { value: "emotional", label: "Emotional & Spiritual", icon: Brain },
+    { value: "digestive", label: "Digestive Wellness", icon: Apple },
+    { value: "energy", label: "Energy & Balance", icon: Zap },
+  ];
+
+  // Wellness concerns for filtering
+  const wellnessConcerns = [
+    { value: "all", label: "All Concerns" },
+    { value: "bloating", label: "Bloating" },
+    { value: "fatigue", label: "Fatigue" },
+    { value: "stiffness", label: "Stiffness" },
+    { value: "mood", label: "Mood Support" },
+    { value: "stress", label: "Stress Relief" },
+    { value: "sleep", label: "Sleep Support" },
+    { value: "pain", label: "Pain & Discomfort" },
+    { value: "hormonal", label: "Hormonal Balance" },
+  ];
+
+  // Mobility levels for accessibility
+  const mobilityLevels = [
+    { value: "all", label: "All Levels" },
+    { value: "chair", label: "Chair-based" },
+    { value: "gentle", label: "Gentle & Slow" },
+    { value: "moderate", label: "Moderate" },
+    { value: "active", label: "Active & Energising" },
+  ];
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -146,7 +184,7 @@ const ContentLibrary = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [content, selectedDosha, selectedLifePhase, selectedPregnancyStatus, selectedType, selectedCompletion, selectedMovement, completedContentIds, userMovementPreference, userPrimaryDosha]);
+  }, [content, searchQuery, selectedCategory, selectedDosha, selectedLifePhase, selectedMobility, selectedConcern, selectedCompletion, completedContentIds, userMovementPreference, userPrimaryDosha]);
 
   const loadContent = async () => {
     setLoading(true);
@@ -210,8 +248,40 @@ const ContentLibrary = () => {
   const applyFilters = () => {
     let filtered = [...content];
 
-    if (selectedType !== "all") {
-      filtered = filtered.filter(item => item.content_type === selectedType);
+    // Search query filter - search across titles, descriptions, and tags
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(item => 
+        item.title?.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query) ||
+        item.tags?.some(tag => tag.toLowerCase().includes(query)) ||
+        item.benefits?.some(benefit => benefit.toLowerCase().includes(query)) ||
+        item.cycle_phases?.some(phase => phase.toLowerCase().includes(query)) ||
+        item.doshas?.some(dosha => dosha.toLowerCase().includes(query))
+      );
+    }
+
+    // Category filter - maps to content types and tags
+    if (selectedCategory !== "all") {
+      const categoryMappings: Record<string, { types: string[], tags: string[] }> = {
+        yoga: { types: ["yoga"], tags: ["yoga", "asana", "flow", "stretch"] },
+        mobility: { types: ["yoga"], tags: ["arthritis", "joint-care", "mobility", "chair-yoga", "wall-yoga", "bed-yoga", "senior-friendly", "accessible"] },
+        ayurveda: { types: ["article", "learning"], tags: ["ayurveda", "dosha", "lifestyle", "routine", "ritual"] },
+        nutrition: { types: ["nutrition"], tags: ["nutrition", "recipe", "food", "meal", "diet", "eating"] },
+        pregnancy: { types: ["yoga", "nutrition", "article"], tags: ["pregnancy", "prenatal", "postpartum", "fertility", "trimester"] },
+        menopause: { types: ["yoga", "nutrition", "article"], tags: ["menopause", "perimenopause", "post-menopause", "hormonal", "hot-flush"] },
+        emotional: { types: ["meditation", "article"], tags: ["emotional", "spiritual", "mindfulness", "meditation", "breathwork", "grounding", "dhikr", "prayer"] },
+        digestive: { types: ["nutrition", "article"], tags: ["digestive", "bloating", "gut", "ibs", "digestion", "easy-digest"] },
+        energy: { types: ["yoga", "nutrition", "meditation"], tags: ["energy-support", "blood-sugar", "balanced-energy", "fatigue", "vitality"] },
+      };
+
+      const mapping = categoryMappings[selectedCategory];
+      if (mapping) {
+        filtered = filtered.filter(item => 
+          mapping.types.includes(item.content_type) ||
+          item.tags?.some(tag => mapping.tags.some(t => tag.toLowerCase().includes(t)))
+        );
+      }
     }
 
     if (selectedDosha !== "all") {
@@ -222,13 +292,48 @@ const ContentLibrary = () => {
 
     if (selectedLifePhase !== "all") {
       filtered = filtered.filter(item => 
-        !item.cycle_phases || item.cycle_phases.length === 0 || item.cycle_phases.includes(selectedLifePhase)
+        !item.cycle_phases || item.cycle_phases.length === 0 || item.cycle_phases.includes(selectedLifePhase) ||
+        item.pregnancy_statuses?.includes(selectedLifePhase)
       );
     }
 
-    if (selectedPregnancyStatus !== "all") {
+    // Mobility level filter
+    if (selectedMobility !== "all") {
+      const mobilityMappings: Record<string, string[]> = {
+        chair: ["chair-yoga", "seated", "bed-yoga", "accessible"],
+        gentle: ["gentle", "restorative", "slow", "beginner", "relaxation"],
+        moderate: ["moderate", "intermediate", "flow"],
+        active: ["strong", "energising", "dynamic", "power", "active"],
+      };
+      const mobilityTags = mobilityMappings[selectedMobility] || [];
+      filtered = filtered.filter(item => {
+        if (!item.tags || item.tags.length === 0) return selectedMobility === "gentle";
+        return item.tags.some(tag => 
+          mobilityTags.some(mTag => tag.toLowerCase().includes(mTag))
+        ) || item.difficulty_level?.toLowerCase() === selectedMobility;
+      });
+    }
+
+    // Wellness concern filter
+    if (selectedConcern !== "all") {
+      const concernMappings: Record<string, string[]> = {
+        bloating: ["bloating", "digestive", "gut", "ibs"],
+        fatigue: ["fatigue", "energy", "tiredness", "exhaustion", "vitality"],
+        stiffness: ["stiffness", "mobility", "joint", "arthritis", "flexibility"],
+        mood: ["mood", "emotional", "anxiety", "stress", "calm", "peace"],
+        stress: ["stress", "relaxation", "calming", "grounding", "anxiety"],
+        sleep: ["sleep", "insomnia", "rest", "relaxation", "evening"],
+        pain: ["pain", "discomfort", "relief", "soothing"],
+        hormonal: ["hormonal", "hormone", "menopause", "perimenopause", "menstrual", "pms"],
+      };
+      const concernTags = concernMappings[selectedConcern] || [];
       filtered = filtered.filter(item => 
-        !item.pregnancy_statuses || item.pregnancy_statuses.length === 0 || item.pregnancy_statuses.includes(selectedPregnancyStatus)
+        item.tags?.some(tag => 
+          concernTags.some(cTag => tag.toLowerCase().includes(cTag))
+        ) ||
+        item.benefits?.some(benefit => 
+          concernTags.some(cTag => benefit.toLowerCase().includes(cTag))
+        )
       );
     }
 
@@ -237,22 +342,6 @@ const ContentLibrary = () => {
         filtered = filtered.filter(item => completedContentIds.has(item.id));
       } else if (selectedCompletion === "not-completed") {
         filtered = filtered.filter(item => !completedContentIds.has(item.id));
-      }
-    }
-
-    // Apply movement preference filter
-    if (selectedMovement !== "all") {
-      const movementTags = selectedMovement === "recommend" 
-        ? getDoshaMovementTags(userPrimaryDosha)
-        : movementToTagsMap[selectedMovement] || [];
-      
-      if (movementTags.length > 0) {
-        filtered = filtered.filter(item => {
-          if (!item.tags || item.tags.length === 0) return true;
-          return item.tags.some(tag => 
-            movementTags.some(mTag => tag.toLowerCase().includes(mTag.toLowerCase()))
-          );
-        });
       }
     }
 
@@ -387,13 +476,79 @@ const ContentLibrary = () => {
     }
   };
 
+  // Reusable content card renderer
+  const renderContentCard = (item: WellnessContent) => {
+    const isLocked = !isContentUnlocked(item);
+    return (
+      <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
+        <div className="h-40 overflow-hidden bg-muted relative">
+          <img 
+            src={item.image_url || getContentImage(item.content_type, item.tags)}
+            alt={item.title}
+            className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
+          />
+          {isLocked && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+              <div className="text-center text-white p-4">
+                <Lock className="h-10 w-10 mx-auto mb-2" />
+                <p className="text-sm font-semibold">Upgrade to unlock</p>
+              </div>
+            </div>
+          )}
+          {/* Category badge */}
+          <Badge className="absolute top-2 left-2 capitalize text-xs">
+            {item.content_type}
+          </Badge>
+        </div>
+        
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="text-base line-clamp-2">{item.title}</CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 flex-shrink-0"
+              onClick={() => toggleSaveContent(item.id)}
+            >
+              <Heart className={`h-4 w-4 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`} />
+            </Button>
+          </div>
+          <CardDescription className="line-clamp-2 text-sm">
+            {item.description}
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="pt-0">
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {item.doshas?.slice(0, 2).map((dosha) => (
+              <Badge key={dosha} variant="outline" className="text-xs capitalize">{dosha}</Badge>
+            ))}
+            {item.duration_minutes && (
+              <Badge variant="outline" className="text-xs">{item.duration_minutes} min</Badge>
+            )}
+          </div>
+          
+          <Button 
+            className="w-full" 
+            size="sm"
+            onClick={() => openContentDetail(item)}
+            disabled={isLocked}
+          >
+            {isLocked ? 'View Preview' : 'View Details'}
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  };
+
   const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("all");
     setSelectedDosha("all");
     setSelectedLifePhase("all");
-    setSelectedPregnancyStatus("all");
-    setSelectedType("all");
+    setSelectedMobility("all");
+    setSelectedConcern("all");
     setSelectedCompletion("all");
-    setSelectedMovement("all");
   };
 
   const getContentIcon = (type: string) => {
@@ -668,35 +823,95 @@ const ContentLibrary = () => {
           </Card>
         )}
 
-        {/* Filters */}
+        {/* Category Tabs */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 mb-6 h-auto gap-1 p-1">
-            <TabsTrigger value="all" className="text-sm md:text-base py-2.5">All Content</TabsTrigger>
-            <TabsTrigger value="saved" className="flex items-center gap-2 text-sm md:text-base py-2.5">
-              <Heart className="h-4 w-4" />
-              Favorites
-            </TabsTrigger>
-            <TabsTrigger value="yoga" className="text-sm md:text-base py-2.5">Yoga</TabsTrigger>
-            <TabsTrigger value="meditation" className="text-sm md:text-base py-2.5">Meditation</TabsTrigger>
-            <TabsTrigger value="nutrition" className="text-sm md:text-base py-2.5">Nutrition</TabsTrigger>
-            <TabsTrigger value="article" className="text-sm md:text-base py-2.5">Articles</TabsTrigger>
-            <TabsTrigger value="joint-care" className="flex items-center gap-2 text-sm md:text-base py-2.5 bg-wellness-sage-light/50 data-[state=active]:bg-primary">
-              <Flower2 className="h-4 w-4" />
-              Joint Care
-            </TabsTrigger>
-            <TabsTrigger value="energy-support" className="flex items-center gap-2 text-sm md:text-base py-2.5 bg-amber-100/50 dark:bg-amber-900/30 data-[state=active]:bg-primary">
-              <Zap className="h-4 w-4" />
-              Energy Support
-            </TabsTrigger>
-          </TabsList>
+          <div className="mb-6">
+            <ScrollArea className="w-full">
+              <TabsList className="inline-flex w-max h-auto gap-1 p-1 bg-muted/50">
+                <TabsTrigger value="all" className="text-sm py-2 px-3">
+                  <BookOpen className="h-4 w-4 mr-1.5" />
+                  All
+                </TabsTrigger>
+                <TabsTrigger value="saved" className="text-sm py-2 px-3">
+                  <Heart className="h-4 w-4 mr-1.5" />
+                  Favorites
+                </TabsTrigger>
+                <TabsTrigger value="yoga" className="text-sm py-2 px-3">
+                  <Flower2 className="h-4 w-4 mr-1.5" />
+                  Yoga
+                </TabsTrigger>
+                <TabsTrigger value="joint-care" className="text-sm py-2 px-3">
+                  <Activity className="h-4 w-4 mr-1.5" />
+                  Mobility
+                </TabsTrigger>
+                <TabsTrigger value="nutrition" className="text-sm py-2 px-3">
+                  <Salad className="h-4 w-4 mr-1.5" />
+                  Nutrition
+                </TabsTrigger>
+                <TabsTrigger value="pregnancy" className="text-sm py-2 px-3">
+                  <Baby className="h-4 w-4 mr-1.5" />
+                  Pregnancy
+                </TabsTrigger>
+                <TabsTrigger value="menopause" className="text-sm py-2 px-3">
+                  <Sparkles className="h-4 w-4 mr-1.5" />
+                  Menopause
+                </TabsTrigger>
+                <TabsTrigger value="emotional" className="text-sm py-2 px-3">
+                  <Brain className="h-4 w-4 mr-1.5" />
+                  Spiritual
+                </TabsTrigger>
+                <TabsTrigger value="energy-support" className="text-sm py-2 px-3">
+                  <Zap className="h-4 w-4 mr-1.5" />
+                  Energy
+                </TabsTrigger>
+              </TabsList>
+            </ScrollArea>
+          </div>
 
           <TabsContent value="all" className="space-y-6">
-            <Card className="mb-6">
-              <CardHeader>
+            {/* Search Bar */}
+            <Card className="bg-gradient-to-r from-primary/5 to-secondary/5">
+              <CardContent className="pt-6">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Search for yoga, nutrition, breathwork, life phases, conditions..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 pr-10 h-12 text-base"
+                  />
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Try: "yoga for arthritis", "perimenopause support", "breathwork", "nutrition for bloating"
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Disclaimer Banner */}
+            <div className="p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 rounded-lg">
+              <p className="text-xs text-amber-700 dark:text-amber-300 text-center">
+                <AlertTriangle className="h-3 w-3 inline mr-1" />
+                This content provides general wellbeing and lifestyle guidance only. It is not medical advice. Always consult your doctor for medical concerns.
+              </p>
+            </div>
+
+            {/* Filters */}
+            <Card>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Filter className="h-5 w-5" />
-                    <CardTitle>Filters</CardTitle>
+                    <CardTitle className="text-lg">Filter Content</CardTitle>
                   </div>
                   <Button variant="ghost" size="sm" onClick={clearFilters}>
                     Clear All
@@ -704,119 +919,146 @@ const ContentLibrary = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Content Type</label>
-                <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger className="text-base">
-                    <SelectValue placeholder="All types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all" className="text-base py-2">All Types</SelectItem>
-                    <SelectItem value="yoga" className="text-base py-2">Yoga</SelectItem>
-                    <SelectItem value="meditation" className="text-base py-2">Meditation</SelectItem>
-                    <SelectItem value="nutrition" className="text-base py-2">Nutrition</SelectItem>
-                    <SelectItem value="article" className="text-base py-2">Articles</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                  <div>
+                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Category</label>
+                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map(cat => (
+                          <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div>
-                <label className="text-sm font-medium mb-2 block">Movement Style</label>
-                <Select value={selectedMovement} onValueChange={setSelectedMovement}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All styles" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Styles</SelectItem>
-                    <SelectItem value="gentle">Gentle & Slow</SelectItem>
-                    <SelectItem value="stretchy">Stretchy & Fluid</SelectItem>
-                    <SelectItem value="strong">Strong & Energising</SelectItem>
-                    <SelectItem value="seated">Seated / Chair-based</SelectItem>
-                    <SelectItem value="recommend">Dosha-Matched</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Mobility Level</label>
+                    <Select value={selectedMobility} onValueChange={setSelectedMobility}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {mobilityLevels.map(level => (
+                          <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div>
-                <label className="text-sm font-medium mb-2 block">Dosha</label>
-                <Select value={selectedDosha} onValueChange={setSelectedDosha}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All doshas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Doshas</SelectItem>
-                    <SelectItem value="vata">Vata</SelectItem>
-                    <SelectItem value="pitta">Pitta</SelectItem>
-                    <SelectItem value="kapha">Kapha</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Life Phase</label>
+                    <Select value={selectedLifePhase} onValueChange={setSelectedLifePhase}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Phases</SelectItem>
+                        <SelectItem value="menstrual">Menstrual</SelectItem>
+                        <SelectItem value="fertility">Fertility</SelectItem>
+                        <SelectItem value="pregnancy">Pregnancy</SelectItem>
+                        <SelectItem value="postpartum">Postpartum</SelectItem>
+                        <SelectItem value="perimenopause">Perimenopause</SelectItem>
+                        <SelectItem value="menopause">Menopause</SelectItem>
+                        <SelectItem value="post-menopause">Post-menopause</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div>
-                <label className="text-sm font-medium mb-2 block">Life Phase</label>
-                <Select value={selectedLifePhase} onValueChange={setSelectedLifePhase}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All phases" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Phases</SelectItem>
-                    <SelectItem value="menstrual">Menstrual</SelectItem>
-                    <SelectItem value="fertility">Fertility</SelectItem>
-                    <SelectItem value="pregnancy">Pregnancy</SelectItem>
-                    <SelectItem value="postpartum">Postpartum</SelectItem>
-                    <SelectItem value="perimenopause">Perimenopause</SelectItem>
-                    <SelectItem value="menopause">Menopause</SelectItem>
-                    <SelectItem value="post-menopause">Post-menopause</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Dosha</label>
+                    <Select value={selectedDosha} onValueChange={setSelectedDosha}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Doshas</SelectItem>
+                        <SelectItem value="vata">Vata</SelectItem>
+                        <SelectItem value="pitta">Pitta</SelectItem>
+                        <SelectItem value="kapha">Kapha</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div>
-                <label className="text-sm font-medium mb-2 block">Pregnancy Status</label>
-                <Select value={selectedPregnancyStatus} onValueChange={setSelectedPregnancyStatus}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All statuses" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="not_pregnant">Not Pregnant</SelectItem>
-                    <SelectItem value="pregnant">Pregnant</SelectItem>
-                    <SelectItem value="postpartum">Postpartum</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Wellness Concern</label>
+                    <Select value={selectedConcern} onValueChange={setSelectedConcern}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {wellnessConcerns.map(concern => (
+                          <SelectItem key={concern.value} value={concern.value}>{concern.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div>
-                <label className="text-sm font-medium mb-2 block">Progress</label>
-                <Select value={selectedCompletion} onValueChange={setSelectedCompletion}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All content" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Content</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="not-completed">Not Completed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  {user && (
+                    <div>
+                      <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Progress</label>
+                      <Select value={selectedCompletion} onValueChange={setSelectedCompletion}>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Content</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="not-completed">Not Completed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
 
-                {/* Show user's movement preference indicator */}
-                {userMovementPreference && (
-                  <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/20">
-                    <p className="text-sm text-muted-foreground">
-                      <Sparkles className="h-4 w-4 inline mr-1 text-primary" />
-                      Content is prioritised for your preference: <span className="font-medium text-foreground">
-                        {userMovementPreference === "gentle" && "Gentle & Slow"}
-                        {userMovementPreference === "stretchy" && "Stretchy & Fluid"}
-                        {userMovementPreference === "strong" && "Strong & Energising"}
-                        {userMovementPreference === "seated" && "Seated / Chair-based"}
-                        {userMovementPreference === "recommend" && `Dosha-matched (${userPrimaryDosha ? userPrimaryDosha.charAt(0).toUpperCase() + userPrimaryDosha.slice(1) : 'Your dosha'})`}
-                      </span>
-                    </p>
+                {/* Active filters indicator */}
+                {(searchQuery || selectedCategory !== "all" || selectedMobility !== "all" || selectedLifePhase !== "all" || selectedDosha !== "all" || selectedConcern !== "all") && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {searchQuery && (
+                      <Badge variant="secondary" className="gap-1">
+                        Search: "{searchQuery}"
+                        <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchQuery("")} />
+                      </Badge>
+                    )}
+                    {selectedCategory !== "all" && (
+                      <Badge variant="secondary" className="gap-1">
+                        {categories.find(c => c.value === selectedCategory)?.label}
+                        <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCategory("all")} />
+                      </Badge>
+                    )}
+                    {selectedMobility !== "all" && (
+                      <Badge variant="secondary" className="gap-1">
+                        {mobilityLevels.find(m => m.value === selectedMobility)?.label}
+                        <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedMobility("all")} />
+                      </Badge>
+                    )}
+                    {selectedLifePhase !== "all" && (
+                      <Badge variant="secondary" className="gap-1 capitalize">
+                        {selectedLifePhase}
+                        <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedLifePhase("all")} />
+                      </Badge>
+                    )}
+                    {selectedDosha !== "all" && (
+                      <Badge variant="secondary" className="gap-1 capitalize">
+                        {selectedDosha}
+                        <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedDosha("all")} />
+                      </Badge>
+                    )}
+                    {selectedConcern !== "all" && (
+                      <Badge variant="secondary" className="gap-1">
+                        {wellnessConcerns.find(c => c.value === selectedConcern)?.label}
+                        <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedConcern("all")} />
+                      </Badge>
+                    )}
                   </div>
                 )}
+
+                {/* Results count */}
+                <div className="mt-3 text-sm text-muted-foreground">
+                  Showing {filteredContent.length} of {content.length} items
+                </div>
               </CardContent>
             </Card>
 
@@ -1594,127 +1836,155 @@ const ContentLibrary = () => {
             )}
           </TabsContent>
 
-          {['yoga', 'meditation', 'nutrition', 'article'].map((type) => (
-            <TabsContent key={type} value={type} className="space-y-6">
-              {loading ? (
-                <ContentGridSkeleton count={6} />
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredContent
-                    .filter(item => item.content_type === type)
-                    .map((item) => {
-                    const isLocked = !isContentUnlocked(item);
-                    
-                    return (
-                      <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
-                        <div className="h-48 overflow-hidden bg-muted relative">
-                          <img 
-                            src={item.image_url || getContentImage(item.content_type, item.tags)}
-                            alt={item.title}
-                            className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
-                          />
-                          {isLocked && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                              <div className="text-center text-white p-4">
-                                <Lock className="h-12 w-12 mx-auto mb-2" />
-                                <p className="text-sm font-semibold">Locked Content</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <CardHeader>
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-2 flex-1">
-                              {getContentIcon(item.content_type)}
-                              <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {user && completedContentIds.has(item.id) && (
-                                <Badge variant="default" className="bg-green-600 hover:bg-green-700">
-                                  <CheckCircle2 className="h-3 w-3" />
-                                </Badge>
-                              )}
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => toggleSaveContent(item.id)}
-                              >
-                                <Heart 
-                                  className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
-                                />
-                              </Button>
-                            </div>
-                          </div>
-                          <CardDescription className="line-clamp-2">
-                            {item.description}
-                          </CardDescription>
-                        </CardHeader>
-                        
-                        <CardContent>
-                          <div className="space-y-3 mb-4">
-                            {item.doshas && item.doshas.length > 0 && (
-                              <div className="flex flex-wrap gap-2">
-                                {item.doshas.map((dosha) => (
-                                  <div key={dosha}>{getDoshaIcon(dosha)}</div>
-                                ))}
-                              </div>
-                            )}
-                            
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="secondary" className="capitalize">
-                                {item.content_type}
-                              </Badge>
-                              {item.difficulty_level && (
-                                <Badge variant="outline">{item.difficulty_level}</Badge>
-                              )}
-                              {item.duration_minutes && (
-                                <Badge variant="outline">{item.duration_minutes} min</Badge>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            <Button 
-                              className="flex-1" 
-                              onClick={() => openContentDetail(item)}
-                              disabled={isLocked}
-                            >
-                              {isLocked ? (
-                                <>
-                                  <Lock className="h-4 w-4 mr-2" />
-                                  View Preview
-                                </>
-                              ) : (
-                                'View Details'
-                              )}
-                            </Button>
-                            {user && !isLocked && (
-                              <Button
-                                variant={completedContentIds.has(item.id) ? "default" : "outline"}
-                                size="icon"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleCompletion(item.id);
-                                }}
-                                title={completedContentIds.has(item.id) ? "Mark as not completed" : "Mark as completed"}
-                              >
-                                {completedContentIds.has(item.id) ? (
-                                  <CheckCircle2 className="h-4 w-4" />
-                                ) : (
-                                  <Circle className="h-4 w-4" />
-                                )}
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+          {/* Yoga Tab */}
+          <TabsContent value="yoga" className="space-y-6">
+            {loading ? (
+              <ContentGridSkeleton count={6} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {content
+                  .filter(item => item.content_type === 'yoga')
+                  .map((item) => renderContentCard(item))}
+              </div>
+            )}
+            {!loading && content.filter(item => item.content_type === 'yoga').length === 0 && (
+              <Card className="p-12 text-center">
+                <Flower2 className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-xl font-semibold mb-2">Yoga Content Coming Soon</h3>
+                <p className="text-muted-foreground">Supportive yoga practices are being prepared with care.</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Nutrition Tab */}
+          <TabsContent value="nutrition" className="space-y-6">
+            {loading ? (
+              <ContentGridSkeleton count={6} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {content
+                  .filter(item => item.content_type === 'nutrition' || item.tags?.some(tag => ['recipe', 'food', 'meal', 'eating'].includes(tag)))
+                  .map((item) => renderContentCard(item))}
+              </div>
+            )}
+            {!loading && content.filter(item => item.content_type === 'nutrition').length === 0 && (
+              <Card className="p-12 text-center">
+                <Salad className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-xl font-semibold mb-2">Nutrition Content Coming Soon</h3>
+                <p className="text-muted-foreground">Ayurveda-inspired nutrition guidance is being prepared with care.</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Pregnancy & Postpartum Tab */}
+          <TabsContent value="pregnancy" className="space-y-6">
+            <Card className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-950/30 dark:to-rose-950/30 border-pink-200">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <Baby className="h-10 w-10 text-pink-600" />
+                  <div>
+                    <h2 className="text-xl font-semibold text-pink-800 dark:text-pink-300">Pregnancy & Postpartum Support</h2>
+                    <p className="text-pink-600 dark:text-pink-400 text-sm">Gentle practices and Ayurveda-inspired suggestions for your journey</p>
+                  </div>
                 </div>
-              )}
-            </TabsContent>
-          ))}
+              </CardContent>
+            </Card>
+            {loading ? (
+              <ContentGridSkeleton count={6} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {content
+                  .filter(item => 
+                    item.cycle_phases?.some(phase => ['pregnancy', 'postpartum', 'fertility'].includes(phase)) ||
+                    item.pregnancy_statuses?.some(status => ['pregnant', 'postpartum'].includes(status)) ||
+                    item.tags?.some(tag => ['pregnancy', 'prenatal', 'postpartum', 'fertility', 'trimester'].includes(tag))
+                  )
+                  .map((item) => renderContentCard(item))}
+              </div>
+            )}
+            {!loading && content.filter(item => 
+              item.cycle_phases?.some(phase => ['pregnancy', 'postpartum'].includes(phase))
+            ).length === 0 && (
+              <Card className="p-12 text-center">
+                <Baby className="h-16 w-16 mx-auto mb-4 text-pink-400" />
+                <h3 className="text-xl font-semibold mb-2">Pregnancy Content Coming Soon</h3>
+                <p className="text-muted-foreground">Supportive practices for pregnancy and postpartum are being prepared with care.</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Menopause & Beyond Tab */}
+          <TabsContent value="menopause" className="space-y-6">
+            <Card className="bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 border-purple-200">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <Sparkles className="h-10 w-10 text-purple-600" />
+                  <div>
+                    <h2 className="text-xl font-semibold text-purple-800 dark:text-purple-300">Menopause & Beyond</h2>
+                    <p className="text-purple-600 dark:text-purple-400 text-sm">Holistic routines that may help you feel better during this transition</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            {loading ? (
+              <ContentGridSkeleton count={6} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {content
+                  .filter(item => 
+                    item.cycle_phases?.some(phase => ['perimenopause', 'menopause', 'post-menopause'].includes(phase)) ||
+                    item.tags?.some(tag => ['menopause', 'perimenopause', 'post-menopause', 'hormonal', 'hot-flush'].includes(tag))
+                  )
+                  .map((item) => renderContentCard(item))}
+              </div>
+            )}
+            {!loading && content.filter(item => 
+              item.cycle_phases?.some(phase => ['perimenopause', 'menopause', 'post-menopause'].includes(phase))
+            ).length === 0 && (
+              <Card className="p-12 text-center">
+                <Sparkles className="h-16 w-16 mx-auto mb-4 text-purple-400" />
+                <h3 className="text-xl font-semibold mb-2">Menopause Content Coming Soon</h3>
+                <p className="text-muted-foreground">Supportive practices for menopause and beyond are being prepared with care.</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Emotional & Spiritual Tab */}
+          <TabsContent value="emotional" className="space-y-6">
+            <Card className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/30 dark:to-blue-950/30 border-indigo-200">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <Brain className="h-10 w-10 text-indigo-600" />
+                  <div>
+                    <h2 className="text-xl font-semibold text-indigo-800 dark:text-indigo-300">Emotional & Spiritual Wellbeing</h2>
+                    <p className="text-indigo-600 dark:text-indigo-400 text-sm">Mindfulness, meditation, and spiritual tools (Islamic + universal options)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            {loading ? (
+              <ContentGridSkeleton count={6} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {content
+                  .filter(item => 
+                    item.content_type === 'meditation' ||
+                    item.tags?.some(tag => ['emotional', 'spiritual', 'mindfulness', 'meditation', 'breathwork', 'grounding', 'dhikr', 'prayer', 'gratitude', 'reflection'].includes(tag))
+                  )
+                  .map((item) => renderContentCard(item))}
+              </div>
+            )}
+            {!loading && content.filter(item => 
+              item.content_type === 'meditation' ||
+              item.tags?.some(tag => ['emotional', 'spiritual', 'mindfulness'].includes(tag))
+            ).length === 0 && (
+              <Card className="p-12 text-center">
+                <Brain className="h-16 w-16 mx-auto mb-4 text-indigo-400" />
+                <h3 className="text-xl font-semibold mb-2">Spiritual Content Coming Soon</h3>
+                <p className="text-muted-foreground">Mindfulness and spiritual support are being prepared with care.</p>
+              </Card>
+            )}
+          </TabsContent>
         </Tabs>
 
         {/* Content Detail Dialog */}
