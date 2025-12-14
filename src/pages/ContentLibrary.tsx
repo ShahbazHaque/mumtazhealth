@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell, Zap, AlertTriangle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import yogaImage from "@/assets/wellness-yoga.jpg";
@@ -26,6 +26,7 @@ import jointCareKitchari from "@/assets/joint-care-kitchari.jpg";
 import jointCareBoneSoup from "@/assets/joint-care-bone-soup.jpg";
 import jointCareBreathwork from "@/assets/joint-care-breathwork.jpg";
 import jointCareFunctional from "@/assets/joint-care-functional.jpg";
+import bloodSugarEnergySupport from "@/assets/blood-sugar-energy-support.jpg";
 import { Navigation } from "@/components/Navigation";
 import { ContentGridSkeleton } from "@/components/ContentSkeleton";
 import { DailyReminderButton } from "@/components/DailyReminderButton";
@@ -669,7 +670,7 @@ const ContentLibrary = () => {
 
         {/* Filters */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 mb-6 h-auto gap-1 p-1">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 mb-6 h-auto gap-1 p-1">
             <TabsTrigger value="all" className="text-sm md:text-base py-2.5">All Content</TabsTrigger>
             <TabsTrigger value="saved" className="flex items-center gap-2 text-sm md:text-base py-2.5">
               <Heart className="h-4 w-4" />
@@ -679,9 +680,13 @@ const ContentLibrary = () => {
             <TabsTrigger value="meditation" className="text-sm md:text-base py-2.5">Meditation</TabsTrigger>
             <TabsTrigger value="nutrition" className="text-sm md:text-base py-2.5">Nutrition</TabsTrigger>
             <TabsTrigger value="article" className="text-sm md:text-base py-2.5">Articles</TabsTrigger>
-            <TabsTrigger value="joint-care" className="flex items-center gap-2 text-sm md:text-base py-2.5 col-span-2 md:col-span-1 bg-wellness-sage-light/50 data-[state=active]:bg-primary">
+            <TabsTrigger value="joint-care" className="flex items-center gap-2 text-sm md:text-base py-2.5 bg-wellness-sage-light/50 data-[state=active]:bg-primary">
               <Flower2 className="h-4 w-4" />
               Joint Care
+            </TabsTrigger>
+            <TabsTrigger value="energy-support" className="flex items-center gap-2 text-sm md:text-base py-2.5 bg-amber-100/50 dark:bg-amber-900/30 data-[state=active]:bg-primary">
+              <Zap className="h-4 w-4" />
+              Energy Support
             </TabsTrigger>
           </TabsList>
 
@@ -1271,6 +1276,319 @@ const ContentLibrary = () => {
                 <h3 className="text-xl font-semibold mb-2">Joint Care Content Coming Soon</h3>
                 <p className="text-muted-foreground text-lg">
                   Gentle practices for arthritis and mobility are being prepared with care.
+                </p>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Holistic Blood Sugar & Energy Support Section */}
+          <TabsContent value="energy-support" className="space-y-6">
+            {/* Medical Disclaimer */}
+            <Card className="border-amber-300 bg-amber-50/50 dark:bg-amber-950/20">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <AlertTriangle className="h-6 w-6 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-amber-800 dark:text-amber-400">Important Disclaimer</h4>
+                    <p className="text-sm text-amber-700 dark:text-amber-300">
+                      This content is for <strong>general wellbeing and educational purposes only</strong>. It does not diagnose, treat, reverse, or cure any medical condition including diabetes. 
+                      Always consult your doctor or healthcare provider before making changes to your treatment, medication, or lifestyle. 
+                      This section does not replace professional medical care.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Section Header */}
+            <Card className="bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-950/40 dark:to-orange-950/40 border-amber-200">
+              <CardContent className="pt-6">
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-amber-200 flex-shrink-0">
+                    <img 
+                      src={bloodSugarEnergySupport} 
+                      alt="Holistic Energy Support" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-center md:text-left flex-1">
+                    <h2 className="text-2xl md:text-3xl font-semibold mb-2 text-amber-900 dark:text-amber-100">Holistic Blood Sugar & Energy Support</h2>
+                    <p className="text-lg text-amber-700 dark:text-amber-300 max-w-2xl">
+                      Gentle lifestyle practices inspired by yoga, Ayurveda, nutrition, and spirituality to support balanced energy and overall wellbeing.
+                    </p>
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Gentle Mobility</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Breathing Exercises</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Grounding Routines</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Mindful Nutrition</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Spiritual Tools</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Content Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-green-100 rounded-full">
+                      <Flower2 className="h-5 w-5 text-green-600" />
+                    </div>
+                    <h4 className="font-semibold text-green-800 dark:text-green-300">Gentle Mobility</h4>
+                  </div>
+                  <p className="text-sm text-green-700 dark:text-green-400">
+                    Chair yoga, gentle stretches, and movement routines to improve circulation and reduce stiffness.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-blue-50 to-sky-50 dark:from-blue-950/30 dark:to-sky-950/30 border-blue-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-blue-100 rounded-full">
+                      <Wind className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <h4 className="font-semibold text-blue-800 dark:text-blue-300">Breathing & Relaxation</h4>
+                  </div>
+                  <p className="text-sm text-blue-700 dark:text-blue-400">
+                    Simple breathwork and stress-reducing techniques to calm the nervous system and support wellbeing.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 border-orange-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-orange-100 rounded-full">
+                      <Leaf className="h-5 w-5 text-orange-600" />
+                    </div>
+                    <h4 className="font-semibold text-orange-800 dark:text-orange-300">Mindful Nutrition</h4>
+                  </div>
+                  <p className="text-sm text-orange-700 dark:text-orange-400">
+                    Warm, easy-to-digest meal ideas and mindful eating guidance for balanced, sustained energy.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 border-purple-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-purple-100 rounded-full">
+                      <Mountain className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <h4 className="font-semibold text-purple-800 dark:text-purple-300">Grounding Routines</h4>
+                  </div>
+                  <p className="text-sm text-purple-700 dark:text-purple-400">
+                    Daily grounding practices and healthy routine suggestions inspired by Ayurvedic wisdom.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/30 dark:to-rose-950/30 border-pink-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-pink-100 rounded-full">
+                      <Sparkles className="h-5 w-5 text-pink-600" />
+                    </div>
+                    <h4 className="font-semibold text-pink-800 dark:text-pink-300">Spiritual Support</h4>
+                  </div>
+                  <p className="text-sm text-pink-700 dark:text-pink-400">
+                    Islamic spiritual tools (dhikr, du'a) and universal mindfulness options for emotional balance.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 border-teal-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-teal-100 rounded-full">
+                      <Lightbulb className="h-5 w-5 text-teal-600" />
+                    </div>
+                    <h4 className="font-semibold text-teal-800 dark:text-teal-300">Lifestyle Education</h4>
+                  </div>
+                  <p className="text-sm text-teal-700 dark:text-teal-400">
+                    Educational content on how lifestyle choices can support balanced energy and overall health.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Premium Tier Information */}
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <Crown className="h-6 w-6 text-primary flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold mb-2">Premium Content Available</h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Upgrade to access deeper education and personalised guidance from our practitioner. 
+                      Premium members receive tailored recommendations based on their unique constitution.
+                    </p>
+                    <p className="text-xs text-muted-foreground italic">
+                      Note: Premium content provides educational lifestyle guidance only and does not replace working with a qualified healthcare practitioner.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {loading ? (
+              <ContentGridSkeleton count={6} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {content
+                  .filter(item => 
+                    item.tags?.some(tag => 
+                      ['energy-support', 'blood-sugar', 'balanced-energy', 'grounding', 'stress-relief', 'mindful-eating', 'gentle-movement', 'circulation', 'nervous-system', 'relaxation', 'digestive-health'].includes(tag)
+                    ) ||
+                    (item.tags?.includes('gentle') && item.tags?.includes('breathwork')) ||
+                    (item.content_type === 'nutrition' && item.tags?.some(tag => ['easy-digest', 'warming', 'nourishing', 'balancing'].includes(tag)))
+                  )
+                  .map((item) => {
+                  const isLocked = !isContentUnlocked(item);
+                  
+                  return (
+                    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
+                      <div className="h-48 overflow-hidden bg-muted relative">
+                        <img 
+                          src={item.image_url || getContentImage(item.content_type, item.tags)}
+                          alt={item.title}
+                          className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
+                        />
+                        {isLocked && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                            <div className="text-center text-white p-4">
+                              <Lock className="h-12 w-12 mx-auto mb-2" />
+                              <p className="text-base font-semibold">Locked Content</p>
+                              <p className="text-sm mt-1">Upgrade to access</p>
+                            </div>
+                          </div>
+                        )}
+                        {/* Energy Support tag */}
+                        <Badge className="absolute top-2 left-2 bg-amber-500 text-white text-sm">
+                          <Zap className="h-3 w-3 mr-1" />
+                          Energy Support
+                        </Badge>
+                      </div>
+                      
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2 flex-1">
+                            {getContentIcon(item.content_type)}
+                            <CardTitle className="text-lg md:text-xl line-clamp-2">{item.title}</CardTitle>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {user && completedContentIds.has(item.id) && (
+                              <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                                <CheckCircle2 className="h-4 w-4" />
+                              </Badge>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => toggleSaveContent(item.id)}
+                              className="h-10 w-10"
+                            >
+                              <Heart 
+                                className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
+                              />
+                            </Button>
+                          </div>
+                        </div>
+                        <CardDescription className="line-clamp-2 text-base">
+                          {item.description}
+                        </CardDescription>
+                      </CardHeader>
+                      
+                      <CardContent>
+                        <div className="space-y-3 mb-4">
+                          {item.doshas && item.doshas.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {item.doshas.map((dosha) => (
+                                <div key={dosha}>{getDoshaIcon(dosha)}</div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="secondary" className="capitalize text-sm">
+                              {item.content_type}
+                            </Badge>
+                            {item.difficulty_level && (
+                              <Badge variant="outline" className="text-sm">{item.difficulty_level}</Badge>
+                            )}
+                            {item.duration_minutes && (
+                              <Badge variant="outline" className="text-sm">{item.duration_minutes} min</Badge>
+                            )}
+                          </div>
+
+                          {/* Benefits preview */}
+                          {item.benefits && item.benefits.length > 0 && (
+                            <div className="text-sm text-muted-foreground">
+                              <span className="font-medium">Benefits: </span>
+                              {item.benefits.slice(0, 2).join(', ')}
+                              {item.benefits.length > 2 && '...'}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button 
+                            className="flex-1 text-base py-5" 
+                            size="lg"
+                            onClick={() => openContentDetail(item)}
+                            disabled={isLocked}
+                          >
+                            {isLocked ? (
+                              <>
+                                <Lock className="h-4 w-4 mr-2" />
+                                View Preview
+                              </>
+                            ) : (
+                              'View Details'
+                            )}
+                          </Button>
+                          {user && !isLocked && (
+                            <Button
+                              variant={completedContentIds.has(item.id) ? "default" : "outline"}
+                              size="lg"
+                              className="px-4"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleCompletion(item.id);
+                              }}
+                              title={completedContentIds.has(item.id) ? "Mark as not completed" : "Mark as completed"}
+                            >
+                              {completedContentIds.has(item.id) ? (
+                                <CheckCircle2 className="h-5 w-5" />
+                              ) : (
+                                <Circle className="h-5 w-5" />
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+
+            {!loading && content.filter(item => 
+              item.tags?.some(tag => 
+                ['energy-support', 'blood-sugar', 'balanced-energy', 'grounding', 'stress-relief', 'mindful-eating', 'gentle-movement'].includes(tag)
+              )
+            ).length === 0 && (
+              <Card className="p-12 text-center">
+                <Zap className="h-16 w-16 mx-auto mb-4 text-amber-500" />
+                <h3 className="text-xl font-semibold mb-2">Energy Support Content Coming Soon</h3>
+                <p className="text-muted-foreground text-lg mb-4">
+                  Holistic lifestyle practices for balanced energy and wellbeing are being prepared with care.
+                </p>
+                <p className="text-sm text-muted-foreground italic">
+                  Remember: Always consult your healthcare provider for medical advice.
                 </p>
               </Card>
             )}
