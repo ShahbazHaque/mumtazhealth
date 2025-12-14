@@ -2,24 +2,30 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Sparkles, ArrowRight, Star, StarOff } from "lucide-react";
+import { Heart, X, Sparkles, ArrowRight, Star, StarOff, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const feelingOptions = [
-  { id: "tired", label: "Tired", emoji: "😴" },
-  { id: "pain", label: "In pain", emoji: "😣" },
-  { id: "exhausted", label: "Exhausted", emoji: "😩" },
-  { id: "hormonal", label: "Hormonal", emoji: "🌙" },
-  { id: "emotional", label: "Emotional", emoji: "💧" },
-  { id: "restless", label: "Restless", emoji: "🦋" },
-  { id: "bloated", label: "Bloated", emoji: "🎈" },
-  { id: "cant-sleep", label: "Can't sleep", emoji: "🌃" },
-  { id: "hot-flushes", label: "Hot flushes", emoji: "🔥" },
-  { id: "digestive", label: "Digestive issues", emoji: "🍵" },
-  { id: "back-ache", label: "Back ache", emoji: "🧘" },
-  { id: "neck-shoulder", label: "Neck/shoulder", emoji: "💆" },
+  { id: "tired", label: "Tired", emoji: "😴", color: "from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30" },
+  { id: "pain", label: "In pain", emoji: "😣", color: "from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30" },
+  { id: "exhausted", label: "Exhausted", emoji: "😩", color: "from-gray-100 to-slate-100 dark:from-gray-900/30 dark:to-slate-900/30" },
+  { id: "hormonal", label: "Hormonal", emoji: "🌙", color: "from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30" },
+  { id: "emotional", label: "Emotional", emoji: "💧", color: "from-cyan-100 to-blue-100 dark:from-cyan-900/30 dark:to-blue-900/30" },
+  { id: "restless", label: "Restless", emoji: "🦋", color: "from-teal-100 to-emerald-100 dark:from-teal-900/30 dark:to-emerald-900/30" },
+  { id: "bloated", label: "Bloated", emoji: "🎈", color: "from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30" },
+  { id: "cant-sleep", label: "Can't sleep", emoji: "🌃", color: "from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30" },
+  { id: "hot-flushes", label: "Hot flushes", emoji: "🔥", color: "from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30" },
+  { id: "digestive", label: "Digestive issues", emoji: "🍵", color: "from-green-100 to-lime-100 dark:from-green-900/30 dark:to-lime-900/30" },
+  { id: "back-ache", label: "Back ache", emoji: "🧘", color: "from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30" },
+  { id: "neck-shoulder", label: "Neck/shoulder", emoji: "💆", color: "from-fuchsia-100 to-purple-100 dark:from-fuchsia-900/30 dark:to-purple-900/30" },
+  { id: "period-pain", label: "Period pain", emoji: "🩸", color: "from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30" },
+  { id: "joint-stiffness", label: "Joint stiffness", emoji: "🦴", color: "from-stone-100 to-zinc-100 dark:from-stone-900/30 dark:to-zinc-900/30" },
+  { id: "post-surgery", label: "Post-surgery discomfort", emoji: "🏥", color: "from-sky-100 to-cyan-100 dark:from-sky-900/30 dark:to-cyan-900/30" },
+  { id: "low-mood", label: "Low mood", emoji: "😢", color: "from-slate-100 to-gray-100 dark:from-slate-900/30 dark:to-gray-900/30" },
+  { id: "overwhelmed", label: "Overwhelmed", emoji: "😵", color: "from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30" },
+  { id: "stressed", label: "Stressed", emoji: "😰", color: "from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30" },
 ];
 
 const suggestions: Record<string, { tips: string[]; explore: string }> = {
@@ -119,6 +125,54 @@ const suggestions: Record<string, { tips: string[]; explore: string }> = {
     ],
     explore: "View chair yoga and gentle stretches"
   },
+  "period-pain": {
+    tips: [
+      "Gentle heat on your lower belly can ease cramps",
+      "Reclining bound angle pose opens the pelvis gently",
+      "Chamomile or raspberry leaf tea may help"
+    ],
+    explore: "Explore menstrual cycle support"
+  },
+  "joint-stiffness": {
+    tips: [
+      "Gentle morning stretches before getting out of bed",
+      "Warm sesame oil massage supports joint mobility",
+      "Anti-inflammatory foods like turmeric and ginger help"
+    ],
+    explore: "View joint care and mobility content"
+  },
+  "post-surgery": {
+    tips: [
+      "Honor your recovery — rest is healing",
+      "Gentle breathwork supports circulation",
+      "Warm, nourishing soups support tissue repair"
+    ],
+    explore: "Explore rehabilitation guidance"
+  },
+  "low-mood": {
+    tips: [
+      "Be gentle with yourself today",
+      "Even a short walk outside can lift your spirits",
+      "Reach out to someone who cares about you"
+    ],
+    explore: "Discover mood-lifting practices"
+  },
+  overwhelmed: {
+    tips: [
+      "You don't have to do everything today",
+      "Focus on just one small thing at a time",
+      "Three slow breaths can reset your nervous system"
+    ],
+    explore: "Find grounding meditations"
+  },
+  stressed: {
+    tips: [
+      "Take three slow, deep breaths right now",
+      "Step outside for fresh air if possible",
+      "Box breathing (4-4-4-4) calms the mind quickly"
+    ],
+    explore: "Explore stress-relief breathwork"
+  },
 };
 
 interface QuickCheckInProps {
@@ -138,6 +192,7 @@ export function QuickCheckIn({ username }: QuickCheckInProps) {
   const [favorites, setFavorites] = useState<FavoriteFeeling[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [topFeelings, setTopFeelings] = useState<{feeling_id: string; count: number}[]>([]);
 
   useEffect(() => {
     checkUser();
@@ -148,6 +203,7 @@ export function QuickCheckIn({ username }: QuickCheckInProps) {
     if (user) {
       setUserId(user.id);
       fetchFavorites(user.id);
+      fetchTopFeelings(user.id);
     }
   };
 
@@ -159,6 +215,34 @@ export function QuickCheckIn({ username }: QuickCheckInProps) {
     
     if (!error && data) {
       setFavorites(data);
+    }
+  };
+
+  const fetchTopFeelings = async (uid: string) => {
+    // Get feeling counts from the last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const { data, error } = await supabase
+      .from("quick_checkin_logs")
+      .select("feeling_id")
+      .eq("user_id", uid)
+      .gte("created_at", thirtyDaysAgo.toISOString());
+    
+    if (!error && data) {
+      // Count occurrences
+      const counts: Record<string, number> = {};
+      data.forEach(log => {
+        counts[log.feeling_id] = (counts[log.feeling_id] || 0) + 1;
+      });
+      
+      // Sort by count and take top 3
+      const sorted = Object.entries(counts)
+        .map(([feeling_id, count]) => ({ feeling_id, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 3);
+      
+      setTopFeelings(sorted);
     }
   };
 
@@ -286,6 +370,26 @@ export function QuickCheckIn({ username }: QuickCheckInProps) {
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Top Feelings Insight */}
+        {topFeelings.length > 0 && !selectedFeeling && (
+          <div className="p-3 rounded-lg bg-gradient-to-r from-wellness-lilac/10 to-wellness-sage/10 border border-wellness-lilac/20">
+            <p className="text-xs font-medium text-muted-foreground flex items-center gap-1 mb-2">
+              <TrendingUp className="h-3 w-3 text-wellness-sage" /> Your patterns this month
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {topFeelings.map(({ feeling_id, count }) => {
+                const feeling = feelingOptions.find(f => f.id === feeling_id);
+                if (!feeling) return null;
+                return (
+                  <span key={feeling_id} className="text-xs text-muted-foreground">
+                    {feeling.emoji} {feeling.label} ({count}x)
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {!selectedFeeling ? (
           <div className="space-y-4">
             {favorites.length > 0 && (
@@ -295,15 +399,19 @@ export function QuickCheckIn({ username }: QuickCheckInProps) {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {sortedFeelings.filter(f => isFavorite(f.id)).map((feeling) => (
-                    <Badge
+                    <button
                       key={feeling.id}
-                      variant="outline"
-                      className="px-4 py-2 text-sm cursor-pointer bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-all"
                       onClick={() => handleFeelingSelect(feeling.id)}
+                      className={`px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer 
+                        bg-gradient-to-br ${feeling.color} 
+                        border-2 border-yellow-300 dark:border-yellow-700
+                        shadow-sm hover:shadow-md hover:scale-105 
+                        transition-all duration-200 ease-out
+                        flex items-center gap-2`}
                     >
-                      <span className="mr-2">{feeling.emoji}</span>
-                      {feeling.label}
-                    </Badge>
+                      <span className="text-lg">{feeling.emoji}</span>
+                      <span className="text-foreground">{feeling.label}</span>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -315,15 +423,19 @@ export function QuickCheckIn({ username }: QuickCheckInProps) {
               )}
               <div className="flex flex-wrap gap-2">
                 {sortedFeelings.filter(f => !isFavorite(f.id)).map((feeling) => (
-                  <Badge
+                  <button
                     key={feeling.id}
-                    variant="outline"
-                    className="px-4 py-2 text-sm cursor-pointer hover:bg-mumtaz-lilac/20 hover:border-mumtaz-lilac transition-all"
                     onClick={() => handleFeelingSelect(feeling.id)}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer 
+                      bg-gradient-to-br ${feeling.color} 
+                      border border-border/50 hover:border-wellness-lilac
+                      shadow-sm hover:shadow-md hover:scale-105 
+                      transition-all duration-200 ease-out
+                      flex items-center gap-2`}
                   >
-                    <span className="mr-2">{feeling.emoji}</span>
-                    {feeling.label}
-                  </Badge>
+                    <span className="text-lg">{feeling.emoji}</span>
+                    <span className="text-foreground">{feeling.label}</span>
+                  </button>
                 ))}
               </div>
             </div>

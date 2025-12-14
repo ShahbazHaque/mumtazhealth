@@ -8,20 +8,23 @@ import { Heart, ArrowRight, Sparkles, Check } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 const feelingOptions = [
-  { id: "tired", label: "Tired", emoji: "😴" },
-  { id: "in_pain", label: "In pain", emoji: "🤕" },
-  { id: "exhausted", label: "Exhausted", emoji: "😩" },
-  { id: "emotional", label: "Emotional / hormonal", emoji: "💔" },
-  { id: "restless", label: "Restless", emoji: "🌀" },
-  { id: "bloated", label: "Bloated", emoji: "🎈" },
-  { id: "digestive", label: "Digestive issues", emoji: "🌿" },
-  { id: "hot_flushes", label: "Hot flushes", emoji: "🔥" },
-  { id: "cant_sleep", label: "Can't sleep", emoji: "🌙" },
-  { id: "back_ache", label: "Back ache", emoji: "🦴" },
-  { id: "neck_shoulder", label: "Neck + shoulder tension", emoji: "💆" },
-  { id: "low_mood", label: "Low mood", emoji: "😢" },
-  { id: "overwhelmed", label: "Overwhelmed", emoji: "😵" },
-  { id: "stressed", label: "Stressed", emoji: "😰" },
+  { id: "tired", label: "Tired", emoji: "😴", color: "from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30" },
+  { id: "in_pain", label: "In pain", emoji: "🤕", color: "from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30" },
+  { id: "exhausted", label: "Exhausted", emoji: "😩", color: "from-gray-100 to-slate-100 dark:from-gray-900/30 dark:to-slate-900/30" },
+  { id: "emotional", label: "Emotional / hormonal", emoji: "💔", color: "from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30" },
+  { id: "restless", label: "Restless", emoji: "🌀", color: "from-teal-100 to-emerald-100 dark:from-teal-900/30 dark:to-emerald-900/30" },
+  { id: "bloated", label: "Bloated", emoji: "🎈", color: "from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30" },
+  { id: "digestive", label: "Digestive issues", emoji: "🌿", color: "from-green-100 to-lime-100 dark:from-green-900/30 dark:to-lime-900/30" },
+  { id: "hot_flushes", label: "Hot flushes", emoji: "🔥", color: "from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30" },
+  { id: "cant_sleep", label: "Can't sleep", emoji: "🌙", color: "from-indigo-100 to-violet-100 dark:from-indigo-900/30 dark:to-violet-900/30" },
+  { id: "back_ache", label: "Back ache", emoji: "🦴", color: "from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30" },
+  { id: "neck_shoulder", label: "Neck + shoulder tension", emoji: "💆", color: "from-fuchsia-100 to-purple-100 dark:from-fuchsia-900/30 dark:to-purple-900/30" },
+  { id: "low_mood", label: "Low mood", emoji: "😢", color: "from-slate-100 to-gray-100 dark:from-slate-900/30 dark:to-gray-900/30" },
+  { id: "overwhelmed", label: "Overwhelmed", emoji: "😵", color: "from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30" },
+  { id: "stressed", label: "Stressed", emoji: "😰", color: "from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30" },
+  { id: "period_pain", label: "Period pain", emoji: "🩸", color: "from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30" },
+  { id: "joint_stiffness", label: "Joint stiffness", emoji: "🦴", color: "from-stone-100 to-zinc-100 dark:from-stone-900/30 dark:to-zinc-900/30" },
+  { id: "post_surgery", label: "Post-surgery discomfort", emoji: "🏥", color: "from-sky-100 to-cyan-100 dark:from-sky-900/30 dark:to-cyan-900/30" },
 ];
 
 const guidanceMap: Record<string, { tips: string[]; practice: string; practiceType: string }> = {
@@ -93,6 +96,21 @@ const guidanceMap: Record<string, { tips: string[]; practice: string; practiceTy
   stressed: {
     tips: ["Take three slow, deep breaths right now", "Step outside for fresh air if possible"],
     practice: "Stress-relief breathing: Box Breath",
+    practiceType: "breathwork"
+  },
+  period_pain: {
+    tips: ["Gentle heat on your lower belly can ease cramps", "Rest in a comfortable position"],
+    practice: "Reclining bound angle pose for menstrual relief",
+    practiceType: "yoga"
+  },
+  joint_stiffness: {
+    tips: ["Gentle morning stretches before getting out of bed", "Warm sesame oil massage supports mobility"],
+    practice: "Chair yoga for joint mobility",
+    practiceType: "yoga"
+  },
+  post_surgery: {
+    tips: ["Honor your recovery – rest is healing", "Warm, nourishing soups support tissue repair"],
+    practice: "Gentle breathwork for recovery",
     practiceType: "breathwork"
   }
 };
@@ -242,25 +260,26 @@ export function FirstTimeQuickCheckIn({ onComplete, onStartFullOnboarding }: Fir
               </p>
             </CardHeader>
             <CardContent className="space-y-6 pb-8">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto pr-2">
                 {feelingOptions.map((feeling) => {
                   const isSelected = selectedFeelings.includes(feeling.id);
                   return (
                     <button
                       key={feeling.id}
                       onClick={() => toggleFeeling(feeling.id)}
-                      className={`p-3 rounded-xl border-2 transition-all duration-200 text-left flex items-center gap-3 ${
-                        isSelected
-                          ? "border-wellness-lilac bg-wellness-lilac/10 shadow-md"
-                          : "border-border hover:border-wellness-lilac/50 hover:bg-muted/50"
-                      }`}
+                      className={`p-3 rounded-xl transition-all duration-200 text-left flex items-center gap-2.5
+                        bg-gradient-to-br ${feeling.color}
+                        ${isSelected
+                          ? "border-2 border-wellness-lilac shadow-lg scale-[1.02]"
+                          : "border border-border/50 hover:border-wellness-lilac/50 hover:shadow-md hover:scale-[1.02]"
+                        }`}
                     >
-                      <span className="text-2xl">{feeling.emoji}</span>
-                      <span className={`text-sm font-medium ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
+                      <span className="text-xl">{feeling.emoji}</span>
+                      <span className={`text-sm font-medium flex-1 ${isSelected ? "text-foreground" : "text-foreground/80"}`}>
                         {feeling.label}
                       </span>
                       {isSelected && (
-                        <Check className="h-4 w-4 text-wellness-lilac ml-auto" />
+                        <Check className="h-4 w-4 text-wellness-lilac flex-shrink-0" />
                       )}
                     </button>
                   );
