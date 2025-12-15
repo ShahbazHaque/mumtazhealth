@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell, Zap, AlertTriangle, Search, X, Baby, Salad, Brain, Activity } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell, Droplet, AlertTriangle, Search, X, Baby, Salad, Brain, Activity } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -112,7 +112,7 @@ const ContentLibrary = () => {
     { value: "menopause", label: "Menopause & Beyond", icon: Sparkles },
     { value: "emotional", label: "Emotional & Spiritual", icon: Brain },
     { value: "digestive", label: "Digestive Wellness", icon: Apple },
-    { value: "energy", label: "Energy & Balance", icon: Zap },
+    { value: "energy", label: "Diabetes Support", icon: Droplet },
   ];
 
   // Wellness concerns for filtering
@@ -272,7 +272,7 @@ const ContentLibrary = () => {
         menopause: { types: ["yoga", "nutrition", "article"], tags: ["menopause", "perimenopause", "post-menopause", "hormonal", "hot-flush"] },
         emotional: { types: ["meditation", "article"], tags: ["emotional", "spiritual", "mindfulness", "meditation", "breathwork", "grounding", "dhikr", "prayer"] },
         digestive: { types: ["nutrition", "article"], tags: ["digestive", "bloating", "gut", "ibs", "digestion", "easy-digest"] },
-        energy: { types: ["yoga", "nutrition", "meditation"], tags: ["energy-support", "blood-sugar", "balanced-energy", "fatigue", "vitality"] },
+        energy: { types: ["yoga", "nutrition", "meditation"], tags: ["diabetes", "blood-sugar", "insulin-resistance", "type-2-diabetes", "balanced-energy", "energy-support", "blood-sugar-balance", "diabetes-support"] },
       };
 
       const mapping = categoryMappings[selectedCategory];
@@ -861,8 +861,8 @@ const ContentLibrary = () => {
                   Spiritual
                 </TabsTrigger>
                 <TabsTrigger value="energy-support" className="text-sm py-2 px-3">
-                  <Zap className="h-4 w-4 mr-1.5" />
-                  Energy
+                  <Droplet className="h-4 w-4 mr-1.5" />
+                  Diabetes Support
                 </TabsTrigger>
               </TabsList>
             </ScrollArea>
@@ -1543,27 +1543,27 @@ const ContentLibrary = () => {
             </Card>
 
             {/* Section Header */}
-            <Card className="bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-950/40 dark:to-orange-950/40 border-amber-200">
+            <Card className="bg-gradient-to-r from-teal-100 to-cyan-100 dark:from-teal-950/40 dark:to-cyan-950/40 border-teal-200">
               <CardContent className="pt-6">
                 <div className="flex flex-col md:flex-row items-center gap-6">
-                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-amber-200 flex-shrink-0">
-                    <img 
-                      src={bloodSugarEnergySupport} 
-                      alt="Holistic Energy Support" 
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-teal-200 flex-shrink-0 flex items-center justify-center bg-teal-50">
+                    <Droplet className="h-16 w-16 text-teal-600" />
                   </div>
                   <div className="text-center md:text-left flex-1">
-                    <h2 className="text-2xl md:text-3xl font-semibold mb-2 text-amber-900 dark:text-amber-100">Holistic Blood Sugar & Energy Support</h2>
-                    <p className="text-lg text-amber-700 dark:text-amber-300 max-w-2xl">
-                      Gentle lifestyle practices inspired by yoga, Ayurveda, nutrition, and spirituality to support balanced energy and overall wellbeing.
+                    <h2 className="text-2xl md:text-3xl font-semibold mb-2 text-teal-900 dark:text-teal-100">Blood Sugar & Diabetes Support</h2>
+                    <p className="text-lg text-teal-700 dark:text-teal-300 max-w-2xl">
+                      This space offers gentle yoga, lifestyle, nutrition and spiritual tools to support women living with or at risk of type 2 diabetes. 
+                      It is for education and wellbeing only and does not replace medical care.
+                    </p>
+                    <p className="text-sm text-teal-600 dark:text-teal-400 mt-2 italic">
+                      Please always check with your doctor before making changes to medication, diet or exercise.
                     </p>
                     <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
-                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Gentle Mobility</Badge>
-                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Breathing Exercises</Badge>
-                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Grounding Routines</Badge>
-                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Mindful Nutrition</Badge>
-                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-amber-200/80 text-amber-800">Spiritual Tools</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-teal-200/80 text-teal-800">Gentle Yoga</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-teal-200/80 text-teal-800">Blood Sugar Balance</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-teal-200/80 text-teal-800">Stress & Sleep Support</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-teal-200/80 text-teal-800">Simple Nutrition</Badge>
+                      <Badge variant="secondary" className="text-sm py-1 px-3 bg-teal-200/80 text-teal-800">Spiritual Wellbeing</Badge>
                     </div>
                   </div>
                 </div>
@@ -1683,10 +1683,10 @@ const ContentLibrary = () => {
                 {content
                   .filter(item => 
                     item.tags?.some(tag => 
-                      ['energy-support', 'blood-sugar', 'balanced-energy', 'grounding', 'stress-relief', 'mindful-eating', 'gentle-movement', 'circulation', 'nervous-system', 'relaxation', 'digestive-health'].includes(tag)
+                      ['diabetes', 'blood-sugar', 'insulin-resistance', 'type-2-diabetes', 'diabetes-support', 'blood-sugar-balance', 'energy-support', 'balanced-energy', 'grounding', 'stress-relief', 'mindful-eating', 'gentle-movement', 'circulation', 'nervous-system', 'relaxation'].includes(tag)
                     ) ||
                     (item.tags?.includes('gentle') && item.tags?.includes('breathwork')) ||
-                    (item.content_type === 'nutrition' && item.tags?.some(tag => ['easy-digest', 'warming', 'nourishing', 'balancing'].includes(tag)))
+                    (item.content_type === 'nutrition' && item.tags?.some(tag => ['easy-digest', 'warming', 'nourishing', 'balancing', 'blood-sugar'].includes(tag)))
                   )
                   .map((item) => {
                   const isLocked = !isContentUnlocked(item);
@@ -1709,9 +1709,9 @@ const ContentLibrary = () => {
                           </div>
                         )}
                         {/* Energy Support tag */}
-                        <Badge className="absolute top-2 left-2 bg-amber-500 text-white text-sm">
-                          <Zap className="h-3 w-3 mr-1" />
-                          Energy Support
+                        <Badge className="absolute top-2 left-2 bg-teal-500 text-white text-sm">
+                          <Droplet className="h-3 w-3 mr-1" />
+                          Diabetes Support
                         </Badge>
                       </div>
                       
@@ -1824,10 +1824,10 @@ const ContentLibrary = () => {
               )
             ).length === 0 && (
               <Card className="p-12 text-center">
-                <Zap className="h-16 w-16 mx-auto mb-4 text-amber-500" />
-                <h3 className="text-xl font-semibold mb-2">Energy Support Content Coming Soon</h3>
+                <Droplet className="h-16 w-16 mx-auto mb-4 text-teal-500" />
+                <h3 className="text-xl font-semibold mb-2">Diabetes Support Content Coming Soon</h3>
                 <p className="text-muted-foreground text-lg mb-4">
-                  Holistic lifestyle practices for balanced energy and wellbeing are being prepared with care.
+                  Gentle yoga, lifestyle, nutrition and spiritual tools to support women living with or at risk of type 2 diabetes are being prepared with care.
                 </p>
                 <p className="text-sm text-muted-foreground italic">
                   Remember: Always consult your healthcare provider for medical advice.
