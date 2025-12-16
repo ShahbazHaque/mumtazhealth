@@ -31,6 +31,7 @@ import bloodSugarEnergySupport from "@/assets/blood-sugar-energy-support.jpg";
 import { Navigation } from "@/components/Navigation";
 import { ContentGridSkeleton } from "@/components/ContentSkeleton";
 import { DailyReminderButton } from "@/components/DailyReminderButton";
+import { AnimatedPoseDemo } from "@/components/AnimatedPoseDemo";
 interface WellnessContent {
   id: string;
   title: string;
@@ -2069,14 +2070,13 @@ const ContentLibrary = () => {
                       </div>
                     )}
 
-                    {/* No video content placeholder */}
+                    {/* Animated demonstration when no video content */}
                     {!selectedContent.animation_url && !selectedContent.video_url && (
-                      <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
-                        <div className="text-center p-6">
-                          <Sparkles className="h-10 w-10 mx-auto mb-2 text-muted-foreground/50" />
-                          <p className="text-sm text-muted-foreground font-medium">Video coming soon</p>
-                        </div>
-                      </div>
+                      <AnimatedPoseDemo 
+                        contentType={selectedContent.content_type}
+                        tags={selectedContent.tags}
+                        title={selectedContent.title}
+                      />
                     )}
 
                     {/* Title and Tags Section */}
