@@ -31,7 +31,7 @@ import bloodSugarEnergySupport from "@/assets/blood-sugar-energy-support.jpg";
 import { Navigation } from "@/components/Navigation";
 import { ContentGridSkeleton } from "@/components/ContentSkeleton";
 import { DailyReminderButton } from "@/components/DailyReminderButton";
-import { AnimatedPoseDemo } from "@/components/AnimatedPoseDemo";
+import { PoseSequenceGuide } from "@/components/PoseSequenceGuide";
 interface WellnessContent {
   id: string;
   title: string;
@@ -2070,12 +2070,13 @@ const ContentLibrary = () => {
                       </div>
                     )}
 
-                    {/* Animated demonstration when no video content */}
+                    {/* Step-by-step pose sequence guide */}
                     {!selectedContent.animation_url && !selectedContent.video_url && (
-                      <AnimatedPoseDemo 
+                      <PoseSequenceGuide 
                         contentType={selectedContent.content_type}
                         tags={selectedContent.tags}
                         title={selectedContent.title}
+                        isPremium={selectedContent.tier_requirement === 'premium'}
                       />
                     )}
 
