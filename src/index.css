@@ -145,4 +145,111 @@ All colors MUST be HSL.
     height: 200px;
     z-index: 0;
   }
+
+  /* Animated Pose Demo Animations */
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  @keyframes breathe-outer {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.25); opacity: 0.1; }
+  }
+
+  @keyframes breathe-ring {
+    0%, 100% { transform: scale(1); opacity: 0.2; }
+    50% { transform: scale(1.2); opacity: 0; }
+  }
+
+  @keyframes breathe-text {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes breathe-subtle {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(1.05); }
+  }
+
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  @keyframes steam {
+    0% { opacity: 0.4; transform: translateY(0); }
+    50% { opacity: 0.2; transform: translateY(-8px); }
+    100% { opacity: 0; transform: translateY(-15px); }
+  }
+
+  @keyframes shoulder-circle {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(3px, -3px); }
+    50% { transform: translate(0, -5px); }
+    75% { transform: translate(-3px, -3px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes shoulder-circle-reverse {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-3px, -3px); }
+    50% { transform: translate(0, -5px); }
+    75% { transform: translate(3px, -3px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes wrist-rotate {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+  }
+
+  @keyframes cat-cow {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.9); }
+  }
+
+  .animate-breathe {
+    animation: breathe 6s ease-in-out infinite;
+  }
+
+  .animate-breathe-outer {
+    animation: breathe-outer 6s ease-in-out infinite;
+  }
+
+  .animate-breathe-ring {
+    animation: breathe-ring 6s ease-in-out infinite;
+  }
+
+  .animate-breathe-text {
+    animation: breathe-text 6s ease-in-out infinite;
+  }
+
+  .animate-breathe-subtle {
+    animation: breathe-subtle 4s ease-in-out infinite;
+  }
+
+  .animate-bob {
+    animation: bob 2s ease-in-out infinite;
+  }
+
+  .animate-steam {
+    animation: steam 3s ease-in-out infinite;
+  }
+
+  .animate-shoulder-circle {
+    animation: shoulder-circle 2s ease-in-out infinite;
+  }
+
+  .animate-shoulder-circle-reverse {
+    animation: shoulder-circle-reverse 2s ease-in-out infinite;
+  }
+
+  .animate-wrist-rotate {
+    animation: wrist-rotate 3s ease-in-out infinite;
+  }
+
+  .animate-cat-cow {
+    animation: cat-cow 4s ease-in-out infinite;
+  }
 }
