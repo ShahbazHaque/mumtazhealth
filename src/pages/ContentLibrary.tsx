@@ -47,6 +47,7 @@ interface WellnessContent {
   duration_minutes: number;
   image_url: string;
   video_url: string;
+  animation_url: string; // Animated instructional videos (available to all tiers)
   audio_url: string;
   tier_requirement: string;
   is_premium: boolean;
@@ -624,22 +625,29 @@ const ContentLibrary = () => {
     return true;
   };
 
-  const isVideoUnlocked = (item: WellnessContent) => {
+  // Check if animated instructional video is available (all tiers can view animations)
+  const isAnimationAvailable = (item: WellnessContent) => {
+    return !!item.animation_url;
+  };
+
+  // Check if live video is unlocked (Premium only for live recorded sessions)
+  const isLiveVideoUnlocked = (item: WellnessContent) => {
     if (!user) return false;
     
     const tierHierarchy: Record<string, number> = { free: 0, basic: 1, standard: 2, premium: 3 };
     const userTierLevel = tierHierarchy[userTier] || 0;
     
-    // Basic tier has no video access
-    if (userTierLevel < 2) return false; // Must be Standard (2) or Premium (3)
+    // Only Premium (3) gets access to live recorded video sessions
+    return userTierLevel >= 3;
+  };
+
+  // Legacy function for backward compatibility
+  const isVideoUnlocked = (item: WellnessContent) => {
+    // Animations are available to all authenticated users
+    if (item.animation_url && user) return true;
     
-    // Standard tier only gets beginner/essential videos
-    if (userTierLevel === 2 && item.difficulty_level !== 'beginner') {
-      return false;
-    }
-    
-    // Premium gets all videos
-    return true;
+    // Live videos require Premium
+    return isLiveVideoUnlocked(item);
   };
 
   const getDoshaIcon = (dosha: string) => {
@@ -2011,10 +2019,30 @@ const ContentLibrary = () => {
                 </DialogHeader>
                 <ScrollArea className="max-h-[50vh]">
                   <div className="space-y-4">
-                    {/* Video Section - Top Priority */}
-                    {selectedContent.video_url ? (
+                    {/* Animation Section - Available to all tiers */}
+                    {selectedContent.animation_url && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sparkles className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-medium text-foreground">Animated Instruction</span>
+                          <Badge variant="outline" className="text-xs">All Tiers</Badge>
+                        </div>
+                        <video controls className="w-full rounded-lg bg-black">
+                          <source src={selectedContent.animation_url} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    )}
+
+                    {/* Live Video Section - Premium Only */}
+                    {selectedContent.video_url && (
                       <div className="relative">
-                        {isVideoUnlocked(selectedContent) ? (
+                        <div className="flex items-center gap-2 mb-2">
+                          <Crown className="h-4 w-4 text-amber-500" />
+                          <span className="text-sm font-medium text-foreground">Live Session with Mumtaz</span>
+                          <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-xs">Premium</Badge>
+                        </div>
+                        {isLiveVideoUnlocked(selectedContent) ? (
                           <div className="space-y-2">
                             <video controls className="w-full rounded-lg bg-black">
                               <source src={selectedContent.video_url} type="video/mp4" />
@@ -2026,24 +2054,23 @@ const ContentLibrary = () => {
                             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-black/60 to-black/80 backdrop-blur-sm">
                               <div className="text-center text-white p-6">
                                 <Lock className="h-12 w-12 mx-auto mb-3 opacity-80" />
-                                <p className="text-lg font-semibold mb-2">Video Locked</p>
+                                <p className="text-lg font-semibold mb-2">Live Video - Premium Only</p>
                                 <p className="text-sm opacity-90 mb-3">
-                                  {userTier === 'free' || userTier === 'basic' 
-                                    ? 'Upgrade to Standard or Premium to watch videos'
-                                    : userTier === 'standard' && selectedContent.difficulty_level !== 'beginner'
-                                    ? 'Upgrade to Premium for advanced videos'
-                                    : 'Unlock this video with your plan'}
+                                  Upgrade to Premium for live recorded sessions with Mumtaz
                                 </p>
-                                <Badge className="bg-primary/90 text-primary-foreground">
+                                <Badge className="bg-gradient-to-r from-purple-600 to-pink-600">
                                   <Crown className="h-4 w-4 mr-1" />
-                                  {userTier === 'free' || userTier === 'basic' ? 'Standard+' : 'Premium'}
+                                  Premium
                                 </Badge>
                               </div>
                             </div>
                           </div>
                         )}
                       </div>
-                    ) : (
+                    )}
+
+                    {/* No video content placeholder */}
+                    {!selectedContent.animation_url && !selectedContent.video_url && (
                       <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
                         <div className="text-center p-6">
                           <Sparkles className="h-10 w-10 mx-auto mb-2 text-muted-foreground/50" />
