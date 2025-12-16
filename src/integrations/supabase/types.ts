@@ -531,6 +531,7 @@ export type Database = {
       }
       wellness_content: {
         Row: {
+          animation_url: string | null
           audio_url: string | null
           benefits: string[] | null
           content_type: string
@@ -557,6 +558,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          animation_url?: string | null
           audio_url?: string | null
           benefits?: string[] | null
           content_type: string
@@ -583,6 +585,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          animation_url?: string | null
           audio_url?: string | null
           benefits?: string[] | null
           content_type?: string

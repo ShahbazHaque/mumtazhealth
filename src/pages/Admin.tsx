@@ -35,6 +35,7 @@ interface WellnessContent {
   description: string | null;
   content_type: string;
   video_url: string | null;
+  animation_url: string | null; // Animated instructional videos (all tiers)
   image_url: string | null;
   tier_requirement: string;
   difficulty_level: string | null;
@@ -59,7 +60,9 @@ export default function Admin() {
   const [contentList, setContentList] = useState<WellnessContent[]>([]);
   const [selectedContent, setSelectedContent] = useState<WellnessContent | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [animationFile, setAnimationFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingAnimation, setUploadingAnimation] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -206,6 +209,46 @@ export default function Admin() {
       toast.error('Failed to upload video');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleAnimationUpload = async (contentId: string) => {
+    if (!animationFile) {
+      toast.error("Please select an animation file");
+      return;
+    }
+
+    setUploadingAnimation(true);
+    try {
+      const fileExt = animationFile.name.split('.').pop();
+      const fileName = `animation-${contentId}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('wellness-videos')
+        .upload(filePath, animationFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('wellness-videos')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('wellness_content')
+        .update({ animation_url: publicUrl })
+        .eq('id', contentId);
+
+      if (updateError) throw updateError;
+
+      toast.success('Animation uploaded successfully');
+      loadContent();
+      setAnimationFile(null);
+    } catch (error) {
+      console.error('Error uploading animation:', error);
+      toast.error('Failed to upload animation');
+    } finally {
+      setUploadingAnimation(false);
     }
   };
 
@@ -489,14 +532,24 @@ export default function Admin() {
                             <p className="text-sm text-muted-foreground">
                               {content.description}
                             </p>
-                            {content.video_url ? (
-                              <p className="text-xs text-green-600 flex items-center gap-1">
-                                <Video className="w-3 h-3" />
-                                Video uploaded
-                              </p>
-                            ) : (
-                              <p className="text-xs text-amber-600">No video uploaded</p>
-                            )}
+                            <div className="flex flex-col gap-1">
+                              {content.animation_url ? (
+                                <p className="text-xs text-blue-600 flex items-center gap-1">
+                                  <Video className="w-3 h-3" />
+                                  Animation uploaded (All Tiers)
+                                </p>
+                              ) : (
+                                <p className="text-xs text-amber-600">No animation uploaded</p>
+                              )}
+                              {content.video_url ? (
+                                <p className="text-xs text-purple-600 flex items-center gap-1">
+                                  <Video className="w-3 h-3" />
+                                  Live video uploaded (Premium Only)
+                                </p>
+                              ) : (
+                                <p className="text-xs text-muted-foreground">No live video</p>
+                              )}
+                            </div>
                           </div>
                           <div className="flex flex-col gap-2">
                             <Dialog open={editDialogOpen && selectedContent?.id === content.id} 
@@ -519,8 +572,40 @@ export default function Admin() {
                                   <DialogTitle>Edit Content: {content.title}</DialogTitle>
                                 </DialogHeader>
                                 <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="animation-upload" className="flex items-center gap-2">
+                                      Upload Animation
+                                      <span className="text-xs text-muted-foreground font-normal">(Available to all tiers)</span>
+                                    </Label>
+                                    <div className="flex gap-2">
+                                      <Input
+                                        id="animation-upload"
+                                        type="file"
+                                        accept="video/mp4,video/webm,video/quicktime,image/gif"
+                                        onChange={(e) => setAnimationFile(e.target.files?.[0] || null)}
+                                        disabled={uploadingAnimation}
+                                      />
+                                      <Button
+                                        onClick={() => handleAnimationUpload(content.id)}
+                                        disabled={!animationFile || uploadingAnimation}
+                                        size="sm"
+                                      >
+                                        <Upload className="w-4 h-4 mr-1" />
+                                        {uploadingAnimation ? 'Uploading...' : 'Upload'}
+                                      </Button>
+                                    </div>
+                                    {content.animation_url && (
+                                      <p className="text-xs text-muted-foreground">
+                                        Current: {content.animation_url.split('/').pop()}
+                                      </p>
+                                    )}
+                                  </div>
+
                                   <div className="space-y-2">
-                                    <Label htmlFor="video-upload">Upload Video</Label>
+                                    <Label htmlFor="video-upload" className="flex items-center gap-2">
+                                      Upload Live Video
+                                      <span className="text-xs text-purple-600 font-normal">(Premium Only)</span>
+                                    </Label>
                                     <div className="flex gap-2">
                                       <Input
                                         id="video-upload"
