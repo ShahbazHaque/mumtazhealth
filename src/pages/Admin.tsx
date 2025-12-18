@@ -11,8 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar, Video, Upload, Edit, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Calendar, Video, Upload, Edit, Trash2, Plus, Image } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
+import { AdminPoseImageUploader } from "@/components/AdminPoseImageUploader";
 
 interface Profile {
   id: string;
@@ -48,6 +49,30 @@ interface WellnessContent {
   is_premium: boolean;
   is_active: boolean;
 }
+
+// Helper component to show pose image count
+const PoseImageCount = ({ contentId }: { contentId: string }) => {
+  const [count, setCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from('content_pose_images')
+      .select('id', { count: 'exact', head: true })
+      .eq('content_id', contentId)
+      .then(({ count: imageCount }) => {
+        setCount(imageCount || 0);
+      });
+  }, [contentId]);
+
+  if (count === null) return null;
+
+  return (
+    <p className={`text-xs flex items-center gap-1 ${count > 0 ? 'text-green-600' : 'text-muted-foreground'}`}>
+      <Image className="w-3 h-3" />
+      {count > 0 ? `${count} pose images uploaded` : 'No pose images'}
+    </p>
+  );
+};
 
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null);
@@ -549,6 +574,7 @@ export default function Admin() {
                               ) : (
                                 <p className="text-xs text-muted-foreground">No live video</p>
                               )}
+                              <PoseImageCount contentId={content.id} />
                             </div>
                           </div>
                           <div className="flex flex-col gap-2">
@@ -713,6 +739,14 @@ export default function Admin() {
                                         </SelectContent>
                                       </Select>
                                     </div>
+                                  </div>
+
+                                  {/* Pose Images Section */}
+                                  <div className="border-t pt-4">
+                                    <AdminPoseImageUploader 
+                                      contentId={content.id} 
+                                      contentTitle={content.title}
+                                    />
                                   </div>
 
                                   <Button
