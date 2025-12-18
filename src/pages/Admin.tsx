@@ -655,6 +655,27 @@ export default function Admin() {
                                       </p>
                                     )}
                                   </div>
+
+                                  <div className="space-y-2">
+                                    <Label htmlFor="video-url" className="flex items-center gap-2">
+                                      Video URL (Direct Link)
+                                      <span className="text-xs text-purple-600 font-normal">(Premium Only)</span>
+                                    </Label>
+                                    <Input
+                                      id="video-url"
+                                      type="url"
+                                      placeholder="https://example.com/video.mp4"
+                                      defaultValue={content.video_url || ''}
+                                      onChange={(e) => {
+                                        if (selectedContent) {
+                                          setSelectedContent({...selectedContent, video_url: e.target.value || null});
+                                        }
+                                      }}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                      Enter a direct URL to a video file, or upload above
+                                    </p>
+                                  </div>
                                   
                                   <div className="space-y-2">
                                     <Label htmlFor="title">Title</Label>
