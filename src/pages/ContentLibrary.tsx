@@ -32,6 +32,7 @@ import { Navigation } from "@/components/Navigation";
 import { ContentGridSkeleton } from "@/components/ContentSkeleton";
 import { DailyReminderButton } from "@/components/DailyReminderButton";
 import { PoseSequenceGuide } from "@/components/PoseSequenceGuide";
+import { PoseImageSequence } from "@/components/PoseImageSequence";
 interface WellnessContent {
   id: string;
   title: string;
@@ -2020,7 +2021,15 @@ const ContentLibrary = () => {
                 </DialogHeader>
                 <ScrollArea className="max-h-[50vh]">
                   <div className="space-y-4">
-                    {/* Animation Section - Available to all tiers */}
+                    {/* Pose Image Sequence - Primary display for all content */}
+                    <PoseImageSequence
+                      contentId={selectedContent.id}
+                      videoUrl={selectedContent.video_url}
+                      isPremiumUser={userTier === 'premium'}
+                      isPremiumContent={selectedContent.tier_requirement === 'premium'}
+                    />
+
+                    {/* Fallback: Animation Section - If no pose images uploaded */}
                     {selectedContent.animation_url && (
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 mb-2">
@@ -2033,51 +2042,6 @@ const ContentLibrary = () => {
                           Your browser does not support the video tag.
                         </video>
                       </div>
-                    )}
-
-                    {/* Live Video Section - Premium Only */}
-                    {selectedContent.video_url && (
-                      <div className="relative">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Crown className="h-4 w-4 text-amber-500" />
-                          <span className="text-sm font-medium text-foreground">Live Session with Mumtaz</span>
-                          <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-xs">Premium</Badge>
-                        </div>
-                        {isLiveVideoUnlocked(selectedContent) ? (
-                          <div className="space-y-2">
-                            <video controls className="w-full rounded-lg bg-black">
-                              <source src={selectedContent.video_url} type="video/mp4" />
-                              Your browser does not support the video tag.
-                            </video>
-                          </div>
-                        ) : (
-                          <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-black/60 to-black/80 backdrop-blur-sm">
-                              <div className="text-center text-white p-6">
-                                <Lock className="h-12 w-12 mx-auto mb-3 opacity-80" />
-                                <p className="text-lg font-semibold mb-2">Live Video - Premium Only</p>
-                                <p className="text-sm opacity-90 mb-3">
-                                  Upgrade to Premium for live recorded sessions with Mumtaz
-                                </p>
-                                <Badge className="bg-gradient-to-r from-purple-600 to-pink-600">
-                                  <Crown className="h-4 w-4 mr-1" />
-                                  Premium
-                                </Badge>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Step-by-step pose sequence guide */}
-                    {!selectedContent.animation_url && !selectedContent.video_url && (
-                      <PoseSequenceGuide 
-                        contentType={selectedContent.content_type}
-                        tags={selectedContent.tags}
-                        title={selectedContent.title}
-                        isPremium={selectedContent.tier_requirement === 'premium'}
-                      />
                     )}
 
                     {/* Title and Tags Section */}

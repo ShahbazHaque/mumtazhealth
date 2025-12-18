@@ -118,6 +118,50 @@ export type Database = {
         }
         Relationships: []
       }
+      content_pose_images: {
+        Row: {
+          content_id: string
+          created_at: string
+          cue_text: string | null
+          id: string
+          image_url: string
+          modification_text: string | null
+          pose_name: string | null
+          step_number: number
+          updated_at: string
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          cue_text?: string | null
+          id?: string
+          image_url: string
+          modification_text?: string | null
+          pose_name?: string | null
+          step_number: number
+          updated_at?: string
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          cue_text?: string | null
+          id?: string
+          image_url?: string
+          modification_text?: string | null
+          pose_name?: string | null
+          step_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_pose_images_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "wellness_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_practice_reminders: {
         Row: {
           content_id: string
