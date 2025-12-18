@@ -39,6 +39,17 @@ import camelPose from "@/assets/poses/camel-pose.jpeg";
 import lowLungeBlock from "@/assets/poses/low-lunge-block.jpeg";
 import seatedWelcome from "@/assets/poses/seated-welcome.jpeg";
 import downwardDogBlocks from "@/assets/poses/downward-dog-blocks.jpeg";
+// Additional pose images
+import lizardPose from "@/assets/poses/lizard-pose.jpg";
+import highCobraBlocks from "@/assets/poses/high-cobra-blocks.jpeg";
+import trianglePose from "@/assets/poses/triangle-pose.jpeg";
+import bridgeLegLift from "@/assets/poses/bridge-leg-lift.jpeg";
+import lowLungeHip from "@/assets/poses/low-lunge-hip.jpeg";
+import modifiedChaturanga from "@/assets/poses/modified-chaturanga.jpeg";
+import threeLegPlank from "@/assets/poses/three-leg-plank.jpeg";
+import highLungeTwist from "@/assets/poses/high-lunge-twist.jpeg";
+import babyCobraBlocks from "@/assets/poses/baby-cobra-blocks.jpeg";
+import birdDogStretch from "@/assets/poses/bird-dog-stretch.jpeg";
 import { Navigation } from "@/components/Navigation";
 import { ContentGridSkeleton } from "@/components/ContentSkeleton";
 import { DailyReminderButton } from "@/components/DailyReminderButton";
@@ -590,6 +601,16 @@ const ContentLibrary = () => {
     '/src/assets/poses/low-lunge-block.jpeg': lowLungeBlock,
     '/src/assets/poses/seated-welcome.jpeg': seatedWelcome,
     '/src/assets/poses/downward-dog-blocks.jpeg': downwardDogBlocks,
+    '/src/assets/poses/lizard-pose.jpg': lizardPose,
+    '/src/assets/poses/high-cobra-blocks.jpeg': highCobraBlocks,
+    '/src/assets/poses/triangle-pose.jpeg': trianglePose,
+    '/src/assets/poses/bridge-leg-lift.jpeg': bridgeLegLift,
+    '/src/assets/poses/low-lunge-hip.jpeg': lowLungeHip,
+    '/src/assets/poses/modified-chaturanga.jpeg': modifiedChaturanga,
+    '/src/assets/poses/three-leg-plank.jpeg': threeLegPlank,
+    '/src/assets/poses/high-lunge-twist.jpeg': highLungeTwist,
+    '/src/assets/poses/baby-cobra-blocks.jpeg': babyCobraBlocks,
+    '/src/assets/poses/bird-dog-stretch.jpeg': birdDogStretch,
     '/src/assets/joint-care-chair-yoga.jpg': jointCareChairYoga,
     '/src/assets/joint-care-wall-yoga.jpg': jointCareWallYoga,
     '/src/assets/joint-care-bed-mobility.jpg': jointCareBedMobility,
@@ -641,6 +662,37 @@ const ContentLibrary = () => {
     }
     if (tags?.some(tag => ['downward-dog', 'foundation', 'inversion'].includes(tag))) {
       return downwardDogBlocks;
+    }
+    // Additional pose images
+    if (tags?.some(tag => ['lizard', 'deep-lunge', 'hip-opener'].includes(tag))) {
+      return lizardPose;
+    }
+    if (tags?.some(tag => ['cobra', 'upward-dog', 'chest-opener'].includes(tag))) {
+      return highCobraBlocks;
+    }
+    if (tags?.some(tag => ['triangle', 'trikonasana', 'side-body'].includes(tag))) {
+      return trianglePose;
+    }
+    if (tags?.some(tag => ['bridge', 'glutes', 'pelvic-floor', 'postpartum'].includes(tag))) {
+      return bridgeLegLift;
+    }
+    if (tags?.some(tag => ['crescent-lunge', 'balance', 'leg-strength'].includes(tag))) {
+      return lowLungeHip;
+    }
+    if (tags?.some(tag => ['chaturanga', 'plank', 'arm-strength', 'modified'].includes(tag))) {
+      return modifiedChaturanga;
+    }
+    if (tags?.some(tag => ['core', 'plank-variation', 'advanced'].includes(tag))) {
+      return threeLegPlank;
+    }
+    if (tags?.some(tag => ['twist', 'detox', 'digestion', 'revolved'].includes(tag))) {
+      return highLungeTwist;
+    }
+    if (tags?.some(tag => ['baby-cobra', 'gentle-backbend', 'beginner'].includes(tag))) {
+      return babyCobraBlocks;
+    }
+    if (tags?.some(tag => ['bird-dog', 'balance', 'core-stability', 'all-fours'].includes(tag))) {
+      return birdDogStretch;
     }
 
     // Check for joint care specific images based on tags
