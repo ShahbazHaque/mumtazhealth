@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Upload, Trash2, GripVertical, Plus, Image, Eye, Images } from "lucide-react";
+import { Upload, Trash2, GripVertical, Plus, Image, Eye, Images, Crown, User } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { PoseImageSequence } from "./PoseImageSequence";
 
 interface PoseImage {
@@ -30,6 +31,7 @@ export const AdminPoseImageUploader = ({ contentId, contentTitle }: AdminPoseIma
   const [uploading, setUploading] = useState(false);
   const [bulkUploading, setBulkUploading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewAsPremium, setPreviewAsPremium] = useState(true);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [newPose, setNewPose] = useState({
     pose_name: "",
@@ -279,14 +281,30 @@ export const AdminPoseImageUploader = ({ contentId, contentTitle }: AdminPoseIma
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>User Preview: {contentTitle}</DialogTitle>
+                <DialogTitle className="flex items-center justify-between pr-8">
+                  <span>User Preview: {contentTitle}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <User className={`h-4 w-4 ${!previewAsPremium ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <span className={!previewAsPremium ? 'font-medium' : 'text-muted-foreground'}>Basic</span>
+                    </div>
+                    <Switch
+                      checked={previewAsPremium}
+                      onCheckedChange={setPreviewAsPremium}
+                    />
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <Crown className={`h-4 w-4 ${previewAsPremium ? 'text-amber-500' : 'text-muted-foreground'}`} />
+                      <span className={previewAsPremium ? 'font-medium text-amber-600' : 'text-muted-foreground'}>Premium</span>
+                    </div>
+                  </div>
+                </DialogTitle>
               </DialogHeader>
               <div className="mt-4">
                 <PoseImageSequence
                   contentId={contentId}
                   videoUrl={null}
-                  isPremiumUser={false}
-                  isPremiumContent={false}
+                  isPremiumUser={previewAsPremium}
+                  isPremiumContent={true}
                 />
               </div>
             </DialogContent>
