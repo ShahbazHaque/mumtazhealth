@@ -28,6 +28,17 @@ import jointCareBoneSoup from "@/assets/joint-care-bone-soup.jpg";
 import jointCareBreathwork from "@/assets/joint-care-breathwork.jpg";
 import jointCareFunctional from "@/assets/joint-care-functional.jpg";
 import bloodSugarEnergySupport from "@/assets/blood-sugar-energy-support.jpg";
+// New pose images
+import seatedMeditation from "@/assets/poses/seated-meditation.jpeg";
+import seatedSideStretch from "@/assets/poses/seated-side-stretch.jpeg";
+import headToKnee from "@/assets/poses/head-to-knee.jpeg";
+import neckShoulderStretch from "@/assets/poses/neck-shoulder-stretch.jpeg";
+import prayerPose from "@/assets/poses/prayer-pose.jpeg";
+import pyramidPoseBlocks from "@/assets/poses/pyramid-pose-blocks.jpeg";
+import camelPose from "@/assets/poses/camel-pose.jpeg";
+import lowLungeBlock from "@/assets/poses/low-lunge-block.jpeg";
+import seatedWelcome from "@/assets/poses/seated-welcome.jpeg";
+import downwardDogBlocks from "@/assets/poses/downward-dog-blocks.jpeg";
 import { Navigation } from "@/components/Navigation";
 import { ContentGridSkeleton } from "@/components/ContentSkeleton";
 import { DailyReminderButton } from "@/components/DailyReminderButton";
@@ -486,7 +497,7 @@ const ContentLibrary = () => {
       <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
         <div className="h-40 overflow-hidden bg-muted relative">
           <img 
-            src={item.image_url || getContentImage(item.content_type, item.tags)}
+            src={getContentImage(item.content_type, item.tags, item.image_url)}
             alt={item.title}
             className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
           />
@@ -567,7 +578,71 @@ const ContentLibrary = () => {
     }
   };
 
-  const getContentImage = (type: string, tags?: string[]) => {
+  // Map database image URLs to imported images
+  const imageUrlMap: Record<string, string> = {
+    '/src/assets/poses/seated-meditation.jpeg': seatedMeditation,
+    '/src/assets/poses/seated-side-stretch.jpeg': seatedSideStretch,
+    '/src/assets/poses/head-to-knee.jpeg': headToKnee,
+    '/src/assets/poses/neck-shoulder-stretch.jpeg': neckShoulderStretch,
+    '/src/assets/poses/prayer-pose.jpeg': prayerPose,
+    '/src/assets/poses/pyramid-pose-blocks.jpeg': pyramidPoseBlocks,
+    '/src/assets/poses/camel-pose.jpeg': camelPose,
+    '/src/assets/poses/low-lunge-block.jpeg': lowLungeBlock,
+    '/src/assets/poses/seated-welcome.jpeg': seatedWelcome,
+    '/src/assets/poses/downward-dog-blocks.jpeg': downwardDogBlocks,
+    '/src/assets/joint-care-chair-yoga.jpg': jointCareChairYoga,
+    '/src/assets/joint-care-wall-yoga.jpg': jointCareWallYoga,
+    '/src/assets/joint-care-bed-mobility.jpg': jointCareBedMobility,
+    '/src/assets/joint-care-abhyanga.jpg': jointCareAbhyanga,
+    '/src/assets/joint-care-golden-milk.jpg': jointCareGoldenMilk,
+    '/src/assets/joint-care-kitchari.jpg': jointCareKitchari,
+    '/src/assets/joint-care-bone-soup.jpg': jointCareBoneSoup,
+    '/src/assets/joint-care-breathwork.jpg': jointCareBreathwork,
+    '/src/assets/joint-care-functional.jpg': jointCareFunctional,
+    '/src/assets/blood-sugar-energy-support.jpg': bloodSugarEnergySupport,
+  };
+
+  const resolveImageUrl = (imageUrl: string | null | undefined): string | null => {
+    if (!imageUrl) return null;
+    return imageUrlMap[imageUrl] || null;
+  };
+
+  const getContentImage = (type: string, tags?: string[], imageUrl?: string) => {
+    // First check if there's a database image URL that maps to an import
+    if (imageUrl) {
+      const resolved = resolveImageUrl(imageUrl);
+      if (resolved) return resolved;
+    }
+
+    // Check for specific tag-based images (new pose images first)
+    if (tags?.some(tag => ['meditation', 'breathwork', 'relaxation', 'calming'].includes(tag))) {
+      return seatedMeditation;
+    }
+    if (tags?.some(tag => ['flexibility', 'side-stretch', 'stretch'].includes(tag))) {
+      return seatedSideStretch;
+    }
+    if (tags?.some(tag => ['forward-fold', 'hamstring'].includes(tag))) {
+      return headToKnee;
+    }
+    if (tags?.some(tag => ['neck', 'shoulder', 'upper-body'].includes(tag))) {
+      return neckShoulderStretch;
+    }
+    if (tags?.some(tag => ['prayer', 'spiritual', 'mantra', 'affirmation', 'dosha'].includes(tag))) {
+      return prayerPose;
+    }
+    if (tags?.some(tag => ['standing', 'strength', 'pyramid'].includes(tag))) {
+      return pyramidPoseBlocks;
+    }
+    if (tags?.some(tag => ['backbend', 'spine', 'camel'].includes(tag))) {
+      return camelPose;
+    }
+    if (tags?.some(tag => ['hip', 'lunge', 'hip-flexor'].includes(tag))) {
+      return lowLungeBlock;
+    }
+    if (tags?.some(tag => ['downward-dog', 'foundation', 'inversion'].includes(tag))) {
+      return downwardDogBlocks;
+    }
+
     // Check for joint care specific images based on tags
     if (tags?.some(tag => ['chair-yoga', 'senior-friendly'].includes(tag))) {
       return jointCareChairYoga;
@@ -597,13 +672,17 @@ const ContentLibrary = () => {
       return jointCareFunctional;
     }
     
+    // Default by content type with new pose images as primary
     switch (type) {
-      case 'yoga': return yogaImage;
-      case 'meditation': return meditationImage;
-      case 'nutrition': return nutritionImage;
-      case 'article': return articleImage;
-      case 'learning': return articleImage;
-      default: return articleImage;
+      case 'yoga': return seatedMeditation;
+      case 'meditation': return seatedMeditation;
+      case 'breathwork': return seatedMeditation;
+      case 'affirmation': return prayerPose;
+      case 'nutrition': return seatedWelcome;
+      case 'article': return seatedWelcome;
+      case 'learning': return seatedWelcome;
+      case 'recipe': return seatedWelcome;
+      default: return seatedWelcome;
     }
   };
 
