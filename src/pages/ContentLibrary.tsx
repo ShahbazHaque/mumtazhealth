@@ -1216,7 +1216,7 @@ const ContentLibrary = () => {
                 {/* Content Image with Lock Overlay */}
                 <div className="h-48 overflow-hidden bg-muted relative">
                   <img 
-                    src={item.image_url || getContentImage(item.content_type, item.tags)}
+                    src={getContentImage(item.content_type, item.tags, item.image_url)}
                     alt={item.title}
                     className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
                   />
@@ -1376,7 +1376,7 @@ const ContentLibrary = () => {
                     <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
                       <div className="h-48 overflow-hidden bg-muted relative">
                         <img 
-                          src={item.image_url || getContentImage(item.content_type, item.tags)}
+                          src={getContentImage(item.content_type, item.tags, item.image_url)}
                           alt={item.title}
                           className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
                         />
@@ -1525,7 +1525,7 @@ const ContentLibrary = () => {
                     <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
                       <div className="h-48 overflow-hidden bg-muted relative">
                         <img 
-                          src={item.image_url || getContentImage(item.content_type, item.tags)}
+                          src={getContentImage(item.content_type, item.tags, item.image_url)}
                           alt={item.title}
                           className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
                         />
@@ -1836,7 +1836,7 @@ const ContentLibrary = () => {
                     <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
                       <div className="h-48 overflow-hidden bg-muted relative">
                         <img 
-                          src={item.image_url || getContentImage(item.content_type, item.tags)}
+                          src={getContentImage(item.content_type, item.tags, item.image_url)}
                           alt={item.title}
                           className={`w-full h-full object-cover transition-all ${isLocked ? 'blur-sm opacity-60' : ''}`}
                         />
@@ -2267,10 +2267,10 @@ const ContentLibrary = () => {
                     )}
 
                     {/* Content Image - Supporting Visual */}
-                    {isContentUnlocked(selectedContent) && (selectedContent.image_url || getContentImage(selectedContent.content_type, selectedContent.tags)) && (
+                    {isContentUnlocked(selectedContent) && getContentImage(selectedContent.content_type, selectedContent.tags, selectedContent.image_url) && (
                       <div>
                         <img 
-                          src={selectedContent.image_url || getContentImage(selectedContent.content_type, selectedContent.tags)}
+                          src={getContentImage(selectedContent.content_type, selectedContent.tags, selectedContent.image_url)}
                           alt={selectedContent.title}
                           className="w-full rounded-lg"
                         />
