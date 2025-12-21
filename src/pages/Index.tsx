@@ -12,6 +12,7 @@ import { Navigation } from "@/components/Navigation";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { QuickCheckIn } from "@/components/QuickCheckIn";
 import { PersonalizedRecommendations } from "@/components/PersonalizedRecommendations";
+import { PoseOfTheDay } from "@/components/PoseOfTheDay";
 
 interface UserProfile {
   username: string;
@@ -287,6 +288,11 @@ const Index = () => {
           {/* Quick Check-In */}
           <div className="max-w-5xl mx-auto">
             <QuickCheckIn username={userProfile?.username} />
+          </div>
+
+          {/* Pose of the Day */}
+          <div className="max-w-5xl mx-auto" data-tour="pose-of-day">
+            <PoseOfTheDay />
           </div>
 
           {/* Personalized Recommendations */}
