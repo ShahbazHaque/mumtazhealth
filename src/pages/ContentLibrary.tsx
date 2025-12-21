@@ -670,7 +670,7 @@ const ContentLibrary = () => {
     if (tags?.some(tag => ['cobra', 'upward-dog', 'chest-opener'].includes(tag))) {
       return highCobraBlocks;
     }
-    if (tags?.some(tag => ['triangle', 'trikonasana', 'side-body'].includes(tag))) {
+    if (tags?.some(tag => ['revolved-forward-fold', 'parivrtta-uttanasana', 'standing-twist'].includes(tag))) {
       return trianglePose;
     }
     if (tags?.some(tag => ['bridge', 'glutes', 'pelvic-floor', 'postpartum'].includes(tag))) {
