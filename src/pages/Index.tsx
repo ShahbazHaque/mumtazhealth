@@ -13,6 +13,8 @@ import { OnboardingTour } from "@/components/OnboardingTour";
 import { QuickCheckIn } from "@/components/QuickCheckIn";
 import { PersonalizedRecommendations } from "@/components/PersonalizedRecommendations";
 import { PoseOfTheDay } from "@/components/PoseOfTheDay";
+import { ReturningUserWelcome } from "@/components/ReturningUserWelcome";
+import { FavoritesQuickAccess } from "@/components/FavoritesQuickAccess";
 
 interface UserProfile {
   username: string;
@@ -47,6 +49,8 @@ const Index = () => {
   const [totalVisits, setTotalVisits] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [showTour, setShowTour] = useState(false);
+  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
+  const [isReturningUser, setIsReturningUser] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -66,6 +70,22 @@ const Index = () => {
       localStorage.removeItem('mumtaz_trigger_tour');
       setTimeout(() => setShowTour(true), 500);
     }
+    
+    // Check if returning user should see welcome dialog
+    const lastVisit = localStorage.getItem('mumtaz_last_visit');
+    const welcomeShownToday = localStorage.getItem('mumtaz_welcome_shown_today');
+    const today = new Date().toDateString();
+    
+    if (lastVisit && welcomeShownToday !== today) {
+      // User has visited before and hasn't seen welcome today
+      setIsReturningUser(true);
+      // Show welcome dialog after a short delay
+      setTimeout(() => setShowWelcomeDialog(true), 800);
+      localStorage.setItem('mumtaz_welcome_shown_today', today);
+    }
+    
+    // Update last visit
+    localStorage.setItem('mumtaz_last_visit', new Date().toISOString());
   }, []);
 
   const handleTourComplete = () => {
@@ -184,6 +204,15 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         <Navigation />
         <OnboardingTour run={showTour} onComplete={handleTourComplete} />
+        
+        {/* Returning User Welcome Dialog */}
+        {showWelcomeDialog && isReturningUser && (
+          <ReturningUserWelcome onClose={() => setShowWelcomeDialog(false)} />
+        )}
+        
+        {/* Favorites Quick Access Button */}
+        <FavoritesQuickAccess />
+        
         {/* Watermark */}
         <div className="watermark-lotus">
           <Logo size="xl" showText={false} />
