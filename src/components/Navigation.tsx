@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Logo } from "@/components/Logo";
+import { VoiceNavigator } from "@/components/VoiceNavigator";
 import { cn } from "@/lib/utils";
 
 interface NavigationProps {
@@ -9,7 +10,7 @@ interface NavigationProps {
 export function Navigation({ className }: NavigationProps) {
   return (
     <nav className={cn("fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border", className)}>
-      <div className="container mx-auto px-4 h-16 flex items-center">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link 
           to="/" 
           className="flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:opacity-80"
@@ -17,6 +18,9 @@ export function Navigation({ className }: NavigationProps) {
           <Logo size="sm" showText={false} />
           <span className="font-semibold text-foreground hidden sm:inline">Mumtaz Health</span>
         </Link>
+        
+        {/* Voice Navigator */}
+        <VoiceNavigator />
       </div>
     </nav>
   );

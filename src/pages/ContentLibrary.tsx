@@ -55,6 +55,8 @@ import { ContentGridSkeleton } from "@/components/ContentSkeleton";
 import { DailyReminderButton } from "@/components/DailyReminderButton";
 import { PoseSequenceGuide } from "@/components/PoseSequenceGuide";
 import { PoseImageSequence } from "@/components/PoseImageSequence";
+import { FavoritesQuickAccess } from "@/components/FavoritesQuickAccess";
+import { trackLastActivity } from "@/components/ReturningUserWelcome";
 interface WellnessContent {
   id: string;
   title: string;
@@ -447,6 +449,14 @@ const ContentLibrary = () => {
   const openContentDetail = (item: WellnessContent) => {
     setSelectedContent(item);
     setIsDialogOpen(true);
+    
+    // Track this activity for returning user experience
+    trackLastActivity({
+      type: 'content',
+      title: item.title,
+      path: `/content-library?highlight=${item.id}`,
+      timestamp: new Date().toISOString()
+    });
   };
 
   const toggleCompletion = async (contentId: string) => {
