@@ -15,6 +15,7 @@ import { PersonalizedRecommendations } from "@/components/PersonalizedRecommenda
 import { PoseOfTheDay } from "@/components/PoseOfTheDay";
 import { ReturningUserWelcome } from "@/components/ReturningUserWelcome";
 import { FavoritesQuickAccess } from "@/components/FavoritesQuickAccess";
+import { RecentlyViewed } from "@/components/RecentlyViewed";
 
 interface UserProfile {
   username: string;
@@ -327,6 +328,11 @@ const Index = () => {
           {/* Personalized Recommendations */}
           <div className="max-w-5xl mx-auto">
             <PersonalizedRecommendations />
+          </div>
+
+          {/* Recently Viewed */}
+          <div className="max-w-5xl mx-auto">
+            <RecentlyViewed />
           </div>
 
           {/* Progress Tracker */}
