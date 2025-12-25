@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, BookOpen, ChevronRight } from "lucide-react";
+import { Clock, BookOpen, ChevronRight, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface RecentActivity {
   type: string;
@@ -17,7 +18,10 @@ export function RecentlyViewed() {
   const [recentItems, setRecentItems] = useState<RecentActivity[]>([]);
 
   useEffect(() => {
-    // Get recently viewed items from localStorage
+    loadRecentItems();
+  }, []);
+
+  const loadRecentItems = () => {
     const stored = localStorage.getItem('mumtaz_recent_activities');
     if (stored) {
       try {
@@ -37,7 +41,13 @@ export function RecentlyViewed() {
         console.error("Error parsing recent activities:", e);
       }
     }
-  }, []);
+  };
+
+  const clearHistory = () => {
+    localStorage.removeItem('mumtaz_recent_activities');
+    setRecentItems([]);
+    toast.success("Recently viewed history cleared");
+  };
 
   const getTypeIcon = (type: string) => {
     return <BookOpen className="h-4 w-4 text-primary" />;
@@ -68,10 +78,21 @@ export function RecentlyViewed() {
   return (
     <Card className="bg-card border-border/50 shadow-md">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Clock className="h-5 w-5 text-primary" />
-          Recently Viewed
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Clock className="h-5 w-5 text-primary" />
+            Recently Viewed
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearHistory}
+            className="h-8 px-2 text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">Clear history</span>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         {recentItems.map((item, index) => (

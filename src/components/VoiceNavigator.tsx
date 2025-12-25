@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Volume2 } from "lucide-react";
@@ -9,6 +9,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface VoiceNavigatorProps {
   className?: string;
@@ -127,9 +134,11 @@ export function VoiceNavigator({ className }: VoiceNavigatorProps) {
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
   const [recognition, setRecognition] = useState<any>(null);
+  const [showHelp, setShowHelp] = useState(false);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const isLongPress = useRef(false);
 
   useEffect(() => {
-    // Check for browser support
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognitionAPI) {
       setIsSupported(true);
@@ -169,7 +178,6 @@ export function VoiceNavigator({ className }: VoiceNavigatorProps) {
   }, []);
 
   const handleVoiceCommand = useCallback((transcript: string) => {
-    // Find matching command
     for (const command of voiceCommands) {
       for (const pattern of command.patterns) {
         if (transcript.includes(pattern)) {
@@ -182,11 +190,35 @@ export function VoiceNavigator({ className }: VoiceNavigatorProps) {
       }
     }
 
-    // No match found
     toast.info(`Command not recognized: "${transcript}"`, {
-      description: "Try saying: 'Show my favorites' or 'Go to dashboard'"
+      description: "Hold the mic button for help"
     });
   }, [navigate]);
+
+  const handleMouseDown = useCallback(() => {
+    isLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      isLongPress.current = true;
+      setShowHelp(true);
+    }, 500);
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    if (!isLongPress.current && !showHelp) {
+      toggleListening();
+    }
+  }, [showHelp]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
 
   const toggleListening = useCallback(() => {
     if (!recognition) return;
@@ -199,7 +231,7 @@ export function VoiceNavigator({ className }: VoiceNavigatorProps) {
         recognition.start();
         setIsListening(true);
         toast.info("Listening... Say a command", {
-          description: "e.g., 'Show my favorites' or 'Take me to pregnancy trimester 2 content'",
+          description: "e.g., 'Show my favorites' or 'Vata content'",
           duration: 3000
         });
       } catch (error) {
@@ -208,37 +240,112 @@ export function VoiceNavigator({ className }: VoiceNavigatorProps) {
     }
   }, [recognition, isListening]);
 
+  const commandCategories = [
+    { 
+      name: "Navigation", 
+      commands: voiceCommands.filter(c => 
+        c.patterns.some(p => ["dashboard", "home", "settings", "bookings", "practice", "insights", "tracker", "content", "library"].some(k => p.includes(k)))
+      )
+    },
+    { 
+      name: "Favorites", 
+      commands: voiceCommands.filter(c => c.patterns.some(p => p.includes("favorite")))
+    },
+    { 
+      name: "Dosha Content", 
+      commands: voiceCommands.filter(c => c.patterns.some(p => ["vata", "pitta", "kapha"].some(d => p.includes(d))))
+    },
+    { 
+      name: "Pregnancy", 
+      commands: voiceCommands.filter(c => c.patterns.some(p => p.includes("trimester")))
+    },
+    { 
+      name: "Life Stages", 
+      commands: voiceCommands.filter(c => c.patterns.some(p => ["menopause", "perimenopause", "postpartum"].some(s => p.includes(s))))
+    },
+    { 
+      name: "Content Types", 
+      commands: voiceCommands.filter(c => c.patterns.some(p => ["yoga", "meditation", "nutrition", "recipes"].some(t => p.includes(t))))
+    },
+  ];
+
   if (!isSupported) {
-    return null; // Don't render if not supported
+    return null;
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={isListening ? "default" : "outline"}
-            size="icon"
-            onClick={toggleListening}
-            className={`${className} ${isListening ? "animate-pulse bg-primary" : ""}`}
-            aria-label={isListening ? "Stop listening" : "Start voice command"}
-          >
-            {isListening ? (
-              <MicOff className="h-4 w-4" />
-            ) : (
-              <Mic className="h-4 w-4" />
-            )}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{isListening ? "Click to stop" : "Voice commands"}</p>
-          <p className="text-xs text-muted-foreground">
-            Say "Show my favorites" or "Go to dashboard"
-          </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={isListening ? "default" : "outline"}
+              size="icon"
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseLeave}
+              onTouchStart={handleMouseDown}
+              onTouchEnd={handleMouseUp}
+              className={`${className} ${isListening ? "animate-pulse bg-primary" : ""}`}
+              aria-label={isListening ? "Stop listening" : "Start voice command"}
+            >
+              {isListening ? (
+                <MicOff className="h-4 w-4" />
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{isListening ? "Click to stop" : "Voice commands"}</p>
+            <p className="text-xs text-muted-foreground">
+              Hold for help • Click to speak
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <Dialog open={showHelp} onOpenChange={setShowHelp}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mic className="h-5 w-5 text-primary" />
+              Voice Commands
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-4 pr-4">
+              {commandCategories.map((category) => (
+                category.commands.length > 0 && (
+                  <div key={category.name}>
+                    <h4 className="text-sm font-semibold text-foreground mb-2">
+                      {category.name}
+                    </h4>
+                    <div className="space-y-1">
+                      {category.commands.map((cmd, idx) => (
+                        <div 
+                          key={idx}
+                          className="flex items-center justify-between py-1.5 px-2 rounded bg-muted/50 text-sm"
+                        >
+                          <span className="text-muted-foreground">
+                            "{cmd.patterns[0]}"
+                          </span>
+                          <span className="text-xs text-primary font-medium">
+                            {cmd.response}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              ))}
+              <p className="text-xs text-muted-foreground pt-2 border-t">
+                Click the microphone button to start listening, then speak your command clearly.
+              </p>
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
-
-// Web Speech API types are handled via `any` casting above
