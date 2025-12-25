@@ -104,6 +104,22 @@ const voiceCommands = [
     action: "/content-library?type=nutrition",
     response: "Showing nutrition content"
   },
+  // Dosha-specific commands
+  { 
+    patterns: ["vata content", "show vata", "vata", "vata balancing", "vata practices"],
+    action: "/content-library?dosha=vata",
+    response: "Showing Vata balancing content"
+  },
+  { 
+    patterns: ["pitta content", "show pitta", "pitta", "pitta balancing", "pitta practices"],
+    action: "/content-library?dosha=pitta",
+    response: "Showing Pitta balancing content"
+  },
+  { 
+    patterns: ["kapha content", "show kapha", "kapha", "kapha balancing", "kapha practices"],
+    action: "/content-library?dosha=kapha",
+    response: "Showing Kapha balancing content"
+  },
 ];
 
 export function VoiceNavigator({ className }: VoiceNavigatorProps) {

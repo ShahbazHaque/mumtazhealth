@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,6 +57,7 @@ import { PoseSequenceGuide } from "@/components/PoseSequenceGuide";
 import { PoseImageSequence } from "@/components/PoseImageSequence";
 import { FavoritesQuickAccess } from "@/components/FavoritesQuickAccess";
 import { trackLastActivity } from "@/components/ReturningUserWelcome";
+import { trackRecentActivity } from "@/components/RecentlyViewed";
 interface WellnessContent {
   id: string;
   title: string;
@@ -106,6 +107,7 @@ const getDoshaMovementTags = (primaryDosha: string | null): string[] => {
 
 const ContentLibrary = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [userTier, setUserTier] = useState<string>("free");
   const [userMovementPreference, setUserMovementPreference] = useState<string | null>(null);
@@ -163,6 +165,34 @@ const ContentLibrary = () => {
     { value: "moderate", label: "Moderate" },
     { value: "active", label: "Active & Energising" },
   ];
+
+  // Handle URL params for filtering
+  useEffect(() => {
+    const doshaParam = searchParams.get('dosha');
+    const typeParam = searchParams.get('type');
+    const filterParam = searchParams.get('filter');
+    const pregnancyParam = searchParams.get('pregnancy');
+    const stageParam = searchParams.get('stage');
+    
+    if (doshaParam) {
+      setSelectedDosha(doshaParam);
+    }
+    if (typeParam) {
+      // Map type to category
+      const typeToCategory: Record<string, string> = {
+        yoga: 'yoga',
+        meditation: 'emotional',
+        nutrition: 'nutrition'
+      };
+      setSelectedCategory(typeToCategory[typeParam] || 'all');
+    }
+    if (filterParam === 'favorites') {
+      setSelectedCompletion('saved');
+    }
+    if (pregnancyParam || stageParam) {
+      setSelectedLifePhase(pregnancyParam || stageParam || 'all');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -456,6 +486,13 @@ const ContentLibrary = () => {
       title: item.title,
       path: `/content-library?highlight=${item.id}`,
       timestamp: new Date().toISOString()
+    });
+    
+    // Track for recently viewed section on dashboard
+    trackRecentActivity({
+      type: item.content_type,
+      title: item.title,
+      path: `/content-library?highlight=${item.id}`
     });
   };
 
