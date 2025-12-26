@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell, Droplet, AlertTriangle, Search, X, Baby, Salad, Brain, Activity } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell, Droplet, AlertTriangle, Search, X, Baby, Salad, Brain, Activity, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -144,6 +144,7 @@ const ContentLibrary = () => {
   const [selectedMobility, setSelectedMobility] = useState<string>("all");
   const [selectedConcern, setSelectedConcern] = useState<string>("all");
   const [selectedCompletion, setSelectedCompletion] = useState<string>("all");
+  const [filtersExpanded, setFiltersExpanded] = useState<boolean>(false);
 
   // Category definitions for better organization
   const categories = [
@@ -1114,113 +1115,140 @@ const ContentLibrary = () => {
             <Card>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <button 
+                    className="flex items-center gap-2 md:cursor-default"
+                    onClick={() => setFiltersExpanded(!filtersExpanded)}
+                  >
                     <Filter className="h-5 w-5" />
                     <CardTitle className="text-lg">Filter Content</CardTitle>
-                  </div>
+                    {/* Active filter count badge */}
+                    {(() => {
+                      const activeCount = [
+                        selectedCategory !== "all",
+                        selectedMobility !== "all",
+                        selectedLifePhase !== "all",
+                        selectedDosha !== "all",
+                        selectedConcern !== "all",
+                        selectedCompletion !== "all"
+                      ].filter(Boolean).length;
+                      return activeCount > 0 ? (
+                        <Badge variant="default" className="h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
+                          {activeCount}
+                        </Badge>
+                      ) : null;
+                    })()}
+                    <ChevronDown className={`h-4 w-4 md:hidden transition-transform duration-200 ${filtersExpanded ? 'rotate-180' : ''}`} />
+                  </button>
                   <Button variant="ghost" size="sm" onClick={clearFilters}>
                     Clear All
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                  <div>
-                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Category</label>
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="All" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map(cat => (
-                          <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Mobility Level</label>
-                    <Select value={selectedMobility} onValueChange={setSelectedMobility}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="All" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {mobilityLevels.map(level => (
-                          <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Life Phase</label>
-                    <Select value={selectedLifePhase} onValueChange={setSelectedLifePhase}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="All" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Phases</SelectItem>
-                        <SelectItem value="menstrual">Menstrual</SelectItem>
-                        <SelectItem value="fertility">Fertility</SelectItem>
-                        <SelectItem value="pregnancy">Pregnancy</SelectItem>
-                        <SelectItem value="postpartum">Postpartum</SelectItem>
-                        <SelectItem value="perimenopause">Perimenopause</SelectItem>
-                        <SelectItem value="menopause">Menopause</SelectItem>
-                        <SelectItem value="post-menopause">Post-menopause</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Dosha</label>
-                    <Select value={selectedDosha} onValueChange={setSelectedDosha}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="All" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Doshas</SelectItem>
-                        <SelectItem value="vata">Vata</SelectItem>
-                        <SelectItem value="pitta">Pitta</SelectItem>
-                        <SelectItem value="kapha">Kapha</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Wellness Concern</label>
-                    <Select value={selectedConcern} onValueChange={setSelectedConcern}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="All" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {wellnessConcerns.map(concern => (
-                          <SelectItem key={concern.value} value={concern.value}>{concern.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {user && (
+              
+              {/* Mobile: Collapsible, Desktop: Always visible */}
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out md:!max-h-none md:!opacity-100 ${filtersExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 md:max-h-none md:opacity-100'}`}>
+                <CardContent className="pt-0">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                     <div>
-                      <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Progress</label>
-                      <Select value={selectedCompletion} onValueChange={setSelectedCompletion}>
+                      <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Category</label>
+                      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                         <SelectTrigger className="h-9">
                           <SelectValue placeholder="All" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All Content</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="not-completed">Not Completed</SelectItem>
+                          {categories.map(cat => (
+                            <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
-                  )}
-                </div>
 
+                    <div>
+                      <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Mobility Level</label>
+                      <Select value={selectedMobility} onValueChange={setSelectedMobility}>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mobilityLevels.map(level => (
+                            <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Life Phase</label>
+                      <Select value={selectedLifePhase} onValueChange={setSelectedLifePhase}>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Phases</SelectItem>
+                          <SelectItem value="menstrual">Menstrual</SelectItem>
+                          <SelectItem value="fertility">Fertility</SelectItem>
+                          <SelectItem value="pregnancy">Pregnancy</SelectItem>
+                          <SelectItem value="postpartum">Postpartum</SelectItem>
+                          <SelectItem value="perimenopause">Perimenopause</SelectItem>
+                          <SelectItem value="menopause">Menopause</SelectItem>
+                          <SelectItem value="post-menopause">Post-menopause</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Dosha</label>
+                      <Select value={selectedDosha} onValueChange={setSelectedDosha}>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Doshas</SelectItem>
+                          <SelectItem value="vata">Vata</SelectItem>
+                          <SelectItem value="pitta">Pitta</SelectItem>
+                          <SelectItem value="kapha">Kapha</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Wellness Concern</label>
+                      <Select value={selectedConcern} onValueChange={setSelectedConcern}>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {wellnessConcerns.map(concern => (
+                            <SelectItem key={concern.value} value={concern.value}>{concern.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {user && (
+                      <div>
+                        <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Progress</label>
+                        <Select value={selectedCompletion} onValueChange={setSelectedCompletion}>
+                          <SelectTrigger className="h-9">
+                            <SelectValue placeholder="All" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Content</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="not-completed">Not Completed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </div>
+
+              {/* Active filters - always visible */}
+              <CardContent className="pt-0">
                 {/* Active filters indicator */}
                 {(searchQuery || selectedCategory !== "all" || selectedMobility !== "all" || selectedLifePhase !== "all" || selectedDosha !== "all" || selectedConcern !== "all") && (
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-3">
                     {searchQuery && (
                       <Badge variant="secondary" className="gap-1">
                         Search: "{searchQuery}"
@@ -1261,7 +1289,7 @@ const ContentLibrary = () => {
                 )}
 
                 {/* Results count */}
-                <div className="mt-3 text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground">
                   Showing {filteredContent.length} of {content.length} items
                 </div>
               </CardContent>
