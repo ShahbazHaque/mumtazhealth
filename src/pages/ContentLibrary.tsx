@@ -1028,47 +1028,49 @@ const ContentLibrary = () => {
 
         {/* Category Tabs */}
         <Tabs defaultValue="all" className="w-full">
-          <div className="mb-6">
-            <ScrollArea className="w-full">
-              <TabsList className="inline-flex w-max h-auto gap-1 p-1 bg-muted/50">
-                <TabsTrigger value="all" className="text-sm py-2 px-3">
-                  <BookOpen className="h-4 w-4 mr-1.5" />
+          <div className="mb-6 relative">
+            {/* Scroll hint gradient on right */}
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 md:hidden" />
+            <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 pb-2">
+              <TabsList className="inline-flex w-max h-auto gap-1 p-1.5 bg-muted/50 rounded-lg">
+                <TabsTrigger value="all" className="text-sm py-2 px-3 whitespace-nowrap rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <BookOpen className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   All
                 </TabsTrigger>
-                <TabsTrigger value="saved" className="text-sm py-2 px-3">
-                  <Heart className="h-4 w-4 mr-1.5" />
+                <TabsTrigger value="saved" className="text-sm py-2 px-3 whitespace-nowrap rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Heart className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   Favorites
                 </TabsTrigger>
-                <TabsTrigger value="yoga" className="text-sm py-2 px-3">
-                  <Flower2 className="h-4 w-4 mr-1.5" />
+                <TabsTrigger value="yoga" className="text-sm py-2 px-3 whitespace-nowrap rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Flower2 className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   Yoga
                 </TabsTrigger>
-                <TabsTrigger value="joint-care" className="text-sm py-2 px-3">
-                  <Activity className="h-4 w-4 mr-1.5" />
+                <TabsTrigger value="joint-care" className="text-sm py-2 px-3 whitespace-nowrap rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Activity className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   Mobility
                 </TabsTrigger>
-                <TabsTrigger value="nutrition" className="text-sm py-2 px-3">
-                  <Salad className="h-4 w-4 mr-1.5" />
+                <TabsTrigger value="nutrition" className="text-sm py-2 px-3 whitespace-nowrap rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Salad className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   Nutrition
                 </TabsTrigger>
-                <TabsTrigger value="pregnancy" className="text-sm py-2 px-3">
-                  <Baby className="h-4 w-4 mr-1.5" />
+                <TabsTrigger value="pregnancy" className="text-sm py-2 px-3 whitespace-nowrap rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Baby className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   Pregnancy
                 </TabsTrigger>
-                <TabsTrigger value="menopause" className="text-sm py-2 px-3">
-                  <Sparkles className="h-4 w-4 mr-1.5" />
+                <TabsTrigger value="menopause" className="text-sm py-2 px-3 whitespace-nowrap rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Sparkles className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   Menopause
                 </TabsTrigger>
-                <TabsTrigger value="emotional" className="text-sm py-2 px-3">
-                  <Brain className="h-4 w-4 mr-1.5" />
+                <TabsTrigger value="emotional" className="text-sm py-2 px-3 whitespace-nowrap rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Brain className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   Spiritual
                 </TabsTrigger>
-                <TabsTrigger value="energy-support" className="text-sm py-2 px-3">
-                  <Droplet className="h-4 w-4 mr-1.5" />
+                <TabsTrigger value="energy-support" className="text-sm py-2 px-3 whitespace-nowrap rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Droplet className="h-4 w-4 mr-1.5 flex-shrink-0" />
                   Diabetes Support
                 </TabsTrigger>
               </TabsList>
-            </ScrollArea>
+            </div>
           </div>
 
           <TabsContent value="all" className="space-y-6">
