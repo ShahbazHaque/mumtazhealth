@@ -28,6 +28,21 @@ import jointCareBoneSoup from "@/assets/joint-care-bone-soup.jpg";
 import jointCareBreathwork from "@/assets/joint-care-breathwork.jpg";
 import jointCareFunctional from "@/assets/joint-care-functional.jpg";
 import bloodSugarEnergySupport from "@/assets/blood-sugar-energy-support.jpg";
+// Mumtaz brand images
+import { 
+  brandImages, 
+  getBrandImage,
+  mumtazYoga1, 
+  mumtazYoga2, 
+  mumtazYoga3, 
+  mumtazYoga4, 
+  mumtazYoga5, 
+  mumtazYoga6, 
+  mumtazYoga7, 
+  mumtazYoga8, 
+  mumtazYoga9, 
+  mumtazYoga10 
+} from "@/assets/brandImages";
 // New pose images
 import seatedMeditation from "@/assets/poses/seated-meditation.jpeg";
 import seatedSideStretch from "@/assets/poses/seated-side-stretch.jpeg";
@@ -771,17 +786,17 @@ const ContentLibrary = () => {
       return jointCareFunctional;
     }
     
-    // Default by content type with new pose images as primary
+    // Default by content type - use Mumtaz brand images as primary
     switch (type) {
-      case 'yoga': return seatedMeditation;
-      case 'meditation': return seatedMeditation;
-      case 'breathwork': return seatedMeditation;
-      case 'affirmation': return prayerPose;
-      case 'nutrition': return seatedWelcome;
-      case 'article': return seatedWelcome;
-      case 'learning': return seatedWelcome;
-      case 'recipe': return seatedWelcome;
-      default: return seatedWelcome;
+      case 'yoga': return mumtazYoga6; // Reverse warrior pose
+      case 'meditation': return mumtazYoga8; // Pigeon pose variation
+      case 'breathwork': return mumtazYoga7; // Thread the needle
+      case 'affirmation': return mumtazYoga9; // King pigeon
+      case 'nutrition': return nutritionImage; // Keep food images
+      case 'article': return mumtazYoga10; // Extended side angle outdoor
+      case 'learning': return mumtazYoga10;
+      case 'recipe': return nutritionImage; // Keep food images
+      default: return mumtazYoga6;
     }
   };
 

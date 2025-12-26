@@ -5,17 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, Leaf, Moon, Sun, Activity, ChevronLeft, ChevronRight, Flame, Droplets, Mountain, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-// Import pose images
-import halfMoonPose from "@/assets/poses/half-moon-pose.jpeg";
-import revolvedHeadToKnee from "@/assets/poses/revolved-head-to-knee.jpeg";
-import compassPose from "@/assets/poses/compass-pose.jpeg";
-import forearmReclinedHero from "@/assets/poses/forearm-reclined-hero.jpeg";
-import reclinedFigureFour from "@/assets/poses/reclined-figure-four.jpeg";
-import fishPoseLegsUp from "@/assets/poses/fish-pose-legs-up.jpeg";
-import warriorThree from "@/assets/poses/warrior-three.jpeg";
-import eagleArmsSeated from "@/assets/poses/eagle-arms-seated.jpeg";
-import supportedFishPose from "@/assets/poses/supported-fish-pose.jpeg";
-import locustPose from "@/assets/poses/locust-pose.jpeg";
+// Import Mumtaz brand pose images
+import { 
+  mumtazYoga1, 
+  mumtazYoga2, 
+  mumtazYoga3, 
+  mumtazYoga4, 
+  mumtazYoga5, 
+  mumtazYoga6, 
+  mumtazYoga7, 
+  mumtazYoga8, 
+  mumtazYoga9, 
+  mumtazYoga10 
+} from "@/assets/brandImages";
 
 interface PoseData {
   id: string;
@@ -40,165 +42,107 @@ interface PoseData {
 
 const poseLibrary: PoseData[] = [
   {
-    id: "half-moon",
-    name: "Half Moon Pose",
-    sanskritName: "Ardha Chandrasana",
-    image: halfMoonPose,
-    description: "A powerful standing balance that opens the hips and strengthens the legs while cultivating focus and grace.",
+    id: "dynamic-leg-lift",
+    name: "Dynamic Kneeling Leg Lift",
+    sanskritName: "Vyaghrasana Variation",
+    image: mumtazYoga1,
+    description: "A powerful dynamic movement that strengthens the core and glutes while improving balance and coordination.",
     benefits: [
+      "Strengthens core and glutes",
       "Improves balance and coordination",
-      "Strengthens ankles, thighs, and spine",
-      "Opens hips and chest",
-      "Calms the mind and reduces anxiety"
+      "Opens hip flexors",
+      "Builds leg strength"
     ],
     doshaAlignment: {
-      primary: "Vata",
-      effect: "Grounding practice that stabilises Vata's airy nature through focused balance work"
+      primary: "Kapha",
+      effect: "Activating and energising practice that counters Kapha's sluggish tendencies"
     },
     lifePhases: ["Menstrual (Follicular)", "Perimenopause", "Post-Menopause"],
     modifications: [
-      "Use a block under the bottom hand",
-      "Keep top hand on hip for stability",
-      "Practice against a wall for support"
+      "Keep lower knee on a blanket",
+      "Hold onto a wall for balance",
+      "Reduce range of motion"
     ],
     anatomy: {
-      primary: ["Gluteus medius", "Quadriceps", "Hamstrings"],
-      secondary: ["Core stabilizers", "Hip flexors", "Obliques"]
+      primary: ["Gluteus maximus", "Quadriceps", "Core"],
+      secondary: ["Hip flexors", "Hamstrings", "Lower back"]
     },
     sequenceOrder: 1,
     category: "Strengthening Yoga"
   },
   {
-    id: "revolved-head-to-knee",
-    name: "Revolved Head-to-Knee",
-    sanskritName: "Parivrtta Janu Sirsasana",
-    image: revolvedHeadToKnee,
-    description: "A deep seated twist and side stretch that massages abdominal organs and opens the side body.",
+    id: "kneeling-hamstring-stretch",
+    name: "Kneeling Hamstring Stretch",
+    sanskritName: "Ardha Hanumanasana",
+    image: mumtazYoga2,
+    description: "A gentle seated stretch that opens the hamstrings and prepares for deeper forward folds.",
     benefits: [
-      "Stretches spine, shoulders, and hamstrings",
-      "Stimulates liver and kidneys",
-      "Relieves mild backache",
-      "Supports digestive health"
+      "Stretches hamstrings deeply",
+      "Releases lower back tension",
+      "Prepares for splits practice",
+      "Calms the nervous system"
     ],
     doshaAlignment: {
-      primary: "Pitta",
-      effect: "Cooling twist that releases heat from the liver and aids in Pitta's natural detoxification"
+      primary: "Vata",
+      effect: "Grounding and calming, perfect for settling Vata's restless energy"
     },
-    lifePhases: ["Menstrual (Luteal)", "Perimenopause", "Menopause"],
+    lifePhases: ["Menstrual (All phases)", "Pregnancy (1st-2nd trimester)", "Postpartum", "Perimenopause"],
     modifications: [
-      "Sit on a folded blanket to elevate hips",
-      "Use a strap around extended foot",
-      "Bend the extended knee slightly"
+      "Use blocks under hands",
+      "Keep back knee on a blanket",
+      "Bend front knee slightly"
     ],
     anatomy: {
-      primary: ["Latissimus dorsi", "Obliques", "Hamstrings"],
-      secondary: ["Intercostals", "Hip adductors", "Spinal rotators"]
+      primary: ["Hamstrings", "Calf muscles", "Lower back"],
+      secondary: ["Hip flexors", "Glutes", "Achilles tendon"]
     },
     sequenceOrder: 2,
     category: "Flexibility & Mobility"
   },
   {
-    id: "compass-pose",
-    name: "Compass Pose",
-    sanskritName: "Parivrtta Surya Yantrasana",
-    image: compassPose,
-    description: "An advanced seated posture that opens the hips and shoulders while developing patience and focus.",
+    id: "full-splits",
+    name: "Full Splits with Arms Overhead",
+    sanskritName: "Hanumanasana",
+    image: mumtazYoga3,
+    description: "An advanced hip opener that requires patience and consistent practice to achieve safely.",
     benefits: [
       "Deep hip and hamstring opening",
-      "Shoulder and side body stretch",
-      "Builds concentration",
-      "Develops body awareness"
+      "Strengthens the core",
+      "Builds mental focus",
+      "Develops patience and perseverance"
     ],
     doshaAlignment: {
-      primary: "Kapha",
-      effect: "Energising pose that stimulates circulation and counters Kapha's heavy, sluggish tendencies"
+      primary: "Pitta",
+      effect: "Cooling and releasing, helps Pitta types let go of perfectionism"
     },
     lifePhases: ["Menstrual (Ovulation)", "Post-Menopause (with modifications)"],
     modifications: [
-      "Use a strap around the foot",
-      "Keep the bottom leg extended",
-      "Practice seated leg stretch first"
+      "Use blocks under hands",
+      "Keep back knee down",
+      "Practice half splits first"
     ],
     anatomy: {
-      primary: ["Hamstrings", "Hip rotators", "Deltoids"],
-      secondary: ["Triceps", "Core", "IT band"]
+      primary: ["Hamstrings", "Hip flexors", "Psoas"],
+      secondary: ["Quadriceps", "Glutes", "Core"]
     },
     sequenceOrder: 3,
     category: "Advanced Flexibility"
   },
   {
-    id: "forearm-reclined-hero",
-    name: "Forearm Reclined Hero",
-    sanskritName: "Supta Virasana Variation",
-    image: forearmReclinedHero,
-    description: "A restorative backbend that opens the front body and relieves tension in the thighs and hip flexors.",
-    benefits: [
-      "Stretches thighs and hip flexors",
-      "Opens chest and shoulders",
-      "Relieves menstrual discomfort",
-      "Calms the nervous system"
-    ],
-    doshaAlignment: {
-      primary: "Vata",
-      effect: "Deeply grounding and calming, perfect for settling Vata imbalances and anxiety"
-    },
-    lifePhases: ["Menstrual (All phases)", "Pregnancy (1st trimester)", "Postpartum", "Menopause"],
-    modifications: [
-      "Place a bolster under the back",
-      "Use a block under the head",
-      "Keep knees together with padding between"
-    ],
-    anatomy: {
-      primary: ["Quadriceps", "Hip flexors", "Pectorals"],
-      secondary: ["Psoas", "Intercostals", "Ankle dorsiflexors"]
-    },
-    sequenceOrder: 4,
-    category: "Restorative Yoga"
-  },
-  {
-    id: "reclined-figure-four",
-    name: "Reclined Figure Four",
-    sanskritName: "Supta Kapotasana",
-    image: reclinedFigureFour,
-    description: "A gentle hip opener that releases tension in the piriformis and outer hip while being accessible for all levels.",
-    benefits: [
-      "Opens hips and glutes",
-      "Relieves lower back tension",
-      "Reduces sciatica discomfort",
-      "Promotes relaxation"
-    ],
-    doshaAlignment: {
-      primary: "Vata",
-      effect: "Gentle grounding pose that calms the nervous system and relieves Vata-related tension"
-    },
-    lifePhases: ["Menstrual (All phases)", "Pregnancy (All trimesters)", "Postpartum", "Perimenopause", "Menopause", "Post-Menopause"],
-    modifications: [
-      "Keep head and shoulders on the floor",
-      "Use a strap around the thigh",
-      "Practice with elevated leg against wall"
-    ],
-    anatomy: {
-      primary: ["Piriformis", "Gluteus maximus", "Hip rotators"],
-      secondary: ["Hamstrings", "Lower back muscles", "IT band"]
-    },
-    sequenceOrder: 5,
-    category: "Hip Opening"
-  },
-  {
-    id: "fish-pose-legs-up",
-    name: "Fish Pose with Legs Lifted",
-    sanskritName: "Matsyasana Variation",
-    image: fishPoseLegsUp,
-    description: "An energising backbend with core activation that opens the throat and strengthens the abdominal muscles.",
+    id: "core-block-work",
+    name: "Core Work with Block",
+    sanskritName: "Navasana Variation",
+    image: mumtazYoga4,
+    description: "An energising core exercise that strengthens the abdominals while using props for proper alignment.",
     benefits: [
       "Strengthens core and hip flexors",
-      "Opens chest and throat",
-      "Stimulates thyroid",
-      "Builds abdominal strength"
+      "Improves body awareness",
+      "Builds abdominal strength",
+      "Enhances pelvic floor engagement"
     ],
     doshaAlignment: {
       primary: "Kapha",
-      effect: "Stimulating and warming, this variation activates sluggish Kapha energy"
+      effect: "Stimulating and warming, activates sluggish Kapha energy"
     },
     lifePhases: ["Menstrual (Follicular, Ovulation)", "Post-Menopause"],
     modifications: [
@@ -207,127 +151,185 @@ const poseLibrary: PoseData[] = [
       "Bend knees if core is fatigued"
     ],
     anatomy: {
-      primary: ["Rectus abdominis", "Hip flexors", "Neck extensors"],
+      primary: ["Rectus abdominis", "Hip flexors", "Transverse abdominis"],
       secondary: ["Pectorals", "Serratus anterior", "Quadriceps"]
     },
-    sequenceOrder: 6,
+    sequenceOrder: 4,
     category: "Core Strengthening"
   },
   {
-    id: "warrior-three",
-    name: "Warrior III",
-    sanskritName: "Virabhadrasana III",
-    image: warriorThree,
-    description: "A dynamic balancing posture that strengthens the entire posterior chain while cultivating determination and focus.",
+    id: "scissors-core",
+    name: "Scissors Core Exercise",
+    sanskritName: "Paripurna Navasana Variation",
+    image: mumtazYoga5,
+    description: "A dynamic core exercise that alternates leg movements while maintaining core stability.",
     benefits: [
-      "Strengthens legs, core, and back",
-      "Improves balance and posture",
-      "Builds mental focus",
-      "Tones abdominal organs"
+      "Strengthens entire core",
+      "Improves hip flexor strength",
+      "Builds coordination",
+      "Enhances body control"
     ],
     doshaAlignment: {
       primary: "Kapha",
-      effect: "Activating and energising, combats Kapha's tendency toward lethargy and stagnation"
+      effect: "Energising and activating, excellent for boosting metabolism"
     },
-    lifePhases: ["Menstrual (Follicular, Ovulation)", "Perimenopause", "Post-Menopause"],
+    lifePhases: ["Menstrual (Follicular)", "Perimenopause", "Post-Menopause"],
     modifications: [
-      "Use blocks under hands",
-      "Keep back toes on the floor",
-      "Practice at a wall for support"
+      "Reduce range of motion",
+      "Keep head down on mat",
+      "Slow down the movement"
     ],
     anatomy: {
-      primary: ["Hamstrings", "Glutes", "Erector spinae"],
-      secondary: ["Core stabilizers", "Quadriceps", "Deltoids"]
+      primary: ["Rectus abdominis", "Hip flexors", "Obliques"],
+      secondary: ["Quadriceps", "Lower back", "Transverse abdominis"]
     },
-    sequenceOrder: 7,
-    category: "Strengthening Yoga"
+    sequenceOrder: 5,
+    category: "Core Strengthening"
   },
   {
-    id: "eagle-arms-seated",
-    name: "Eagle Arms Seated",
-    sanskritName: "Garudasana Arms in Vajrasana",
-    image: eagleArmsSeated,
-    description: "A shoulder-opening posture that releases upper back tension and encourages deep breathing.",
+    id: "reverse-warrior",
+    name: "Reverse Warrior",
+    sanskritName: "Viparita Virabhadrasana",
+    image: mumtazYoga6,
+    description: "A graceful standing pose that opens the side body while strengthening the legs.",
     benefits: [
-      "Opens shoulders and upper back",
-      "Releases neck tension",
-      "Improves concentration",
-      "Deepens breath capacity"
+      "Stretches the side body",
+      "Strengthens legs and core",
+      "Opens hips and chest",
+      "Builds stamina"
     ],
     doshaAlignment: {
       primary: "Pitta",
-      effect: "Cooling and calming for the mind, helps release Pitta's intensity and mental heat"
+      effect: "Cooling side stretch that releases heat and tension from the body"
     },
-    lifePhases: ["Menstrual (All phases)", "Pregnancy (All trimesters)", "Postpartum", "Perimenopause", "Menopause", "Post-Menopause"],
+    lifePhases: ["Menstrual (All phases)", "Perimenopause", "Menopause", "Post-Menopause"],
     modifications: [
-      "Hold opposite shoulders if arms don't wrap",
-      "Sit on a block or cushion",
-      "Keep elbows level with shoulders"
+      "Shorten the stance",
+      "Keep back hand on hip",
+      "Practice against a wall"
     ],
     anatomy: {
-      primary: ["Rhomboids", "Trapezius", "Deltoids"],
-      secondary: ["Triceps", "Rotator cuff", "Latissimus dorsi"]
+      primary: ["Quadriceps", "Obliques", "Intercostals"],
+      secondary: ["Glutes", "Hip flexors", "Latissimus dorsi"]
     },
-    sequenceOrder: 8,
-    category: "Shoulder Opening"
+    sequenceOrder: 6,
+    category: "Standing Yoga"
   },
   {
-    id: "supported-fish",
-    name: "Supported Fish Pose",
-    sanskritName: "Salamba Matsyasana",
-    image: supportedFishPose,
-    description: "A deeply restorative heart opener that releases chest tension and promotes emotional wellbeing.",
+    id: "thread-the-needle",
+    name: "Thread the Needle",
+    sanskritName: "Parsva Balasana",
+    image: mumtazYoga7,
+    description: "A gentle twist that releases tension in the shoulders and upper back while calming the mind.",
     benefits: [
-      "Opens chest and heart space",
-      "Relieves respiratory congestion",
-      "Reduces fatigue and anxiety",
-      "Supports emotional release"
+      "Opens shoulders and upper back",
+      "Releases neck tension",
+      "Calms the nervous system",
+      "Improves spinal mobility"
     ],
     doshaAlignment: {
       primary: "Vata",
-      effect: "Profoundly calming and grounding, ideal for Vata's anxious and scattered energy"
+      effect: "Grounding and calming, perfect for settling anxiety and restlessness"
     },
-    lifePhases: ["Menstrual (Menstruation, Luteal)", "Postpartum", "Perimenopause", "Menopause"],
+    lifePhases: ["Menstrual (All phases)", "Pregnancy (All trimesters)", "Postpartum", "Perimenopause", "Menopause"],
     modifications: [
-      "Use a bolster lengthwise under spine",
-      "Place a blanket under head",
-      "Support knees with bolsters"
+      "Place a blanket under the head",
+      "Keep the knees closer together",
+      "Use a block under the shoulder"
     ],
     anatomy: {
-      primary: ["Pectorals", "Intercostals", "Anterior deltoids"],
-      secondary: ["Hip flexors", "Neck muscles", "Diaphragm"]
+      primary: ["Rhomboids", "Trapezius", "Deltoids"],
+      secondary: ["Rotator cuff", "Latissimus dorsi", "Obliques"]
     },
-    sequenceOrder: 9,
+    sequenceOrder: 7,
     category: "Restorative Yoga"
   },
   {
-    id: "locust-pose",
-    name: "Locust Pose",
-    sanskritName: "Salabhasana",
-    image: locustPose,
-    description: "A strengthening backbend that builds posterior chain strength and prepares for deeper backbends.",
+    id: "pigeon-pose-variation",
+    name: "One-Legged King Pigeon",
+    sanskritName: "Eka Pada Rajakapotasana",
+    image: mumtazYoga8,
+    description: "An advanced hip opener that combines a deep stretch with a beautiful backbend.",
     benefits: [
-      "Strengthens back muscles",
-      "Tones buttocks and legs",
+      "Deep hip and psoas release",
+      "Opens the chest and shoulders",
+      "Improves flexibility",
+      "Builds focus and patience"
+    ],
+    doshaAlignment: {
+      primary: "Vata",
+      effect: "Deeply grounding and calming, releases stored tension"
+    },
+    lifePhases: ["Menstrual (Follicular, Ovulation)", "Post-Menopause"],
+    modifications: [
+      "Keep back leg straight",
+      "Use a strap around the back foot",
+      "Practice mermaid pose first"
+    ],
+    anatomy: {
+      primary: ["Hip flexors", "Quadriceps", "Psoas"],
+      secondary: ["Shoulders", "Chest", "Spine"]
+    },
+    sequenceOrder: 8,
+    category: "Advanced Flexibility"
+  },
+  {
+    id: "king-pigeon-seated",
+    name: "Seated King Pigeon",
+    sanskritName: "Eka Pada Rajakapotasana II",
+    image: mumtazYoga9,
+    description: "A beautiful seated backbend that opens the heart and stretches the entire front body.",
+    benefits: [
+      "Opens chest and heart space",
+      "Stretches hip flexors deeply",
       "Improves posture",
-      "Stimulates abdominal organs"
+      "Builds grace and poise"
+    ],
+    doshaAlignment: {
+      primary: "Pitta",
+      effect: "Heart-opening practice that releases emotional heat and tension"
+    },
+    lifePhases: ["Menstrual (Follicular)", "Post-Menopause"],
+    modifications: [
+      "Use a strap around the foot",
+      "Keep the back leg extended",
+      "Practice against a wall"
+    ],
+    anatomy: {
+      primary: ["Quadriceps", "Hip flexors", "Pectorals"],
+      secondary: ["Shoulders", "Triceps", "Spine"]
+    },
+    sequenceOrder: 9,
+    category: "Advanced Flexibility"
+  },
+  {
+    id: "extended-side-angle",
+    name: "Extended Side Angle",
+    sanskritName: "Utthita Parsvakonasana",
+    image: mumtazYoga10,
+    description: "A grounding standing pose that strengthens the legs while opening the side body and hips.",
+    benefits: [
+      "Strengthens legs and core",
+      "Opens hips and chest",
+      "Stretches the side body",
+      "Builds stamina and focus"
     ],
     doshaAlignment: {
       primary: "Kapha",
-      effect: "Heating and energising, excellent for activating sluggish Kapha and boosting metabolism"
+      effect: "Energising and grounding, counters Kapha's heaviness with dynamic movement"
     },
     lifePhases: ["Menstrual (Follicular, Ovulation)", "Perimenopause", "Post-Menopause"],
     modifications: [
-      "Lift only upper body or legs separately",
-      "Place a blanket under hip bones",
-      "Keep arms alongside body"
+      "Place elbow on thigh instead of hand to floor",
+      "Use a block under the bottom hand",
+      "Keep top arm on hip"
     ],
     anatomy: {
-      primary: ["Erector spinae", "Gluteus maximus", "Hamstrings"],
-      secondary: ["Trapezius", "Rhomboids", "Posterior deltoids"]
+      primary: ["Quadriceps", "Glutes", "Obliques"],
+      secondary: ["Hip adductors", "Core", "Shoulders"]
     },
     sequenceOrder: 10,
-    category: "Strengthening Yoga"
+    category: "Standing Yoga"
   }
 ];
 
