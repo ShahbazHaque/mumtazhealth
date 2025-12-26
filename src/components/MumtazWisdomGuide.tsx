@@ -284,7 +284,7 @@ export function MumtazWisdomGuide() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="fixed bottom-6 right-6 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-105 transition-transform pl-6 pr-5 py-6 gap-2"
+          className="fixed bottom-24 right-6 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-105 transition-transform pl-6 pr-5 py-6 gap-2 z-40"
         >
           <Sparkles className="h-5 w-5 text-white" />
           <span className="text-white font-medium text-sm">Ask me a question</span>
