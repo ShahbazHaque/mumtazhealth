@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Sparkles, Send, Loader2, History, Trash2 } from "lucide-react";
+import { Sparkles, Send, Loader2, History, Trash2, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import mumtazAvatar from "@/assets/mumtaz-avatar.jpeg";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Message {
   role: "user" | "assistant";
@@ -39,6 +40,7 @@ export function MumtazWisdomGuide() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeTab, setActiveTab] = useState<"chat" | "history">("chat");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (open) {
@@ -283,14 +285,23 @@ export function MumtazWisdomGuide() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          className="fixed bottom-24 right-6 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-105 transition-transform pl-6 pr-5 py-6 gap-2 z-40"
-        >
-          <Sparkles className="h-5 w-5 text-white" />
-          <span className="text-white font-medium text-sm">Ask me a question</span>
-        </Button>
+        {isMobile ? (
+          <Button
+            size="icon"
+            className="fixed bottom-24 right-4 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-110 transition-all duration-300 z-40 animate-fade-in"
+          >
+            <MessageCircle className="h-6 w-6 text-white" />
+          </Button>
+        ) : (
+          <Button
+            className="fixed bottom-24 right-6 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-105 transition-all duration-300 pl-6 pr-5 py-6 gap-2 z-40 animate-fade-in"
+          >
+            <Sparkles className="h-5 w-5 text-white" />
+            <span className="text-white font-medium text-sm">Ask me a question</span>
+          </Button>
+        )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl h-[600px] p-0 gap-0">
+      <DialogContent className="sm:max-w-2xl h-[600px] p-0 gap-0 animate-scale-in">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "chat" | "history")} className="h-full flex flex-col">
           <CardHeader className="pb-3 border-b bg-gradient-to-r from-wellness-lilac/10 to-wellness-sage/10">
             <div className="flex items-center justify-between">
