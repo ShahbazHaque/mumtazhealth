@@ -25,38 +25,37 @@ const handler = async (req: Request): Promise<Response> => {
     const greeting = userName ? `Hello ${userName}` : "Hello beautiful";
 
     const emailResponse = await resend.emails.send({
-      from: "Mumtaz Haque <mumtazhaque07@gmail.com>",
+      from: "Mumtaz Health <onboarding@resend.dev>",
+      reply_to: "mumtazhaque07@gmail.com",
       to: [userEmail],
-      subject: "Welcome to Mumtaz Health: Your Sanctuary Awaits.",
+      subject: "Welcome to Mumtaz Health 💜",
       html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-          <h1 style="color: #7C9885; font-size: 24px; margin-bottom: 20px;">Welcome to Mumtaz Health</h1>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #333; background: linear-gradient(180deg, #faf8fc 0%, #ffffff 100%);">
+          <div style="text-align: center; margin-bottom: 32px;">
+            <h1 style="color: #9B87C7; font-size: 28px; margin-bottom: 8px;">Mumtaz Health</h1>
+            <div style="width: 60px; height: 3px; background: linear-gradient(90deg, #9B87C7, #7C9885); margin: 0 auto;"></div>
+          </div>
           
-          <p style="line-height: 1.6; margin-bottom: 16px;">${greeting},</p>
+          <p style="line-height: 1.8; margin-bottom: 20px; font-size: 16px;">Welcome beautiful 💜</p>
           
-          <p style="line-height: 1.6; margin-bottom: 16px;">I'm Mumtaz, and I want to personally welcome you to the Mumtaz Health community.</p>
+          <p style="line-height: 1.8; margin-bottom: 20px; font-size: 16px;">Thank you for joining the Mumtaz Health community.</p>
           
-          <p style="line-height: 1.6; margin-bottom: 16px;">If you're here, it means you're ready to honor your unique life journey—and that is a beautiful and powerful choice.</p>
+          <p style="line-height: 1.8; margin-bottom: 20px; font-size: 16px;">This space is created by a woman who has walked through every phase of womanhood — menstrual health, motherhood, perimenopause, menopause, recovery, healing, and transformation.</p>
           
-          <p style="line-height: 1.6; margin-bottom: 16px;">This platform was built from my heart, drawing on over 30 years of holistic experience and having walked through many of womanhood's most profound phases myself, including navigating fertility challenges, postpartum mental health, peri-menopause, and recovery through hysterectomy rehab.</p>
+          <p style="line-height: 1.8; margin-bottom: 20px; font-size: 16px;">Here you will learn about <strong style="color: #7C9885;">Ayurveda</strong>, <strong style="color: #7C9885;">Yoga</strong>, <strong style="color: #7C9885;">Nutrition</strong>, <strong style="color: #7C9885;">Mobility</strong>, and <strong style="color: #7C9885;">Spirituality</strong> in a gentle and personalised way.</p>
           
-          <p style="line-height: 1.6; margin-bottom: 16px;">I created this space because I know the pressures women face, and I know how isolating the path can feel.</p>
+          <div style="background: #f8f5fc; border-left: 4px solid #9B87C7; padding: 20px; margin: 32px 0; border-radius: 0 8px 8px 0;">
+            <p style="line-height: 1.8; margin: 0; font-size: 16px; font-style: italic;">Your journey starts here. 💜</p>
+          </div>
           
-          <h2 style="color: #9B87C7; font-size: 20px; margin-top: 24px; margin-bottom: 16px;">Our Promise to You:</h2>
+          <p style="line-height: 1.8; margin-top: 32px; margin-bottom: 8px; font-size: 16px;">With love and light,</p>
           
-          <p style="line-height: 1.6; margin-bottom: 16px;">This is a safe, non-judgmental space where you can tap into the ancient wisdom of <strong>Yoga, Ayurveda, and spiritual principles</strong> to find balance and clarity—no matter where you are right now. Whether you're tracking your cycle, seeking dietary guidance, or simply looking for connection, we are here to support you.</p>
+          <p style="line-height: 1.6; margin-bottom: 4px; font-size: 16px;"><strong style="color: #9B87C7;">Mumtaz Haque</strong></p>
+          <p style="line-height: 1.6; margin-bottom: 4px; color: #666; font-size: 14px;">Founder, Mumtaz Health</p>
           
-          <p style="line-height: 1.6; margin-bottom: 16px;">Your life's journey is a privilege, and we are privileged to witness it. We are a community of like-minded women who want you to feel <strong>valued, inspired, and truly supported.</strong></p>
-          
-          <p style="line-height: 1.6; margin-bottom: 16px;">Ready to begin? Head back to the app, explore the life-phase tracker, and find a study group that resonates with your heart.</p>
-          
-          <p style="line-height: 1.6; margin-top: 32px; margin-bottom: 8px;">Welcome home,</p>
-          
-          <p style="line-height: 1.6; margin-bottom: 8px;">With deep support and respect,</p>
-          
-          <p style="line-height: 1.6; margin-bottom: 4px;"><strong>Mumtaz Haque</strong></p>
-          <p style="line-height: 1.6; margin-bottom: 4px; color: #666;">Founder, Mumtaz Health</p>
-          <p style="line-height: 1.6; color: #666;">mumtazhaque07@gmail.com</p>
+          <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e5e5; text-align: center;">
+            <p style="color: #999; font-size: 12px;">Reply to this email: mumtazhaque07@gmail.com</p>
+          </div>
         </div>
       `,
     });
