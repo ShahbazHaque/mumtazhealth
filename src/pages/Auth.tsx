@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "sonner";
 import { z } from "zod";
 import { Logo } from "@/components/Logo";
+import { ArrowLeft, KeyRound, Mail } from "lucide-react";
 
 const emailSchema = z.string().trim().email({ message: "Please enter a valid email" });
 const passwordSchema = z.string().min(6, { message: "Password must be at least 6 characters" });
@@ -110,7 +111,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 pb-32">
       <Card className="w-full max-w-md border-mumtaz-lilac/20 shadow-xl">
         <CardHeader className="space-y-4 text-center pt-8">
           <Logo size="md" className="mx-auto" />
@@ -167,7 +168,23 @@ export default function Auth() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
+                  className="h-12"
                 />
+                {/* Forgot Password Button - clearly visible below password field */}
+                {isLogin && !isAdminLogin && (
+                  <div className="pt-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="w-full h-11 text-mumtaz-lilac hover:text-mumtaz-plum hover:bg-mumtaz-lilac/10 font-medium gap-2 justify-center"
+                      onClick={() => setIsResetPassword(true)}
+                      disabled={loading}
+                    >
+                      <KeyRound className="w-4 h-4" />
+                      Forgot your password?
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
             
@@ -179,10 +196,10 @@ export default function Auth() {
               </div>
             )}
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
+          <CardFooter className="flex flex-col space-y-4 pb-8">
             <Button 
               type="submit" 
-              className={`w-full ${isAdminLogin ? 'bg-destructive hover:bg-destructive/90' : 'bg-wellness-taupe hover:bg-wellness-taupe/90'}`}
+              className={`w-full h-12 text-base ${isAdminLogin ? 'bg-destructive hover:bg-destructive/90' : 'bg-wellness-taupe hover:bg-wellness-taupe/90'}`}
               disabled={loading}
             >
               {loading ? "Please wait..." : isResetPassword ? "Send Reset Link" : isAdminLogin ? "Admin Sign In" : isLogin ? "Sign In" : "Sign Up"}
@@ -199,18 +216,6 @@ export default function Auth() {
                     disabled={loading}
                   >
                     {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-                  </Button>
-                )}
-                
-                {isLogin && !isAdminLogin && (
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="text-sm text-wellness-taupe"
-                    onClick={() => setIsResetPassword(true)}
-                    disabled={loading}
-                  >
-                    Forgot password?
                   </Button>
                 )}
                 
@@ -241,15 +246,26 @@ export default function Auth() {
             )}
             
             {isResetPassword && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={() => setIsResetPassword(false)}
-                disabled={loading}
-              >
-                Back to sign in
-              </Button>
+              <div className="space-y-4">
+                <div className="p-4 bg-mumtaz-lilac/10 border border-mumtaz-lilac/20 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <Mail className="w-5 h-5 text-mumtaz-lilac mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">
+                      If this email exists in our system, we'll send you a password reset link. Check your inbox and spam folder.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-11 gap-2 border-mumtaz-lilac/30 hover:bg-mumtaz-lilac/10"
+                  onClick={() => setIsResetPassword(false)}
+                  disabled={loading}
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Sign In
+                </Button>
+              </div>
             )}
           </CardFooter>
         </form>
