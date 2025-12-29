@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Logo } from "@/components/Logo";
 import { ArrowLeft, KeyRound, Mail } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const emailSchema = z.string().trim().email({ message: "Please enter a valid email" });
 const passwordSchema = z.string().min(6, { message: "Password must be at least 6 characters" });
@@ -21,6 +22,7 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -170,19 +172,36 @@ export default function Auth() {
                   disabled={loading}
                   className="h-12"
                 />
-                {/* Forgot Password Button - clearly visible below password field */}
+                {/* Remember Me & Forgot Password - below password field */}
                 {isLogin && !isAdminLogin && (
-                  <div className="pt-1">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="w-full h-11 text-mumtaz-lilac hover:text-mumtaz-plum hover:bg-mumtaz-lilac/10 font-medium gap-2 justify-center"
-                      onClick={() => setIsResetPassword(true)}
-                      disabled={loading}
-                    >
-                      <KeyRound className="w-4 h-4" />
-                      Forgot your password?
-                    </Button>
+                  <div className="pt-2 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="rememberMe"
+                          checked={rememberMe}
+                          onCheckedChange={(checked) => setRememberMe(checked === true)}
+                          disabled={loading}
+                          className="border-mumtaz-lilac/50 data-[state=checked]:bg-mumtaz-lilac data-[state=checked]:border-mumtaz-lilac"
+                        />
+                        <Label 
+                          htmlFor="rememberMe" 
+                          className="text-sm font-normal text-muted-foreground cursor-pointer"
+                        >
+                          Remember me
+                        </Label>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="h-auto p-0 text-sm text-mumtaz-lilac hover:text-mumtaz-plum font-medium"
+                        onClick={() => setIsResetPassword(true)}
+                        disabled={loading}
+                      >
+                        <KeyRound className="w-3.5 h-3.5 mr-1" />
+                        Forgot password?
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
