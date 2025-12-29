@@ -145,6 +145,57 @@ const ContentLibrary = () => {
   const [selectedConcern, setSelectedConcern] = useState<string>("all");
   const [selectedCompletion, setSelectedCompletion] = useState<string>("all");
   const [filtersExpanded, setFiltersExpanded] = useState<boolean>(false);
+  const [activeQuickFilters, setActiveQuickFilters] = useState<Set<string>>(new Set());
+
+  // Quick filter chip definitions
+  const quickFilterChips = [
+    { id: "beginner", label: "Beginner", tags: ["beginner", "gentle", "easy"], icon: "🌱" },
+    { id: "quick", label: "Quick (5-10 min)", durationMax: 10, icon: "⚡" },
+    { id: "chair", label: "Chair-based", tags: ["chair-yoga", "seated", "accessible"], icon: "🪑" },
+    { id: "relaxing", label: "Relaxing", tags: ["restorative", "calming", "relaxation"], icon: "🧘" },
+    { id: "energising", label: "Energising", tags: ["energising", "dynamic", "active"], icon: "✨" },
+  ];
+
+  const toggleQuickFilter = (filterId: string) => {
+    setActiveQuickFilters(prev => {
+      const newFilters = new Set(prev);
+      if (newFilters.has(filterId)) {
+        newFilters.delete(filterId);
+      } else {
+        newFilters.add(filterId);
+      }
+      return newFilters;
+    });
+  };
+
+  // Get recommended content based on user's dosha and preferences
+  const getRecommendedContent = () => {
+    if (!userPrimaryDosha && !userMovementPreference) return [];
+    
+    let recommended = [...content];
+    
+    // Filter by user's dosha
+    if (userPrimaryDosha) {
+      recommended = recommended.filter(item => 
+        !item.doshas || item.doshas.length === 0 || item.doshas.includes(userPrimaryDosha)
+      );
+    }
+    
+    // Score content based on movement preference tags
+    const preferredTags = userMovementPreference 
+      ? movementToTagsMap[userMovementPreference] || []
+      : getDoshaMovementTags(userPrimaryDosha);
+    
+    recommended = recommended.map(item => {
+      const matchScore = item.tags?.filter(tag => 
+        preferredTags.some(pt => tag.toLowerCase().includes(pt))
+      ).length || 0;
+      return { ...item, matchScore };
+    }).sort((a, b) => (b as any).matchScore - (a as any).matchScore);
+    
+    // Return top 4 recommendations
+    return recommended.slice(0, 4);
+  };
 
   // Category definitions for better organization
   const categories = [
@@ -257,7 +308,7 @@ const ContentLibrary = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [content, searchQuery, selectedCategory, selectedDosha, selectedLifePhase, selectedMobility, selectedConcern, selectedCompletion, completedContentIds, userMovementPreference, userPrimaryDosha]);
+  }, [content, searchQuery, selectedCategory, selectedDosha, selectedLifePhase, selectedMobility, selectedConcern, selectedCompletion, completedContentIds, userMovementPreference, userPrimaryDosha, activeQuickFilters]);
 
   const loadContent = async () => {
     setLoading(true);
@@ -416,6 +467,30 @@ const ContentLibrary = () => {
       } else if (selectedCompletion === "not-completed") {
         filtered = filtered.filter(item => !completedContentIds.has(item.id));
       }
+    }
+
+    // Quick filter chips
+    if (activeQuickFilters.size > 0) {
+      filtered = filtered.filter(item => {
+        return Array.from(activeQuickFilters).every(filterId => {
+          const chip = quickFilterChips.find(c => c.id === filterId);
+          if (!chip) return true;
+          
+          // Duration filter
+          if (chip.durationMax) {
+            return item.duration_minutes && item.duration_minutes <= chip.durationMax;
+          }
+          
+          // Tag-based filters
+          if (chip.tags) {
+            return item.tags?.some(tag => 
+              chip.tags!.some(ct => tag.toLowerCase().includes(ct))
+            ) || item.difficulty_level?.toLowerCase() === filterId;
+          }
+          
+          return true;
+        });
+      });
     }
 
     // Sort content to prioritize user's movement preference matches
@@ -1075,6 +1150,50 @@ const ContentLibrary = () => {
           </div>
 
           <TabsContent value="all" className="space-y-6">
+            {/* Recommended for You Section */}
+            {user && (userPrimaryDosha || userMovementPreference) && getRecommendedContent().length > 0 && (
+              <Card className="bg-gradient-to-r from-primary/10 via-secondary/5 to-primary/10 border-primary/20">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    <CardTitle className="text-lg">Recommended for You</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Based on your {userPrimaryDosha && `${userPrimaryDosha.charAt(0).toUpperCase() + userPrimaryDosha.slice(1)} dosha`}
+                    {userPrimaryDosha && userMovementPreference && " and "}
+                    {userMovementPreference && `${userMovementPreference} movement preference`}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {getRecommendedContent().map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => openContentDetail(item)}
+                        className="group relative bg-background rounded-lg overflow-hidden border border-border/50 hover:border-primary/50 transition-all hover:shadow-md text-left"
+                      >
+                        <div className="aspect-video relative overflow-hidden">
+                          <img
+                            src={getContentImage(item.content_type, item.tags, item.image_url)}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          {item.duration_minutes && (
+                            <Badge variant="secondary" className="absolute bottom-1 right-1 text-xs px-1.5 py-0.5">
+                              {item.duration_minutes}m
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="p-2">
+                          <h4 className="text-xs font-medium line-clamp-2">{item.title}</h4>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Search Bar */}
             <Card className="bg-gradient-to-r from-primary/5 to-secondary/5">
               <CardContent className="pt-6">
@@ -1100,6 +1219,35 @@ const ContentLibrary = () => {
                 <p className="text-xs text-muted-foreground mt-2">
                   Try: "yoga for arthritis", "perimenopause support", "breathwork", "nutrition for bloating"
                 </p>
+
+                {/* Quick Filter Chips */}
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {quickFilterChips.map((chip) => (
+                    <button
+                      key={chip.id}
+                      onClick={() => toggleQuickFilter(chip.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        activeQuickFilters.has(chip.id)
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      <span>{chip.icon}</span>
+                      <span>{chip.label}</span>
+                      {activeQuickFilters.has(chip.id) && (
+                        <X className="h-3 w-3 ml-0.5" />
+                      )}
+                    </button>
+                  ))}
+                  {activeQuickFilters.size > 0 && (
+                    <button
+                      onClick={() => setActiveQuickFilters(new Set())}
+                      className="text-xs text-muted-foreground hover:text-foreground underline ml-2"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
