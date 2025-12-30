@@ -167,33 +167,79 @@ const ContentLibrary = () => {
     });
   };
 
-  // Get recommended content based on user's dosha and preferences
-  const getRecommendedContent = () => {
-    if (!userPrimaryDosha && !userMovementPreference) return [];
+  // Get recommended content based on user's dosha, preferences, saved content, and life phase
+  const getRecommendedContent = (): Array<WellnessContent & { recommendationReason: string }> => {
+    if (!userPrimaryDosha && !userMovementPreference && savedContentIds.size === 0) return [];
     
-    let recommended = [...content];
+    let recommended: Array<WellnessContent & { matchScore: number; recommendationReason: string }> = [];
     
-    // Filter by user's dosha
-    if (userPrimaryDosha) {
-      recommended = recommended.filter(item => 
-        !item.doshas || item.doshas.length === 0 || item.doshas.includes(userPrimaryDosha)
-      );
-    }
+    // Get user's life stage for life phase recommendations
+    const userLifeStage = localStorage.getItem('mumtaz_user_life_stage') || '';
     
-    // Score content based on movement preference tags
-    const preferredTags = userMovementPreference 
-      ? movementToTagsMap[userMovementPreference] || []
-      : getDoshaMovementTags(userPrimaryDosha);
-    
-    recommended = recommended.map(item => {
-      const matchScore = item.tags?.filter(tag => 
+    // Score and label content based on multiple factors
+    content.forEach(item => {
+      let matchScore = 0;
+      let reasons: string[] = [];
+      
+      // Check if content matches user's saved content tags (prioritize favorites-based recommendations)
+      const savedItems = content.filter(c => savedContentIds.has(c.id));
+      const savedTags = savedItems.flatMap(c => c.tags || []);
+      const savedTypes = savedItems.map(c => c.content_type);
+      
+      if (savedTags.length > 0) {
+        const tagMatches = item.tags?.filter(tag => savedTags.includes(tag)).length || 0;
+        if (tagMatches > 0 && !savedContentIds.has(item.id)) {
+          matchScore += tagMatches * 3;
+          const matchedType = savedTypes.find(t => t === item.content_type);
+          if (matchedType) {
+            reasons.push(`Because you saved ${matchedType}`);
+          }
+        }
+      }
+      
+      // Check dosha match
+      if (userPrimaryDosha && item.doshas?.includes(userPrimaryDosha)) {
+        matchScore += 5;
+        const doshaName = userPrimaryDosha.charAt(0).toUpperCase() + userPrimaryDosha.slice(1);
+        reasons.push(`${doshaName} support`);
+      }
+      
+      // Check life phase match
+      if (userLifeStage && item.cycle_phases?.includes(userLifeStage)) {
+        matchScore += 4;
+        const phaseName = userLifeStage.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        reasons.push(`${phaseName}`);
+      }
+      
+      // Check movement preference match
+      const preferredTags = userMovementPreference 
+        ? movementToTagsMap[userMovementPreference] || []
+        : getDoshaMovementTags(userPrimaryDosha);
+      
+      const movementMatches = item.tags?.filter(tag => 
         preferredTags.some(pt => tag.toLowerCase().includes(pt))
       ).length || 0;
-      return { ...item, matchScore };
-    }).sort((a, b) => (b as any).matchScore - (a as any).matchScore);
+      
+      if (movementMatches > 0) {
+        matchScore += movementMatches * 2;
+        if (userMovementPreference === 'gentle') {
+          reasons.push('Gentle & calming');
+        } else if (userMovementPreference === 'strong') {
+          reasons.push('Energising');
+        } else if (userMovementPreference === 'seated') {
+          reasons.push('Accessible & seated');
+        }
+      }
+      
+      if (matchScore > 0) {
+        const recommendationReason = reasons.slice(0, 2).join(' • ');
+        recommended.push({ ...item, matchScore, recommendationReason });
+      }
+    });
     
-    // Return top 4 recommendations
-    return recommended.slice(0, 4);
+    // Sort by match score and return top 8
+    recommended.sort((a, b) => b.matchScore - a.matchScore);
+    return recommended.slice(0, 8);
   };
 
   // Category definitions for better organization
@@ -1187,21 +1233,23 @@ const ContentLibrary = () => {
 
           <TabsContent value="all" className="space-y-6">
             {/* Recommended for You Section */}
-            {user && (userPrimaryDosha || userMovementPreference) && getRecommendedContent().length > 0 && (
-              <Card className="bg-gradient-to-r from-primary/10 via-secondary/5 to-primary/10 border-primary/20">
+            {user && (userPrimaryDosha || userMovementPreference || savedContentIds.size > 0) && getRecommendedContent().length > 0 && (
+              <Card className="bg-gradient-to-br from-wellness-lilac-light/40 via-background to-wellness-sage-light/40 border-wellness-lilac/20">
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-lg">Recommended for You</CardTitle>
+                    <div className="p-2 bg-primary/10 rounded-full">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Recommended for You</CardTitle>
+                      <CardDescription className="text-sm">
+                        You might like to explore these practices
+                      </CardDescription>
+                    </div>
                   </div>
-                  <CardDescription>
-                    Based on your {userPrimaryDosha && `${userPrimaryDosha.charAt(0).toUpperCase() + userPrimaryDosha.slice(1)} dosha`}
-                    {userPrimaryDosha && userMovementPreference && " and "}
-                    {userMovementPreference && `${userMovementPreference} movement preference`}
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {getRecommendedContent().map((item) => (
                       <button
                         key={item.id}
@@ -1219,9 +1267,29 @@ const ContentLibrary = () => {
                               {item.duration_minutes}m
                             </Badge>
                           )}
+                          {/* Favorite button on recommendation card */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-1 right-1 h-7 w-7 bg-background/80 hover:bg-background"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSaveContent(item.id);
+                            }}
+                          >
+                            <Heart 
+                              className={`h-4 w-4 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
+                            />
+                          </Button>
                         </div>
-                        <div className="p-2">
-                          <h4 className="text-xs font-medium line-clamp-2">{item.title}</h4>
+                        <div className="p-2.5 space-y-1">
+                          <h4 className="text-sm font-medium line-clamp-2 leading-tight">{item.title}</h4>
+                          {/* Personalized recommendation reason */}
+                          {item.recommendationReason && (
+                            <p className="text-xs text-wellness-sage font-medium line-clamp-1">
+                              {item.recommendationReason}
+                            </p>
+                          )}
                         </div>
                       </button>
                     ))}
@@ -1631,20 +1699,105 @@ const ContentLibrary = () => {
           </TabsContent>
 
           <TabsContent value="saved" className="space-y-6">
+            {/* Favorites Category Filter */}
+            {savedContentIds.size > 0 && (
+              <div className="flex flex-wrap gap-2">
+                <Badge 
+                  variant={selectedCategory === "all" ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/80 transition-colors px-3 py-1.5"
+                  onClick={() => setSelectedCategory("all")}
+                >
+                  All Favorites
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === "yoga" ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/80 transition-colors px-3 py-1.5"
+                  onClick={() => setSelectedCategory("yoga")}
+                >
+                  <Flower2 className="h-3 w-3 mr-1" />
+                  Yoga
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === "mobility" ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/80 transition-colors px-3 py-1.5"
+                  onClick={() => setSelectedCategory("mobility")}
+                >
+                  <Activity className="h-3 w-3 mr-1" />
+                  Mobility
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === "emotional" ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/80 transition-colors px-3 py-1.5"
+                  onClick={() => setSelectedCategory("emotional")}
+                >
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Meditation
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === "nutrition" ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/80 transition-colors px-3 py-1.5"
+                  onClick={() => setSelectedCategory("nutrition")}
+                >
+                  <Salad className="h-3 w-3 mr-1" />
+                  Nutrition
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === "pregnancy" ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/80 transition-colors px-3 py-1.5"
+                  onClick={() => setSelectedCategory("pregnancy")}
+                >
+                  <Baby className="h-3 w-3 mr-1" />
+                  Pregnancy
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === "menopause" ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/80 transition-colors px-3 py-1.5"
+                  onClick={() => setSelectedCategory("menopause")}
+                >
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Menopause
+                </Badge>
+              </div>
+            )}
+            
             {loading ? (
               <ContentGridSkeleton count={6} />
             ) : savedContentIds.size === 0 ? (
-              <Card className="p-12 text-center">
-                <Heart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              <Card className="p-12 text-center bg-gradient-to-br from-wellness-lilac-light/30 to-background border-wellness-lilac/20">
+                <Heart className="h-16 w-16 mx-auto mb-4 text-wellness-lilac" />
                 <h3 className="text-xl font-semibold mb-2">No Favorites Yet</h3>
-                <p className="text-muted-foreground">
-                  Start saving content by clicking the heart icon on any wellness item.
+                <p className="text-muted-foreground mb-4">
+                  Save practices you love by tapping the heart icon. They'll appear here for easy access.
                 </p>
+                <Button variant="outline" onClick={() => navigate('/content-library')}>
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Browse the Library
+                </Button>
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {content
-                  .filter(item => savedContentIds.has(item.id))
+                  .filter(item => {
+                    if (!savedContentIds.has(item.id)) return false;
+                    
+                    // Apply category filter within favorites
+                    if (selectedCategory === "all") return true;
+                    
+                    const categoryMappings: Record<string, { types: string[], tags: string[] }> = {
+                      yoga: { types: ["yoga"], tags: ["yoga", "asana", "flow", "stretch"] },
+                      mobility: { types: ["yoga"], tags: ["arthritis", "joint-care", "mobility", "chair-yoga", "wall-yoga", "bed-yoga"] },
+                      nutrition: { types: ["nutrition"], tags: ["nutrition", "recipe", "food", "meal"] },
+                      pregnancy: { types: ["yoga", "nutrition"], tags: ["pregnancy", "prenatal", "postpartum"] },
+                      menopause: { types: ["yoga", "nutrition"], tags: ["menopause", "perimenopause", "post-menopause"] },
+                      emotional: { types: ["meditation"], tags: ["emotional", "spiritual", "mindfulness", "meditation", "breathwork"] },
+                    };
+                    
+                    const mapping = categoryMappings[selectedCategory];
+                    if (!mapping) return true;
+                    
+                    return mapping.types.includes(item.content_type) ||
+                      item.tags?.some(tag => mapping.tags.some(t => tag.toLowerCase().includes(t)));
+                  })
                   .map((item) => {
                   const isLocked = !isContentUnlocked(item);
                   
@@ -2410,17 +2563,29 @@ const ContentLibrary = () => {
             {selectedContent && (
               <>
                 <DialogHeader>
-                  <div className="flex items-center justify-between">
-                    <DialogTitle className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <DialogTitle className="flex items-center gap-2 flex-1">
                       {getContentIcon(selectedContent.content_type)}
-                      {selectedContent.title}
+                      <span className="line-clamp-1">{selectedContent.title}</span>
                     </DialogTitle>
-                    {selectedContent.is_premium && (
-                      <Badge className="bg-gradient-to-r from-purple-600 to-pink-600">
-                        <Crown className="h-3 w-3 mr-1" />
-                        Premium
-                      </Badge>
-                    )}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {selectedContent.is_premium && (
+                        <Badge className="bg-gradient-to-r from-purple-600 to-pink-600">
+                          <Crown className="h-3 w-3 mr-1" />
+                          Premium
+                        </Badge>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9"
+                        onClick={() => toggleSaveContent(selectedContent.id)}
+                      >
+                        <Heart 
+                          className={`h-5 w-5 ${savedContentIds.has(selectedContent.id) ? 'fill-primary text-primary' : ''}`}
+                        />
+                      </Button>
+                    </div>
                   </div>
                   <DialogDescription>
                     {selectedContent.description}
