@@ -9,10 +9,17 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Logo } from "@/components/Logo";
 import { ArrowLeft, CheckCircle2, KeyRound } from "lucide-react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const passwordSchema = z.string().min(6, { message: "Password must be at least 6 characters" });
 
 export default function ResetPassword() {
+  usePageMeta({
+    title: "Reset password | Mumtaz Health",
+    description: "Reset your password for Mumtaz Health securely and regain access to your wellness tracker.",
+    canonicalPath: "/reset-password",
+  });
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);

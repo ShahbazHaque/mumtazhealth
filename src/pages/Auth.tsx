@@ -10,12 +10,26 @@ import { z } from "zod";
 import { Logo } from "@/components/Logo";
 import { ArrowLeft, KeyRound, Mail } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const emailSchema = z.string().trim().email({ message: "Please enter a valid email" });
 const passwordSchema = z.string().min(6, { message: "Password must be at least 6 characters" });
 const usernameSchema = z.string().trim().min(3, { message: "Username must be at least 3 characters" }).max(50);
 
+const PROD_ORIGIN = "https://mumtazhealth.lovable.app";
+
+function getAuthRedirectBase() {
+  // Requirement: always use production URL for auth emails (avoid localhost).
+  return PROD_ORIGIN;
+}
+
 export default function Auth() {
+  usePageMeta({
+    title: "Sign in | Mumtaz Health",
+    description: "Sign in to Mumtaz Health to access your wellness tracker, daily practices, and insights.",
+    canonicalPath: "/auth",
+  });
+
   const [isLogin, setIsLogin] = useState(true);
   const [isResetPassword, setIsResetPassword] = useState(false);
   const [isAdminLogin, setIsAdminLogin] = useState(false);
@@ -33,14 +47,26 @@ export default function Auth() {
     try {
       // Validate inputs
       emailSchema.parse(email);
-      
+
+      const authBase = getAuthRedirectBase();
+
       if (isResetPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/reset-password`,
+          redirectTo: `${authBase}/reset-password`,
         });
-        
-        if (error) throw error;
-        toast.success("Password reset email sent! Check your inbox.");
+
+        if (error) {
+          // Required: log Supabase error from reset call
+          console.error("resetPasswordForEmail error", {
+            name: error.name,
+            status: error.status,
+            message: error.message,
+          });
+          throw error;
+        }
+
+        // Required: don't confirm whether email exists
+        toast.success("If this email exists, we’ve sent a reset link.");
         setIsResetPassword(false);
       } else if (isLogin) {
         // Special passwordless flow for admin email
@@ -48,27 +74,27 @@ export default function Auth() {
           const { error } = await supabase.auth.signInWithOtp({
             email,
             options: {
-              emailRedirectTo: `${window.location.origin}/`,
+              emailRedirectTo: `${authBase}/`,
             },
           });
-          
+
           if (error) throw error;
           toast.success("Magic link sent! Check your email to log in.");
         } else {
           passwordSchema.parse(password);
-          
+
           const { error, data } = await supabase.auth.signInWithPassword({
             email,
             password,
           });
-          
+
           if (error) {
             if (error.message.includes("Invalid login credentials")) {
               throw new Error("Invalid email or password");
             }
             throw error;
           }
-          
+
           if (data.user) {
             toast.success("Welcome back!");
             navigate("/");
@@ -77,7 +103,7 @@ export default function Auth() {
       } else {
         passwordSchema.parse(password);
         usernameSchema.parse(username);
-        
+
         const { error, data } = await supabase.auth.signUp({
           email,
           password,
@@ -85,23 +111,34 @@ export default function Auth() {
             data: {
               username,
             },
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${authBase}/auth`,
           },
         });
-        
+
         if (error) {
           if (error.message.includes("already registered")) {
             throw new Error("This email is already registered");
           }
           throw error;
         }
-        
+
         if (data.user) {
           toast.success("Account created! Welcome!");
           navigate("/");
         }
       }
     } catch (error) {
+      // Required: friendly reset error + ask to try again
+      if (isResetPassword) {
+        if (error instanceof z.ZodError) {
+          toast.error(error.errors[0].message);
+        } else {
+          console.error("Password reset request failed", error);
+          toast.error("We couldn’t send the reset link. Please try again in a moment.");
+        }
+        return;
+      }
+
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       } else if (error instanceof Error) {
@@ -121,14 +158,13 @@ export default function Auth() {
             {isResetPassword ? "Reset Password" : isAdminLogin ? "Admin Access" : isLogin ? "Welcome Back" : "Create Account"}
           </CardTitle>
           <CardDescription className="font-accent">
-            {isResetPassword 
+            {isResetPassword
               ? "Enter your email to receive a password reset link"
               : isAdminLogin
                 ? "Administrator login - access all user data and settings"
-                : isLogin 
-                  ? "Enter your credentials to access your wellness tracker" 
-                  : "Join us to start your holistic wellness journey"
-            }
+                : isLogin
+                  ? "Enter your credentials to access your wellness tracker"
+                  : "Join us to start your holistic wellness journey"}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleAuth}>
@@ -184,10 +220,7 @@ export default function Auth() {
                           disabled={loading}
                           className="border-mumtaz-lilac/50 data-[state=checked]:bg-mumtaz-lilac data-[state=checked]:border-mumtaz-lilac"
                         />
-                        <Label 
-                          htmlFor="rememberMe" 
-                          className="text-sm font-normal text-muted-foreground cursor-pointer"
-                        >
+                        <Label htmlFor="rememberMe" className="text-sm font-normal text-muted-foreground cursor-pointer">
                           Remember me
                         </Label>
                       </div>
@@ -206,49 +239,39 @@ export default function Auth() {
                 )}
               </div>
             )}
-            
+
             {isLogin && email.toLowerCase() === "mumtazhaque07@gmail.com" && (
               <div className="p-3 bg-wellness-sage/10 border border-wellness-sage/20 rounded-md">
-                <p className="text-sm text-wellness-sage">
-                  🔓 Passwordless admin access - a magic link will be sent to your email
-                </p>
+                <p className="text-sm text-wellness-sage">🔓 Passwordless admin access - a magic link will be sent to your email</p>
               </div>
             )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 pb-8">
-            <Button 
-              type="submit" 
-              className={`w-full h-12 text-base ${isAdminLogin ? 'bg-destructive hover:bg-destructive/90' : 'bg-wellness-taupe hover:bg-wellness-taupe/90'}`}
+            <Button
+              type="submit"
+              className={`w-full h-12 text-base ${isAdminLogin ? "bg-destructive hover:bg-destructive/90" : "bg-wellness-taupe hover:bg-wellness-taupe/90"}`}
               disabled={loading}
             >
               {loading ? "Please wait..." : isResetPassword ? "Send Reset Link" : isAdminLogin ? "Admin Sign In" : isLogin ? "Sign In" : "Sign Up"}
             </Button>
-            
+
             {!isResetPassword && (
               <>
                 {!isAdminLogin && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="w-full"
-                    onClick={() => setIsLogin(!isLogin)}
-                    disabled={loading}
-                  >
+                  <Button type="button" variant="ghost" className="w-full" onClick={() => setIsLogin(!isLogin)} disabled={loading}>
                     {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
                   </Button>
                 )}
-                
+
                 <div className="relative w-full">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-wellness-taupe/20" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">
-                      {isAdminLogin ? "or" : "admin"}
-                    </span>
+                    <span className="bg-card px-2 text-muted-foreground">{isAdminLogin ? "or" : "admin"}</span>
                   </div>
                 </div>
-                
+
                 <Button
                   type="button"
                   variant={isAdminLogin ? "outline" : "secondary"}
@@ -263,7 +286,7 @@ export default function Auth() {
                 </Button>
               </>
             )}
-            
+
             {isResetPassword && (
               <div className="space-y-4">
                 <div className="p-4 bg-mumtaz-lilac/10 border border-mumtaz-lilac/20 rounded-lg">
