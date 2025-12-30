@@ -6,12 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Heart, User, HelpCircle } from "lucide-react";
+import { ArrowLeft, Heart, HelpCircle, Settings as SettingsIcon } from "lucide-react";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { Navigation } from "@/components/Navigation";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
-
+import { AccountSettings } from "@/components/AccountSettings";
 const lifeStages = [
   { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling" },
   { value: "pregnancy", label: "Pregnancy", description: "Expecting a baby" },
@@ -186,6 +186,15 @@ export default function Settings() {
         <NotificationSettings />
         
         <DarkModeToggle />
+
+        {/* Account Settings Section */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <SettingsIcon className="w-5 h-5 text-primary" />
+            Account Settings
+          </h2>
+          <AccountSettings />
+        </div>
 
         {/* Tour Section */}
         <Card className="mt-6">
