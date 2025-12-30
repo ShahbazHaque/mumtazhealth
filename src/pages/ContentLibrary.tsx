@@ -8,8 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, TrendingUp, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell, Droplet, AlertTriangle, Search, X, Baby, Salad, Brain, Activity, ChevronDown } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Sparkles, Apple, Filter, CheckCircle2, Circle, Flame, Wind, Mountain, Flower2, Leaf, Calendar, Users, Lightbulb, Info, HelpCircle, Lock, Crown, Bell, Droplet, AlertTriangle, Search, X, Baby, Salad, Brain, Activity, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -1071,33 +1070,70 @@ const ContentLibrary = () => {
           </Card>
         </TooltipProvider>
 
-        {/* Progress Summary */}
+        {/* Your Personal Wellness Space */}
         {user && (
-          <Card className="mb-6 bg-gradient-to-r from-primary/10 to-secondary/10">
+          <Card className="mb-6 bg-gradient-to-br from-wellness-sage-light/50 via-background to-wellness-lilac-light/50 border-wellness-sage/20">
             <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-primary/20 rounded-full">
-                    <TrendingUp className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold">Your Wellness Journey</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {progressStats.completed} of {progressStats.total} items completed
-                    </p>
-                  </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 bg-wellness-sage/20 rounded-full">
+                  <Heart className="h-6 w-6 text-wellness-sage" />
                 </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-primary">
-                    {progressStats.total > 0 ? Math.round((progressStats.completed / progressStats.total) * 100) : 0}%
-                  </div>
-                  <p className="text-xs text-muted-foreground">Complete</p>
+                <div>
+                  <h3 className="text-lg font-semibold">Your Personal Wellness Space</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Here's what feels supportive today
+                  </p>
                 </div>
               </div>
-              <Progress 
-                value={progressStats.total > 0 ? (progressStats.completed / progressStats.total) * 100 : 0} 
-                className="h-2"
-              />
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Continue where you left off */}
+                <Button 
+                  variant="outline" 
+                  className="h-auto py-4 flex flex-col items-center gap-2 bg-background/60 hover:bg-background border-wellness-sage/30"
+                  onClick={() => {
+                    const lastActivity = localStorage.getItem('mumtaz_last_activity');
+                    if (lastActivity) {
+                      const activity = JSON.parse(lastActivity);
+                      navigate(activity.path);
+                    } else {
+                      toast.info("You might like to explore something new today");
+                    }
+                  }}
+                >
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  <span className="text-sm font-medium">Continue exploring</span>
+                </Button>
+                
+                {/* Go to favorites */}
+                <Button 
+                  variant="outline" 
+                  className="h-auto py-4 flex flex-col items-center gap-2 bg-background/60 hover:bg-background border-wellness-lilac/30"
+                  onClick={() => navigate('/content-library?filter=favorites')}
+                >
+                  <Heart className="h-5 w-5 text-wellness-lilac" />
+                  <span className="text-sm font-medium">Your saved practices</span>
+                </Button>
+                
+                {/* Browse the library */}
+                <Button 
+                  variant="outline" 
+                  className="h-auto py-4 flex flex-col items-center gap-2 bg-background/60 hover:bg-background border-primary/30"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSelectedCategory("all");
+                    setSelectedDosha("all");
+                    setSelectedLifePhase("all");
+                    setSelectedMobility("all");
+                    setSelectedConcern("all");
+                    setSelectedCompletion("all");
+                    setActiveQuickFilters(new Set());
+                  }}
+                >
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  <span className="text-sm font-medium">Browse the library</span>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
