@@ -1707,6 +1707,12 @@ export default function Onboarding() {
         icon: <Armchair className="h-5 w-5 text-primary" />,
       },
       {
+        value: "confidence",
+        label: "Ready to build confidence",
+        description: "Gentle, supportive movements to help you feel safe, capable, and more confident in your body",
+        icon: <Heart className="h-5 w-5 text-primary" />,
+      },
+      {
         value: "recommend",
         label: "I'm not sure — recommend for me",
         description: "We'll suggest movements based on your dosha profile",
