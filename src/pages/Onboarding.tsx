@@ -1441,17 +1441,44 @@ export default function Onboarding() {
   }
 
   if (step === "pregnancy") {
+    // Check if user previously selected a menopause-related life stage
+    const isMenopauseLifeStage = lifeStage === "perimenopause" || lifeStage === "menopause" || lifeStage === "post_menopause";
+    
+    // Handler to update life stage when menopause option is selected
+    const handleJourneyStageChange = (value: string) => {
+      setPregnancyStatus(value);
+      // If selecting a menopause option, also update life stage
+      if (value === "perimenopause" || value === "menopause" || value === "post_menopause") {
+        setLifeStage(value);
+      }
+    };
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
         <TooltipProvider>
           <Card className="w-full max-w-2xl">
             <CardHeader>
               <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Journey Stage</CardTitle>
-              <CardDescription>Where are you in your wellness journey? Hover for details</CardDescription>
+              <CardDescription className="space-y-2">
+                <span className="block">Your body may be changing — choose what feels most accurate right now.</span>
+                <span className="block text-xs text-wellness-sage">You can always update this later in Settings as your journey evolves.</span>
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-              <RadioGroup value={pregnancyStatus} onValueChange={setPregnancyStatus}>
+              
+              {/* Reassuring message if user selected something different earlier */}
+              {lifeStage && !isMenopauseLifeStage && (
+                <div className="p-3 rounded-lg bg-wellness-lilac/10 border border-wellness-lilac/20">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">Earlier you selected: </span>
+                    {lifeStage.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}. 
+                    <span className="block mt-1">That's perfectly fine — many women's journeys include multiple phases. Feel free to adjust if your situation has changed or if you'd like more specific support.</span>
+                  </p>
+                </div>
+              )}
+
+              <RadioGroup value={pregnancyStatus} onValueChange={handleJourneyStageChange}>
                 <div className="space-y-3">
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -1537,6 +1564,81 @@ export default function Onboarding() {
                         <li>Emotional wellness during the "fourth trimester"</li>
                         <li>Navigate hormonal shifts, breastfeeding, and sleep deprivation</li>
                         <li>Expect: restorative practices, pelvic floor care, and self-compassion</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  {/* Menopause Section Divider */}
+                  <div className="pt-4 pb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 h-px bg-border" />
+                      <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Menopause Journey</span>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+                  </div>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-wellness-lilac transition-colors cursor-help bg-wellness-lilac/5">
+                        <RadioGroupItem value="perimenopause" id="perimenopause" />
+                        <Label htmlFor="perimenopause" className="flex-1 cursor-pointer flex items-center gap-2">
+                          Perimenopause
+                          <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                        </Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm p-4">
+                      <p className="font-semibold mb-2">Perimenopause Support:</p>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Navigate the transition years before menopause</li>
+                        <li>Support for irregular cycles and hormonal fluctuations</li>
+                        <li>Practices for managing hot flashes, sleep changes, and mood shifts</li>
+                        <li>Nutrition and lifestyle adjustments for this phase</li>
+                        <li>Expect: gentle guidance through the changes your body is experiencing</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-wellness-lilac transition-colors cursor-help bg-wellness-lilac/5">
+                        <RadioGroupItem value="menopause" id="menopause" />
+                        <Label htmlFor="menopause" className="flex-1 cursor-pointer flex items-center gap-2">
+                          Menopause
+                          <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                        </Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm p-4">
+                      <p className="font-semibold mb-2">Menopause Support:</p>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Embrace this powerful transition with confidence</li>
+                        <li>Practices for bone health, metabolism, and vitality</li>
+                        <li>Support for managing symptoms like hot flashes and sleep disruption</li>
+                        <li>Emotional and spiritual support for this life stage</li>
+                        <li>Expect: practices that honour and support your changing body</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-wellness-lilac transition-colors cursor-help bg-wellness-lilac/5">
+                        <RadioGroupItem value="post_menopause" id="post_menopause" />
+                        <Label htmlFor="post_menopause" className="flex-1 cursor-pointer flex items-center gap-2">
+                          Post-menopause / Beyond menopause
+                          <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                        </Label>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm p-4">
+                      <p className="font-semibold mb-2">Post-Menopause Wellness:</p>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Thriving in your post-menopause years</li>
+                        <li>Focus on bone density, heart health, and cognitive wellness</li>
+                        <li>Gentle movement practices for strength and flexibility</li>
+                        <li>Nutrition for long-term vitality and energy</li>
+                        <li>Expect: empowering practices for this wisdom-filled chapter of life</li>
                       </ul>
                     </TooltipContent>
                   </Tooltip>
