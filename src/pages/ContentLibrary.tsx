@@ -730,12 +730,13 @@ const ContentLibrary = () => {
           <div className="flex items-start justify-between gap-2">
             <CardTitle className="text-base line-clamp-2">{item.title}</CardTitle>
             <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 flex-shrink-0"
-              onClick={() => toggleSaveContent(item.id)}
+              variant={savedContentIds.has(item.id) ? "default" : "outline"}
+              size="sm"
+              className={`flex-shrink-0 text-xs ${savedContentIds.has(item.id) ? 'bg-primary/90 hover:bg-primary' : ''}`}
+              onClick={(e) => { e.stopPropagation(); toggleSaveContent(item.id); }}
             >
-              <Heart className={`h-4 w-4 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`} />
+              <Heart className={`h-3.5 w-3.5 mr-1.5 ${savedContentIds.has(item.id) ? 'fill-white' : ''}`} />
+              {savedContentIds.has(item.id) ? 'Saved ✓' : 'Save'}
             </Button>
           </div>
           <CardDescription className="line-clamp-2 text-sm">
@@ -1286,17 +1287,18 @@ const ContentLibrary = () => {
                           )}
                           {/* Favorite button on recommendation card */}
                           <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-1 right-1 h-7 w-7 bg-background/80 hover:bg-background"
+                            variant={savedContentIds.has(item.id) ? "default" : "outline"}
+                            size="sm"
+                            className={`absolute top-1 right-1 h-7 text-xs px-2 bg-background/90 hover:bg-background border-border/50 ${savedContentIds.has(item.id) ? 'bg-primary/90 hover:bg-primary text-white border-0' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleSaveContent(item.id);
                             }}
                           >
                             <Heart 
-                              className={`h-4 w-4 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
+                              className={`h-3 w-3 mr-1 ${savedContentIds.has(item.id) ? 'fill-white' : ''}`}
                             />
+                            {savedContentIds.has(item.id) ? '✓' : 'Save'}
                           </Button>
                         </div>
                         <div className="p-2.5 space-y-1">
@@ -1624,13 +1626,13 @@ const ContentLibrary = () => {
                         </Badge>
                       )}
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => toggleSaveContent(item.id)}
+                        variant={savedContentIds.has(item.id) ? "default" : "outline"}
+                        size="sm"
+                        className={`text-xs ${savedContentIds.has(item.id) ? 'bg-primary/90 hover:bg-primary' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); toggleSaveContent(item.id); }}
                       >
-                        <Heart 
-                          className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
-                        />
+                        <Heart className={`h-3.5 w-3.5 mr-1.5 ${savedContentIds.has(item.id) ? 'fill-white' : ''}`} />
+                        {savedContentIds.has(item.id) ? 'Saved ✓' : 'Save'}
                       </Button>
                     </div>
                   </div>
@@ -1849,11 +1851,13 @@ const ContentLibrary = () => {
                               </Badge>
                             )}
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => toggleSaveContent(item.id)}
+                              variant="default"
+                              size="sm"
+                              className="bg-primary/90 hover:bg-primary text-xs"
+                              onClick={(e) => { e.stopPropagation(); toggleSaveContent(item.id); }}
                             >
-                              <Heart className="h-5 w-5 fill-primary text-primary" />
+                              <Heart className="h-3.5 w-3.5 mr-1.5 fill-white" />
+                              Saved ✓
                             </Button>
                           </div>
                         </div>
@@ -2005,14 +2009,13 @@ const ContentLibrary = () => {
                               </Badge>
                             )}
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => toggleSaveContent(item.id)}
-                              className="h-10 w-10"
+                              variant={savedContentIds.has(item.id) ? "default" : "outline"}
+                              size="sm"
+                              className={`text-xs ${savedContentIds.has(item.id) ? 'bg-primary/90 hover:bg-primary' : ''}`}
+                              onClick={(e) => { e.stopPropagation(); toggleSaveContent(item.id); }}
                             >
-                              <Heart 
-                                className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
-                              />
+                              <Heart className={`h-3.5 w-3.5 mr-1.5 ${savedContentIds.has(item.id) ? 'fill-white' : ''}`} />
+                              {savedContentIds.has(item.id) ? 'Saved ✓' : 'Save'}
                             </Button>
                           </div>
                         </div>
@@ -2315,14 +2318,13 @@ const ContentLibrary = () => {
                               </Badge>
                             )}
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => toggleSaveContent(item.id)}
-                              className="h-10 w-10"
+                              variant={savedContentIds.has(item.id) ? "default" : "outline"}
+                              size="sm"
+                              className={`text-xs ${savedContentIds.has(item.id) ? 'bg-primary/90 hover:bg-primary' : ''}`}
+                              onClick={(e) => { e.stopPropagation(); toggleSaveContent(item.id); }}
                             >
-                              <Heart 
-                                className={`h-5 w-5 ${savedContentIds.has(item.id) ? 'fill-primary text-primary' : ''}`}
-                              />
+                              <Heart className={`h-3.5 w-3.5 mr-1.5 ${savedContentIds.has(item.id) ? 'fill-white' : ''}`} />
+                              {savedContentIds.has(item.id) ? 'Saved ✓' : 'Save'}
                             </Button>
                           </div>
                         </div>
@@ -2593,14 +2595,13 @@ const ContentLibrary = () => {
                         </Badge>
                       )}
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9"
+                        variant={savedContentIds.has(selectedContent.id) ? "default" : "outline"}
+                        size="sm"
+                        className={`text-xs ${savedContentIds.has(selectedContent.id) ? 'bg-primary/90 hover:bg-primary' : ''}`}
                         onClick={() => toggleSaveContent(selectedContent.id)}
                       >
-                        <Heart 
-                          className={`h-5 w-5 ${savedContentIds.has(selectedContent.id) ? 'fill-primary text-primary' : ''}`}
-                        />
+                        <Heart className={`h-3.5 w-3.5 mr-1.5 ${savedContentIds.has(selectedContent.id) ? 'fill-white' : ''}`} />
+                        {savedContentIds.has(selectedContent.id) ? 'Saved ✓' : 'Save'}
                       </Button>
                     </div>
                   </div>

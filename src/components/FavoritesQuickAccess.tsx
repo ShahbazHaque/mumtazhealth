@@ -122,19 +122,21 @@ export function FavoritesQuickAccess() {
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : favorites.length === 0 ? (
-            <div className="text-center py-12">
-              <Heart className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-              <p className="text-muted-foreground">No favorites yet</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Save content from the library to access it here
+            <div className="text-center py-12 px-4">
+              <div className="w-16 h-16 rounded-full bg-pink-50 dark:bg-pink-950/30 flex items-center justify-center mx-auto mb-4">
+                <Heart className="h-8 w-8 text-pink-300" />
+              </div>
+              <h3 className="text-lg font-medium text-foreground mb-2">Your saved practices will appear here</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
+                When you find content that speaks to you, tap "Save" to keep it close. This is your personal collection — no rush, just what feels right.
               </p>
               <Button 
                 variant="outline" 
-                className="mt-4"
+                className="mt-6"
                 onClick={() => { setIsOpen(false); navigate("/content-library"); }}
               >
                 <BookOpen className="h-4 w-4 mr-2" />
-                Browse Content
+                Browse the Library
               </Button>
             </div>
           ) : (

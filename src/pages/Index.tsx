@@ -297,10 +297,10 @@ const Index = () => {
             {/* Card 4: My saved practices */}
             <Card 
               className="bg-gradient-to-br from-mumtaz-lilac/10 to-mumtaz-lilac/5 border-mumtaz-lilac/20 hover:shadow-lg hover:border-mumtaz-lilac/40 transition-all cursor-pointer group active:scale-[0.98]"
-              onClick={() => navigate("/my-daily-practice")}
+              onClick={() => navigate("/content-library?filter=favorites")}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && navigate("/my-daily-practice")}
+              onKeyDown={(e) => e.key === 'Enter' && navigate("/content-library?filter=favorites")}
             >
               <CardContent className="pt-6 pb-6">
                 <div className="flex items-start gap-4">
