@@ -16,6 +16,7 @@ import { PoseOfTheDay } from "@/components/PoseOfTheDay";
 import { ReturningUserWelcome } from "@/components/ReturningUserWelcome";
 import { FavoritesQuickAccess } from "@/components/FavoritesQuickAccess";
 import { RecentlyViewed } from "@/components/RecentlyViewed";
+import { ConfidenceJourney } from "@/components/ConfidenceJourney";
 
 interface UserProfile {
   username: string;
@@ -318,6 +319,11 @@ const Index = () => {
           {/* Quick Check-In */}
           <div className="max-w-5xl mx-auto">
             <QuickCheckIn username={userProfile?.username} />
+          </div>
+
+          {/* Confidence Journey - for users building confidence */}
+          <div className="max-w-5xl mx-auto">
+            <ConfidenceJourney />
           </div>
 
           {/* Pose of the Day */}
