@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,6 +31,9 @@ interface Conversation {
   preview: string;
 }
 
+// Auth-related routes where chatbot should be hidden
+const AUTH_ROUTES = ['/auth', '/reset-password'];
+
 export function MumtazWisdomGuide() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -41,13 +45,21 @@ export function MumtazWisdomGuide() {
   const [activeTab, setActiveTab] = useState<"chat" | "history">("chat");
   const scrollRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const location = useLocation();
+
+  // Check if we're on an auth page - don't render chatbot there
+  const isAuthPage = AUTH_ROUTES.includes(location.pathname);
+
+  // Don't render on auth pages to avoid interference with CTAs
+  if (isAuthPage) {
+    return null;
+  }
 
   useEffect(() => {
     if (open) {
       fetchUserProfile();
       loadConversations();
       if (!conversationId) {
-        // Start a new conversation
         setConversationId(crypto.randomUUID());
       }
     }
@@ -55,7 +67,6 @@ export function MumtazWisdomGuide() {
 
   useEffect(() => {
     if (open && messages.length === 0 && userProfile) {
-      // Add initial greeting with user's name
       const greeting = {
         role: "assistant" as const,
         content: `Hi ${userProfile.username}, how can I support you today?`,
@@ -65,7 +76,6 @@ export function MumtazWisdomGuide() {
   }, [open, userProfile]);
 
   useEffect(() => {
-    // Scroll to bottom when messages update
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
@@ -113,7 +123,6 @@ export function MumtazWisdomGuide() {
 
       if (error) throw error;
 
-      // Group by conversation_id and get the first message as preview
       const conversationMap = new Map<string, Conversation>();
       data?.forEach((msg) => {
         if (!conversationMap.has(msg.conversation_id)) {
@@ -227,7 +236,6 @@ export function MumtazWisdomGuide() {
     setInput("");
     setLoading(true);
 
-    // Save user message
     await saveMessage(userMessage);
 
     try {
@@ -258,10 +266,7 @@ export function MumtazWisdomGuide() {
       };
       setMessages((prev) => [...prev, assistantMessage]);
       
-      // Save assistant message
       await saveMessage(assistantMessage);
-      
-      // Reload conversations list to show new conversation
       await loadConversations();
     } catch (error: any) {
       console.error("Error:", error);
@@ -289,12 +294,14 @@ export function MumtazWisdomGuide() {
           <Button
             size="icon"
             className="fixed bottom-24 right-4 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-110 transition-all duration-300 z-40 animate-fade-in"
+            aria-label="Ask Mumtaz a question"
           >
             <MessageCircle className="h-6 w-6 text-white" />
           </Button>
         ) : (
           <Button
             className="fixed bottom-24 right-6 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-105 transition-all duration-300 pl-6 pr-5 py-6 gap-2 z-40 animate-fade-in"
+            aria-label="Ask Mumtaz a question"
           >
             <Sparkles className="h-5 w-5 text-white" />
             <span className="text-white font-medium text-sm">Ask me a question</span>

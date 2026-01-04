@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "sonner";
 import { z } from "zod";
 import { Logo } from "@/components/Logo";
-import { ArrowLeft, KeyRound, Mail, RefreshCw } from "lucide-react";
+import { ArrowLeft, KeyRound, Mail, RefreshCw, Eye, EyeOff, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
@@ -20,8 +20,12 @@ const PROD_ORIGIN = "https://mumtazhealth.lovable.app";
 const RESEND_COOLDOWN_SECONDS = 60;
 
 function getAuthRedirectBase() {
-  // Requirement: always use production URL for auth emails (avoid localhost).
   return PROD_ORIGIN;
+}
+
+interface FieldError {
+  field: string;
+  message: string;
 }
 
 export default function Auth() {
@@ -41,6 +45,9 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldError[]>([]);
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
   // Cooldown timer effect
@@ -51,6 +58,92 @@ export default function Auth() {
     }, 1000);
     return () => clearInterval(timer);
   }, [resendCooldown]);
+
+  // Validate individual field
+  const validateField = (field: string, value: string): string | null => {
+    try {
+      switch (field) {
+        case 'email':
+          emailSchema.parse(value);
+          break;
+        case 'password':
+          passwordSchema.parse(value);
+          break;
+        case 'username':
+          usernameSchema.parse(value);
+          break;
+      }
+      return null;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return error.errors[0]?.message || "Please check this field";
+      }
+      return "Please check this field";
+    }
+  };
+
+  const getFieldError = (field: string): string | undefined => {
+    return fieldErrors.find(e => e.field === field)?.message;
+  };
+
+  const handleFieldBlur = (field: string, value: string) => {
+    if (!value.trim()) return; // Don't validate empty fields on blur
+    setTouchedFields(prev => new Set(prev).add(field));
+    const error = validateField(field, value);
+    
+    setFieldErrors(prev => {
+      const filtered = prev.filter(e => e.field !== field);
+      if (error) {
+        return [...filtered, { field, message: error }];
+      }
+      return filtered;
+    });
+  };
+
+  const handleFieldChange = (field: string, value: string, setter: (v: string) => void) => {
+    setter(value);
+    // Clear error when user starts typing again
+    if (touchedFields.has(field) && value.length > 0) {
+      const error = validateField(field, value);
+      setFieldErrors(prev => {
+        const filtered = prev.filter(e => e.field !== field);
+        if (error) {
+          return [...filtered, { field, message: error }];
+        }
+        return filtered;
+      });
+    }
+  };
+
+  // Check if form is valid for submit button
+  const isFormValid = (): boolean => {
+    if (isResetPassword) {
+      return email.trim().length > 0 && !validateField('email', email);
+    }
+    
+    if (isLogin) {
+      // Admin passwordless login
+      if (email.toLowerCase() === "mumtazhaque07@gmail.com") {
+        return email.trim().length > 0 && !validateField('email', email);
+      }
+      return email.trim().length > 0 && 
+             password.length > 0 && 
+             !validateField('email', email) && 
+             !validateField('password', password);
+    }
+    
+    // Sign up - all fields required
+    return email.trim().length > 0 && 
+           password.length > 0 && 
+           username.trim().length > 0 &&
+           !validateField('email', email) && 
+           !validateField('password', password) && 
+           !validateField('username', username);
+  };
+
+  const isFieldValid = (field: string, value: string): boolean => {
+    return value.trim().length > 0 && !validateField(field, value);
+  };
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -65,7 +158,7 @@ export default function Auth() {
       if (error) throw error;
     } catch (error) {
       console.error("Google sign-in error:", error);
-      toast.error("Failed to sign in with Google. Please try again.");
+      toast.error("Unable to sign in with Google. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -94,7 +187,7 @@ export default function Auth() {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       } else {
-        toast.error("Failed to resend. Please try again.");
+        toast.error("Unable to resend. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -103,12 +196,34 @@ export default function Auth() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Mark all fields as touched for validation display
+    setTouchedFields(new Set(['email', 'password', 'username']));
+    
+    // Validate all required fields
+    const errors: FieldError[] = [];
+    
+    const emailError = validateField('email', email);
+    if (emailError) errors.push({ field: 'email', message: emailError });
+    
+    if (!isResetPassword && email.toLowerCase() !== "mumtazhaque07@gmail.com") {
+      const passwordError = validateField('password', password);
+      if (passwordError) errors.push({ field: 'password', message: passwordError });
+    }
+    
+    if (!isLogin && !isResetPassword) {
+      const usernameError = validateField('username', username);
+      if (usernameError) errors.push({ field: 'username', message: usernameError });
+    }
+
+    if (errors.length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      // Validate inputs
-      emailSchema.parse(email);
-
       const authBase = getAuthRedirectBase();
 
       if (isResetPassword) {
@@ -117,21 +232,14 @@ export default function Auth() {
         });
 
         if (error) {
-          // Required: log Supabase error from reset call
-          console.error("resetPasswordForEmail error", {
-            name: error.name,
-            status: error.status,
-            message: error.message,
-          });
+          console.error("resetPasswordForEmail error", error);
           throw error;
         }
 
-        // Required: don't confirm whether email exists
-        toast.success("If this email exists, we’ve sent a reset link.");
+        toast.success("If this email exists, we've sent a reset link.");
         setResetEmailSent(true);
         setResendCooldown(RESEND_COOLDOWN_SECONDS);
       } else if (isLogin) {
-        // Special passwordless flow for admin email
         if (email.toLowerCase() === "mumtazhaque07@gmail.com") {
           const { error } = await supabase.auth.signInWithOtp({
             email,
@@ -143,8 +251,6 @@ export default function Auth() {
           if (error) throw error;
           toast.success("Magic link sent! Check your email to log in.");
         } else {
-          passwordSchema.parse(password);
-
           const { error, data } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -152,7 +258,7 @@ export default function Auth() {
 
           if (error) {
             if (error.message.includes("Invalid login credentials")) {
-              throw new Error("Invalid email or password");
+              throw new Error("The email or password doesn't seem right. Please try again.");
             }
             throw error;
           }
@@ -163,9 +269,6 @@ export default function Auth() {
           }
         }
       } else {
-        passwordSchema.parse(password);
-        usernameSchema.parse(username);
-
         const { error, data } = await supabase.auth.signUp({
           email,
           password,
@@ -179,24 +282,22 @@ export default function Auth() {
 
         if (error) {
           if (error.message.includes("already registered")) {
-            throw new Error("This email is already registered");
+            throw new Error("This email is already registered. Try signing in instead.");
           }
           throw error;
         }
 
         if (data.user) {
-          toast.success("Account created! Welcome!");
+          toast.success("Account created! Welcome to Mumtaz Health.");
           navigate("/");
         }
       }
     } catch (error) {
-      // Required: friendly reset error + ask to try again
       if (isResetPassword) {
         if (error instanceof z.ZodError) {
           toast.error(error.errors[0].message);
         } else {
-          console.error("Password reset request failed", error);
-          toast.error("We couldn’t send the reset link. Please try again in a moment.");
+          toast.error("We couldn't send the reset link. Please try again.");
         }
         return;
       }
@@ -211,68 +312,176 @@ export default function Auth() {
     }
   };
 
+  const resetForm = () => {
+    setFieldErrors([]);
+    setTouchedFields(new Set());
+  };
+
+  const getButtonLabel = () => {
+    if (isResetPassword) return "Send Reset Link";
+    if (isAdminLogin) return "Admin Sign In";
+    return isLogin ? "Sign In" : "Create Account";
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 pb-32">
+    <div className="min-h-screen flex items-start sm:items-center justify-center bg-background px-4 pt-6 pb-40 sm:py-8">
       <Card className="w-full max-w-md border-mumtaz-lilac/20 shadow-xl">
-        <CardHeader className="space-y-4 text-center pt-8">
+        <CardHeader className="space-y-4 text-center pt-6 sm:pt-8">
           <Logo size="md" className="mx-auto" />
-          <CardTitle className="text-3xl font-bold text-mumtaz-plum">
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-mumtaz-plum">
             {isResetPassword ? "Reset Password" : isAdminLogin ? "Admin Access" : isLogin ? "Welcome Back" : "Create Account"}
           </CardTitle>
-          <CardDescription className="font-accent">
+          <CardDescription className="font-accent text-sm sm:text-base">
             {isResetPassword
               ? "Enter your email to receive a password reset link"
               : isAdminLogin
-                ? "Administrator login - access all user data and settings"
+                ? "Administrator login"
                 : isLogin
                   ? "Enter your credentials to access your wellness tracker"
                   : "Join us to start your holistic wellness journey"}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleAuth}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 px-4 sm:px-6">
+            {/* Username field - only for signup */}
             {!isLogin && !isResetPassword && (
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Choose a unique username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required={!isLogin}
-                  disabled={loading}
-                />
+                <Label htmlFor="username" className="text-sm font-medium">
+                  Username
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="Choose a username"
+                    value={username}
+                    onChange={(e) => handleFieldChange('username', e.target.value, setUsername)}
+                    onBlur={() => handleFieldBlur('username', username)}
+                    required={!isLogin}
+                    disabled={loading}
+                    className={`h-12 text-base pr-10 ${
+                      touchedFields.has('username') && getFieldError('username') 
+                        ? 'border-destructive focus-visible:ring-destructive' 
+                        : touchedFields.has('username') && isFieldValid('username', username)
+                        ? 'border-green-500 focus-visible:ring-green-500'
+                        : ''
+                    }`}
+                    autoComplete="username"
+                  />
+                  {touchedFields.has('username') && username && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      {getFieldError('username') ? (
+                        <AlertCircle className="h-5 w-5 text-destructive" />
+                      ) : (
+                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                      )}
+                    </span>
+                  )}
+                </div>
+                {touchedFields.has('username') && getFieldError('username') && (
+                  <p className="text-sm text-destructive flex items-center gap-1.5 mt-1">
+                    {getFieldError('username')}
+                  </p>
+                )}
               </div>
             )}
+
+            {/* Email field */}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-            {!isResetPassword && email.toLowerCase() !== "mumtazhaque07@gmail.com" && (
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+              <Label htmlFor="email" className="text-sm font-medium">
+                Email
+              </Label>
+              <div className="relative">
                 <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => handleFieldChange('email', e.target.value, setEmail)}
+                  onBlur={() => handleFieldBlur('email', email)}
                   required
                   disabled={loading}
-                  className="h-12"
+                  className={`h-12 text-base pr-10 ${
+                    touchedFields.has('email') && getFieldError('email') 
+                      ? 'border-destructive focus-visible:ring-destructive' 
+                      : touchedFields.has('email') && isFieldValid('email', email)
+                      ? 'border-green-500 focus-visible:ring-green-500'
+                      : ''
+                  }`}
+                  autoComplete="email"
                 />
-                {/* Remember Me & Forgot Password - below password field */}
+                {touchedFields.has('email') && email && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    {getFieldError('email') ? (
+                      <AlertCircle className="h-5 w-5 text-destructive" />
+                    ) : (
+                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    )}
+                  </span>
+                )}
+              </div>
+              {touchedFields.has('email') && getFieldError('email') && (
+                <p className="text-sm text-destructive flex items-center gap-1.5 mt-1">
+                  {getFieldError('email')}
+                </p>
+              )}
+            </div>
+
+            {/* Password field */}
+            {!isResetPassword && email.toLowerCase() !== "mumtazhaque07@gmail.com" && (
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder={isLogin ? "Enter your password" : "Create a password (6+ characters)"}
+                    value={password}
+                    onChange={(e) => handleFieldChange('password', e.target.value, setPassword)}
+                    onBlur={() => handleFieldBlur('password', password)}
+                    required
+                    disabled={loading}
+                    className={`h-12 text-base pr-20 ${
+                      touchedFields.has('password') && getFieldError('password') 
+                        ? 'border-destructive focus-visible:ring-destructive' 
+                        : touchedFields.has('password') && isFieldValid('password', password)
+                        ? 'border-green-500 focus-visible:ring-green-500'
+                        : ''
+                    }`}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    {touchedFields.has('password') && password && (
+                      <span className="pointer-events-none">
+                        {getFieldError('password') ? (
+                          <AlertCircle className="h-5 w-5 text-destructive" />
+                        ) : (
+                          <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        )}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded focus:outline-none focus:ring-2 focus:ring-ring"
+                      tabIndex={-1}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                </div>
+                {touchedFields.has('password') && getFieldError('password') && (
+                  <p className="text-sm text-destructive flex items-center gap-1.5 mt-1">
+                    {getFieldError('password')}
+                  </p>
+                )}
+                
+                {/* Remember Me & Forgot Password - for login only */}
                 {isLogin && !isAdminLogin && (
-                  <div className="pt-2 space-y-2">
+                  <div className="pt-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Checkbox
@@ -290,7 +499,10 @@ export default function Auth() {
                         type="button"
                         variant="link"
                         className="h-auto p-0 text-sm text-mumtaz-lilac hover:text-mumtaz-plum font-medium"
-                        onClick={() => setIsResetPassword(true)}
+                        onClick={() => {
+                          setIsResetPassword(true);
+                          resetForm();
+                        }}
                         disabled={loading}
                       >
                         <KeyRound className="w-3.5 h-3.5 mr-1" />
@@ -304,19 +516,34 @@ export default function Auth() {
 
             {isLogin && email.toLowerCase() === "mumtazhaque07@gmail.com" && (
               <div className="p-3 bg-wellness-sage/10 border border-wellness-sage/20 rounded-md">
-                <p className="text-sm text-wellness-sage">🔓 Passwordless admin access - a magic link will be sent to your email</p>
+                <p className="text-sm text-wellness-sage">🔓 Passwordless access - a magic link will be sent to your email</p>
               </div>
             )}
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4 pb-8">
-            <Button
-              type="submit"
-              className={`w-full h-12 text-base ${isAdminLogin ? "bg-destructive hover:bg-destructive/90" : "bg-wellness-taupe hover:bg-wellness-taupe/90"}`}
-              disabled={loading}
-            >
-              {loading ? "Please wait..." : isResetPassword ? "Send Reset Link" : isAdminLogin ? "Admin Sign In" : isLogin ? "Sign In" : "Sign Up"}
-            </Button>
 
+            {/* Primary CTA Button - prominently placed */}
+            <div className="pt-2">
+              <Button
+                type="submit"
+                className={`w-full h-14 text-base font-semibold transition-all duration-200 ${
+                  isAdminLogin 
+                    ? "bg-destructive hover:bg-destructive/90" 
+                    : "bg-mumtaz-lilac hover:bg-mumtaz-lilac/90 hover:shadow-md"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                disabled={loading || !isFormValid()}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Please wait...
+                  </>
+                ) : (
+                  getButtonLabel()
+                )}
+              </Button>
+            </div>
+          </CardContent>
+          
+          <CardFooter className="flex flex-col space-y-4 px-4 sm:px-6 pb-6 sm:pb-8">
             {!isResetPassword && (
               <>
                 {/* Google Sign In */}
@@ -362,7 +589,16 @@ export default function Auth() {
                 )}
 
                 {!isAdminLogin && (
-                  <Button type="button" variant="ghost" className="w-full" onClick={() => setIsLogin(!isLogin)} disabled={loading}>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    className="w-full h-11" 
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      resetForm();
+                    }} 
+                    disabled={loading}
+                  >
                     {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
                   </Button>
                 )}
@@ -379,10 +615,11 @@ export default function Auth() {
                 <Button
                   type="button"
                   variant={isAdminLogin ? "outline" : "secondary"}
-                  className="w-full"
+                  className="w-full h-10"
                   onClick={() => {
                     setIsAdminLogin(!isAdminLogin);
                     setIsLogin(true);
+                    resetForm();
                   }}
                   disabled={loading}
                 >
@@ -392,7 +629,7 @@ export default function Auth() {
             )}
 
             {isResetPassword && (
-              <div className="space-y-4">
+              <div className="space-y-4 w-full">
                 <div className="p-4 bg-mumtaz-lilac/10 border border-mumtaz-lilac/20 rounded-lg">
                   <div className="flex items-start gap-3">
                     <Mail className="w-5 h-5 text-mumtaz-lilac mt-0.5 flex-shrink-0" />
@@ -426,6 +663,7 @@ export default function Auth() {
                   onClick={() => {
                     setIsResetPassword(false);
                     setResetEmailSent(false);
+                    resetForm();
                   }}
                   disabled={loading}
                 >
