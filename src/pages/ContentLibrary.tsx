@@ -102,6 +102,7 @@ const movementToTagsMap: Record<string, string[]> = {
   stretchy: ["stretchy", "fluid", "flow", "vinyasa", "flexibility", "opening", "yin"],
   strong: ["strong", "energising", "dynamic", "power", "strength", "active", "challenging"],
   seated: ["chair-yoga", "seated", "senior-friendly", "accessible", "bed-yoga", "mobility"],
+  confidence: ["beginner", "gentle", "grounding", "chair-yoga", "restorative", "accessible", "calming", "slow", "confidence", "rehabilitation", "recovery"],
   recommend: [], // Will be handled based on dosha
 };
 
@@ -153,6 +154,7 @@ const ContentLibrary = () => {
     { id: "chair", label: "Chair-based", tags: ["chair-yoga", "seated", "accessible"], icon: "🪑" },
     { id: "relaxing", label: "Relaxing", tags: ["restorative", "calming", "relaxation"], icon: "🧘" },
     { id: "energising", label: "Energising", tags: ["energising", "dynamic", "active"], icon: "✨" },
+    { id: "confidence", label: "Confidence-building", tags: ["beginner", "gentle", "grounding", "confidence", "rehabilitation", "recovery"], icon: "💪" },
   ];
 
   const toggleQuickFilter = (filterId: string) => {
@@ -228,6 +230,21 @@ const ContentLibrary = () => {
           reasons.push('Energising');
         } else if (userMovementPreference === 'seated') {
           reasons.push('Accessible & seated');
+        } else if (userMovementPreference === 'confidence') {
+          reasons.push('Confidence-building');
+        }
+      }
+      
+      // Extra boost for confidence preference: prioritize short sessions and beginner content
+      if (userMovementPreference === 'confidence') {
+        if (item.difficulty_level === 'beginner' || item.difficulty_level === 'gentle') {
+          matchScore += 3;
+        }
+        if (item.duration_minutes && item.duration_minutes <= 15) {
+          matchScore += 2; // Prefer short, achievable sessions
+        }
+        if (item.tags?.some(tag => ['grounding', 'confidence', 'calming', 'rehabilitation', 'recovery'].includes(tag.toLowerCase()))) {
+          matchScore += 2;
         }
       }
       
