@@ -17,6 +17,7 @@ import { ReturningUserWelcome } from "@/components/ReturningUserWelcome";
 import { FavoritesQuickAccess } from "@/components/FavoritesQuickAccess";
 import { RecentlyViewed } from "@/components/RecentlyViewed";
 import { ConfidenceJourney } from "@/components/ConfidenceJourney";
+import { ConfidenceMilestones } from "@/components/ConfidenceMilestones";
 
 interface UserProfile {
   username: string;
@@ -324,6 +325,11 @@ const Index = () => {
           {/* Confidence Journey - for users building confidence */}
           <div className="max-w-5xl mx-auto">
             <ConfidenceJourney />
+          </div>
+
+          {/* Confidence Milestones - weekly progress */}
+          <div className="max-w-5xl mx-auto">
+            <ConfidenceMilestones />
           </div>
 
           {/* Pose of the Day */}
