@@ -1,14 +1,14 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Sprout, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Flame, Trophy, Award, Download, Users, Flower2, Activity, Clock } from "lucide-react";
+import { Heart, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Download, Users, Flower2, Activity, Clock, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { format, subDays, parseISO, differenceInCalendarDays } from "date-fns";
+import { format } from "date-fns";
 import founderPortrait from "@/assets/founder-portrait.jpeg";
 import { Logo } from "@/components/Logo";
-import { Navigation } from "@/components/Navigation";
+import { HomeNavigation } from "@/components/HomeNavigation";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { QuickCheckIn } from "@/components/QuickCheckIn";
 import { PersonalizedRecommendations } from "@/components/PersonalizedRecommendations";
@@ -50,19 +50,9 @@ const Index = () => {
   const [recentEntries, setRecentEntries] = useState<WellnessEntry[]>([]);
   const [totalCheckIns, setTotalCheckIns] = useState(0);
   const [totalVisits, setTotalVisits] = useState(0);
-  const [scrollY, setScrollY] = useState(0);
   const [showTour, setShowTour] = useState(false);
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
   const [isReturningUser, setIsReturningUser] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     checkUserProfile();
@@ -188,14 +178,6 @@ const Index = () => {
     return "text-red-600";
   };
 
-  const getMilestones = () => {
-    const milestones = [
-      { count: 7, label: "Getting Started", icon: Award, achieved: totalCheckIns >= 7 },
-      { count: 30, label: "Making Progress", icon: Trophy, achieved: totalCheckIns >= 30 },
-      { count: 90, label: "Wellness Champion", icon: Flower2, achieved: totalCheckIns >= 90 },
-    ];
-    return milestones;
-  };
 
   // Check if user did quick check-in
   const didQuickCheckIn = typeof window !== 'undefined' && localStorage.getItem('mumtaz_quick_checkin_completed') === 'true';
@@ -205,7 +187,7 @@ const Index = () => {
   if (!loading && showDashboard) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <HomeNavigation username={userProfile?.username} />
         <OnboardingTour run={showTour} onComplete={handleTourComplete} />
         
         {/* Returning User Welcome Dialog */}
@@ -222,95 +204,141 @@ const Index = () => {
         </div>
         
         <div className="container mx-auto px-6 py-12 pt-24 space-y-8">
-          {/* Logo and Welcome Header with Parallax */}
-          <div 
-            className="text-center space-y-6 transition-transform duration-300 ease-out"
-            style={{
-              transform: `translateY(${scrollY * 0.15}px)`
-            }}
-          >
-            <Logo size="md" className="mx-auto animate-fade-in-up" />
-            <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <h1 className="text-4xl font-bold text-foreground">
-                Welcome back, {userProfile?.username || "Friend"}!
-              </h1>
-              <p className="text-lg text-muted-foreground font-accent">
-                Your personalized wellness journey continues today
-              </p>
-            </div>
+          {/* Welcome Header - Simple and Warm */}
+          <div className="text-center space-y-4 animate-fade-in">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              Hello, {userProfile?.username || "Friend"}
+            </h1>
+            <p className="text-lg text-muted-foreground font-accent max-w-xl mx-auto">
+              What feels right for you today? No pressure — just gentle options.
+            </p>
           </div>
 
-          {/* Profile Summary Cards */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto" data-tour="profile-summary">
-            <Card className="bg-card backdrop-blur-sm border-mumtaz-lilac/20 shadow-md hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2 text-mumtaz-plum">
-                  <User className="h-5 w-5 text-mumtaz-lilac" />
-                  Life Stage
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-semibold text-foreground">
-                  {getLifeStageDisplay(wellnessProfile.life_stage)}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card backdrop-blur-sm border-mumtaz-lilac/20 shadow-md hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2 text-mumtaz-plum">
-                  <Sparkles className="h-5 w-5 text-mumtaz-lilac" />
-                  Dosha Type
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-1">
-                  <p className="text-2xl font-semibold text-foreground">
-                    {getDoshaDisplay(wellnessProfile.primary_dosha)}
-                  </p>
-                  {wellnessProfile.secondary_dosha && (
-                    <Badge variant="secondary" className="text-xs bg-mumtaz-sand text-mumtaz-plum">
-                      Secondary: {getDoshaDisplay(wellnessProfile.secondary_dosha)}
-                    </Badge>
-                  )}
+          {/* Gentle Entry Cards - 4 Maximum */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto" data-tour="entry-cards">
+            {/* Card 1: Check in with yourself */}
+            <Card 
+              className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20 hover:shadow-lg hover:border-accent/40 transition-all cursor-pointer group active:scale-[0.98]"
+              onClick={() => navigate("/tracker")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate("/tracker")}
+            >
+              <CardContent className="pt-6 pb-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Heart className="w-6 h-6 text-accent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-foreground mb-1 group-hover:text-accent transition-colors">
+                      Check in with yourself
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      A moment to notice how you're feeling — body, mind, and heart.
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card backdrop-blur-sm border-mumtaz-lilac/20 shadow-md hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2 text-mumtaz-plum">
-                  <Heart className="h-5 w-5 text-mumtaz-lilac" />
-                  Spiritual Path
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-semibold text-foreground capitalize">
-                  {wellnessProfile.spiritual_preference === "both" 
-                    ? "Integrated" 
-                    : wellnessProfile.spiritual_preference || "Not set"}
-                </p>
+            {/* Card 2: Support for your body */}
+            <Card 
+              className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 hover:shadow-lg hover:border-primary/40 transition-all cursor-pointer group active:scale-[0.98]"
+              onClick={() => navigate("/content-library?category=mobility")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate("/content-library?category=mobility")}
+            >
+              <CardContent className="pt-6 pb-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Activity className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                      Support for your body
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Gentle movement, mobility, and confidence-building practices.
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Card 3: Learn & explore */}
+            <Card 
+              className="bg-gradient-to-br from-mumtaz-sage/10 to-mumtaz-sage/5 border-mumtaz-sage/20 hover:shadow-lg hover:border-mumtaz-sage/40 transition-all cursor-pointer group active:scale-[0.98]"
+              onClick={() => navigate("/content-library")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate("/content-library")}
+            >
+              <CardContent className="pt-6 pb-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-mumtaz-sage/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <BookOpen className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                      Learn & explore
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Yoga, nutrition, Ayurveda, and spiritual wisdom — at your pace.
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Card 4: My saved practices */}
+            <Card 
+              className="bg-gradient-to-br from-mumtaz-lilac/10 to-mumtaz-lilac/5 border-mumtaz-lilac/20 hover:shadow-lg hover:border-mumtaz-lilac/40 transition-all cursor-pointer group active:scale-[0.98]"
+              onClick={() => navigate("/my-daily-practice")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate("/my-daily-practice")}
+            >
+              <CardContent className="pt-6 pb-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-mumtaz-lilac/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Sparkles className="w-6 h-6 text-accent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-foreground mb-1 group-hover:text-accent transition-colors">
+                      My saved practices
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Return to what you've saved and what feels familiar.
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Complete Onboarding Prompt - Show if quick check-in done but not full onboarding */}
+          {/* Complete Onboarding Prompt - Gentle, non-pressuring */}
           {!wellnessProfile?.onboarding_completed && didQuickCheckIn && (
-            <Card className="max-w-5xl mx-auto bg-gradient-to-r from-wellness-lilac/20 to-wellness-sage/20 border-wellness-lilac/40">
-              <CardContent className="py-6">
+            <Card className="max-w-3xl mx-auto bg-gradient-to-r from-accent/10 to-primary/10 border-accent/30">
+              <CardContent className="py-5">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="text-center sm:text-left">
-                    <h3 className="font-semibold text-foreground mb-1">Ready for deeper guidance?</h3>
+                    <h3 className="font-semibold text-foreground mb-1">Would you like deeper guidance?</h3>
                     <p className="text-sm text-muted-foreground">
-                      Complete your personal onboarding to discover your dosha and receive tailored recommendations
+                      When you're ready, share a bit more about yourself for personalized recommendations.
                     </p>
                   </div>
                   <Button 
                     onClick={() => navigate("/onboarding?full=true")}
-                    className="bg-wellness-lilac hover:bg-wellness-lilac/90 text-white whitespace-nowrap"
+                    variant="outline"
+                    className="border-accent text-accent hover:bg-accent/10 whitespace-nowrap"
                   >
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Complete My Personal Onboarding
+                    Tell me more
                   </Button>
                 </div>
               </CardContent>
@@ -347,173 +375,85 @@ const Index = () => {
             <RecentlyViewed />
           </div>
 
-          {/* Progress Tracker */}
-          <Card className="max-w-5xl mx-auto bg-gradient-to-br from-mumtaz-lilac/20 to-mumtaz-sage/20 border-mumtaz-lilac/40 shadow-lg" data-tour="progress-tracker">
-            <CardHeader>
-              <CardTitle className="text-center flex items-center justify-center gap-3 text-2xl">
-                <Activity className="h-7 w-7 text-accent" />
-                Your Wellness Journey
+          {/* Your Wellness Space - Gentle, non-pressure language */}
+          <Card className="max-w-3xl mx-auto bg-gradient-to-br from-accent/5 to-primary/5 border-border/50 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-center flex items-center justify-center gap-3 text-xl">
+                <Flower2 className="h-6 w-6 text-accent" />
+                Your Wellness Space
               </CardTitle>
               <CardDescription className="text-center">
-                Track your progress and celebrate your commitment
+                A gentle reflection of your journey — no pressure, just awareness.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent>
               <div className="flex items-center justify-center gap-8">
                 <div className="text-center">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Calendar className="h-8 w-8 text-primary" />
-                    <p className="text-5xl font-bold text-foreground">{totalCheckIns}</p>
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <p className="text-3xl font-bold text-foreground">{totalCheckIns}</p>
                   </div>
-                  <p className="text-sm text-muted-foreground font-medium">Total Check-Ins</p>
-                  <p className="text-xs text-muted-foreground">
-                    {totalCheckIns === 1 ? "entry" : "entries"} logged
-                  </p>
+                  <p className="text-sm text-muted-foreground">Check-ins</p>
                 </div>
                 
-                <div className="h-16 w-px bg-border" />
+                <div className="h-12 w-px bg-border/50" />
                 
                 <div className="text-center">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Users className="h-7 w-7 text-accent" />
-                    <p className="text-4xl font-bold text-foreground">{totalVisits}</p>
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <Users className="h-5 w-5 text-accent" />
+                    <p className="text-3xl font-bold text-foreground">{totalVisits}</p>
                   </div>
-                  <p className="text-sm text-muted-foreground font-medium">Total Visits</p>
-                  <p className="text-xs text-muted-foreground">
-                    {totalVisits === 1 ? "day" : "days"} tracked
-                  </p>
-                </div>
-              </div>
-
-              {/* Milestones */}
-              <div className="pt-4 border-t border-border/50">
-                <p className="text-sm font-semibold text-foreground mb-3 text-center">
-                  Milestone Achievements
-                </p>
-                <div className="flex items-center justify-center gap-4">
-                  {getMilestones().map((milestone) => {
-                    const Icon = milestone.icon;
-                    return (
-                      <div
-                        key={milestone.count}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-lg transition-all ${
-                          milestone.achieved
-                            ? "bg-accent/30 border-2 border-accent"
-                            : "bg-muted/30 border border-border opacity-50"
-                        }`}
-                      >
-                        <Icon
-                          className={`h-8 w-8 ${
-                            milestone.achieved ? "text-accent" : "text-muted-foreground"
-                          }`}
-                        />
-                        <div className="text-center">
-                          <p className="text-sm font-bold text-foreground">
-                            {milestone.count} Check-Ins
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {milestone.label}
-                          </p>
-                        </div>
-                        {milestone.achieved && (
-                          <Badge variant="secondary" className="text-xs bg-accent/20">
-                            Unlocked!
-                          </Badge>
-                        )}
-                      </div>
-                    );
-                  })}
+                  <p className="text-sm text-muted-foreground">Days visited</p>
                 </div>
               </div>
 
               {totalCheckIns === 0 && (
-                <div className="text-center py-2">
-                  <p className="text-sm text-muted-foreground">
-                    Start your wellness journey today by logging your first check-in! 🌟
+                <div className="text-center pt-4 mt-4 border-t border-border/30">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    When you're ready, your first check-in is waiting.
                   </p>
                   <Button
                     onClick={() => navigate("/tracker")}
-                    variant="cta"
-                    className="mt-3"
+                    variant="outline"
+                    className="border-accent text-accent hover:bg-accent/10"
                     size="sm"
                   >
-                    Begin Tracking
+                    Start when ready
                   </Button>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Quick Access Section */}
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-foreground mb-6 text-center">
-              Quick Access
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Button
-                onClick={() => navigate("/tracker")}
-                variant="cta"
-                className="h-32 flex-col gap-3"
-                size="lg"
-                data-tour="daily-tracker"
-              >
-                <Calendar className="h-8 w-8" />
-                <span className="text-lg font-semibold">Daily Tracker</span>
-                <span className="text-xs opacity-80">Log today's wellness</span>
-              </Button>
-
+          {/* Additional Tools - Compact row */}
+          <div className="max-w-3xl mx-auto">
+            <div className="flex flex-wrap justify-center gap-3">
               <Button
                 onClick={() => navigate("/condition-tracker")}
-                className="h-32 flex-col gap-3 bg-mumtaz-sage hover:bg-mumtaz-sage/90 text-white"
-                size="lg"
-                data-tour="symptom-tracker"
+                variant="outline"
+                size="sm"
+                className="border-primary/30 text-foreground hover:bg-primary/10 gap-2"
               >
-                <Activity className="h-8 w-8" />
-                <span className="text-lg font-semibold">Symptom Tracker</span>
-                <span className="text-xs opacity-80">Track PCOS & Endo</span>
+                <Activity className="h-4 w-4 text-primary" />
+                Symptom Tracker
               </Button>
-
               <Button
                 onClick={() => navigate("/insights")}
-                className="h-32 flex-col gap-3 bg-primary hover:bg-primary/90 text-primary-foreground"
-                size="lg"
-                data-tour="insights"
+                variant="outline"
+                size="sm"
+                className="border-accent/30 text-foreground hover:bg-accent/10 gap-2"
               >
-                <BarChart3 className="h-8 w-8" />
-                <span className="text-lg font-semibold">Insights</span>
-                <span className="text-xs opacity-80">View your progress</span>
+                <BarChart3 className="h-4 w-4 text-accent" />
+                View Insights
               </Button>
-
               <Button
-                onClick={() => navigate("/content-library")}
-                variant="cta"
-                className="h-32 flex-col gap-3"
-                size="lg"
-                data-tour="content-library"
+                onClick={() => navigate("/bookings")}
+                variant="outline"
+                size="sm"
+                className="border-primary/30 text-foreground hover:bg-primary/10 gap-2"
               >
-                <BookOpen className="h-8 w-8" />
-                <span className="text-lg font-semibold">Content Library</span>
-                <span className="text-xs opacity-80">Explore practices</span>
-              </Button>
-
-              <Button
-                onClick={() => navigate("/my-daily-practice")}
-                className="h-32 flex-col gap-3 bg-mumtaz-sage hover:bg-mumtaz-sage/90 text-white"
-                size="lg"
-              >
-                <Clock className="h-8 w-8" />
-                <span className="text-lg font-semibold">My Practice</span>
-                <span className="text-xs opacity-80">Daily reminders</span>
-              </Button>
-
-              <Button
-                onClick={() => navigate("/settings")}
-                className="h-32 flex-col gap-3 bg-muted hover:bg-muted/90 text-muted-foreground"
-                size="lg"
-              >
-                <User className="h-8 w-8" />
-                <span className="text-lg font-semibold">Profile</span>
-                <span className="text-xs opacity-80">Update settings</span>
+                <Calendar className="h-4 w-4 text-primary" />
+                Book a Session
               </Button>
             </div>
           </div>
