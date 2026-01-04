@@ -709,12 +709,18 @@ const Index = () => {
 
           <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {/* Feature 1: Life-Phase Tracker */}
-            <Card className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group">
+            <Card 
+              className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group cursor-pointer active:scale-[0.98] hover:border-primary/30"
+              onClick={() => navigate('/auth')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate('/auth')}
+            >
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Calendar className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle className="text-2xl mb-3">Life-Phase Tracker</CardTitle>
+                <CardTitle className="text-2xl mb-3 group-hover:text-primary transition-colors">Life-Phase Tracker</CardTitle>
                 <CardDescription className="text-base leading-relaxed">
                   Track symptoms, mood, and health goals specific to your current phase (Fertility, 
                   Postpartum, Peri-Menopause). Understand your patterns and honor your body's wisdom.
@@ -723,12 +729,18 @@ const Index = () => {
             </Card>
 
             {/* Feature 2: Holistic Guidance */}
-            <Card className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group">
+            <Card 
+              className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group cursor-pointer active:scale-[0.98] hover:border-accent/30"
+              onClick={() => navigate('/auth')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate('/auth')}
+            >
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Flower2 className="w-8 h-8 text-accent" />
                 </div>
-                <CardTitle className="text-2xl mb-3">Holistic Guidance</CardTitle>
+                <CardTitle className="text-2xl mb-3 group-hover:text-accent transition-colors">Holistic Guidance</CardTitle>
                 <CardDescription className="text-base leading-relaxed">
                   Tap into curated guidance across Yoga, Ayurvedic Nutrition, and Spiritual Wisdom—
                   available on demand for every challenge you face on your journey.
@@ -737,12 +749,18 @@ const Index = () => {
             </Card>
 
             {/* Feature 3: Movement & Rehab */}
-            <Card className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group">
+            <Card 
+              className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group cursor-pointer active:scale-[0.98] hover:border-primary/30"
+              onClick={() => navigate('/auth')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate('/auth')}
+            >
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Activity className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle className="text-2xl mb-3">Movement & Rehab</CardTitle>
+                <CardTitle className="text-2xl mb-3 group-hover:text-primary transition-colors">Movement & Rehab</CardTitle>
                 <CardDescription className="text-base leading-relaxed">
                   Access video flows and mobility work designed for sensitive life moments, like 
                   hysterectomy rehab or postpartum recovery. Gentle, therapeutic, and deeply nurturing.
@@ -751,12 +769,18 @@ const Index = () => {
             </Card>
 
             {/* Feature 4: The Mumtaz Community */}
-            <Card className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group">
+            <Card 
+              className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group cursor-pointer active:scale-[0.98] hover:border-accent/30"
+              onClick={() => navigate('/auth')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate('/auth')}
+            >
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Users className="w-8 h-8 text-accent" />
                 </div>
-                <CardTitle className="text-2xl mb-3">The Mumtaz Community</CardTitle>
+                <CardTitle className="text-2xl mb-3 group-hover:text-accent transition-colors">The Mumtaz Community</CardTitle>
                 <CardDescription className="text-base leading-relaxed">
                   Connect, study, and share with like-minded women in a non-judgmental space. 
                   Feel valued, supported, and inspired on your wellness journey.
