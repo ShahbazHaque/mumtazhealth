@@ -24,8 +24,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <Toaster />
     <Sonner />
-    <MumtazWisdomGuide />
     <BrowserRouter>
+      <MumtazWisdomGuide />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/tracker" element={<Tracker />} />
