@@ -895,6 +895,8 @@ export default function Onboarding() {
   }
 
   if (step === "lifeStage") {
+    const [showLifeStageHelper, setShowLifeStageHelper] = useState(false);
+    
     const lifeStages = [
       { 
         value: "menstrual_cycle", 
@@ -920,25 +922,182 @@ export default function Onboarding() {
       { 
         value: "perimenopause", 
         label: "Perimenopause", 
-        description: "Transition to menopause", 
+        description: "Cycles changing or symptoms beginning", 
         icon: "🌅",
         tooltip: "Navigate this transitional phase with confidence. Access tools for managing irregular cycles, hot flashes, mood changes, and hormonal fluctuations through holistic practices."
       },
       { 
         value: "menopause", 
         label: "Menopause", 
-        description: "End of menstrual cycles", 
+        description: "No period for 12 months or more", 
         icon: "🌙",
         tooltip: "Embrace this new chapter. Find support for managing symptoms like hot flashes, sleep issues, bone health, and rediscovering vitality through Ayurvedic wisdom and yoga."
       },
       { 
         value: "post_menopause", 
-        label: "Post-Menopause", 
+        label: "Post-Menopause / Beyond", 
         description: "After menopause", 
         icon: "✨",
         tooltip: "Thrive in your wisdom years. Access practices for maintaining bone health, cardiovascular wellness, cognitive vitality, and cultivating purpose and joy in this empowered stage."
       },
+      { 
+        value: "not_sure", 
+        label: "I'm not sure / My body is changing", 
+        description: "Get gentle guidance to find what fits", 
+        icon: "💫",
+        tooltip: "Many women move through phases gradually. We'll help you find what feels right with a few optional questions."
+      },
     ];
+
+    // Import helper component inline for this step
+    const LifeStageHelperContent = () => {
+      const [periodStatus, setPeriodStatus] = useState<string>("");
+      const [showSuggestion, setShowSuggestion] = useState(false);
+
+      const getSuggestedStage = (): { stage: string; label: string } => {
+        switch (periodStatus) {
+          case "yes":
+            return { stage: "menstrual_cycle", label: "Menstrual Cycle" };
+          case "sometimes":
+            return { stage: "perimenopause", label: "Perimenopause" };
+          case "no":
+            return { stage: "menopause", label: "Menopause or Post-Menopause" };
+          default:
+            return { stage: "perimenopause", label: "Perimenopause" };
+        }
+      };
+
+      if (showSuggestion) {
+        const suggestion = getSuggestedStage();
+        
+        return (
+          <div className="space-y-6 p-6 bg-wellness-lilac/5 rounded-xl border border-wellness-lilac/20">
+            <div className="text-center space-y-4">
+              <div className="flex justify-center">
+                <div className="p-3 rounded-full bg-wellness-lilac/10">
+                  <Sparkles className="w-6 h-6 text-wellness-lilac" />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-foreground font-medium">
+                  Based on what you shared, content for
+                </p>
+                <p className="text-lg font-semibold text-wellness-lilac">
+                  {suggestion.label}
+                </p>
+                <p className="text-foreground font-medium">
+                  may feel most supportive right now.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-wellness-sage/10 rounded-lg border border-wellness-sage/20">
+              <p className="text-sm text-muted-foreground italic text-center">
+                This is just a gentle guide. Your body is unique, and you can always change this later in Settings.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <Button 
+                onClick={() => {
+                  setLifeStage(periodStatus === "no" ? "menopause" : suggestion.stage);
+                  setShowLifeStageHelper(false);
+                }}
+                className="w-full bg-wellness-lilac hover:bg-wellness-lilac/90 text-white"
+              >
+                <Heart className="w-4 h-4 mr-2" />
+                Use this suggestion
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                onClick={() => setShowLifeStageHelper(false)}
+                className="w-full border-wellness-sage/30 text-foreground hover:bg-wellness-sage/10"
+              >
+                Choose a different phase
+              </Button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="space-y-6 p-6 bg-wellness-lilac/5 rounded-xl border border-wellness-lilac/20">
+          <div className="text-center space-y-3">
+            <div className="flex justify-center">
+              <div className="p-3 rounded-full bg-wellness-sage/10">
+                <Heart className="w-6 h-6 text-wellness-sage" />
+              </div>
+            </div>
+            <h3 className="font-medium text-foreground">
+              That's completely okay
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Many women move through phases gradually. You can choose what feels closest for now — 
+              this can be updated anytime in Settings.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-foreground">
+                Are you still having periods? <span className="text-muted-foreground font-normal">(optional)</span>
+              </Label>
+              
+              <RadioGroup value={periodStatus} onValueChange={setPeriodStatus}>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/50 hover:bg-wellness-sage/5 transition-colors">
+                    <RadioGroupItem value="yes" id="periods-yes-onboard" />
+                    <Label htmlFor="periods-yes-onboard" className="cursor-pointer text-sm flex-1">
+                      Yes
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/50 hover:bg-wellness-sage/5 transition-colors">
+                    <RadioGroupItem value="sometimes" id="periods-sometimes-onboard" />
+                    <Label htmlFor="periods-sometimes-onboard" className="cursor-pointer text-sm flex-1">
+                      Sometimes / Irregular
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/50 hover:bg-wellness-sage/5 transition-colors">
+                    <RadioGroupItem value="no" id="periods-no-onboard" />
+                    <Label htmlFor="periods-no-onboard" className="cursor-pointer text-sm flex-1">
+                      No
+                    </Label>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowLifeStageHelper(false)}
+              className="flex-1 border-wellness-sage/30 text-foreground hover:bg-wellness-sage/10"
+            >
+              Back
+            </Button>
+            <Button 
+              onClick={() => setShowSuggestion(true)}
+              disabled={!periodStatus}
+              className="flex-1 bg-wellness-lilac hover:bg-wellness-lilac/90 text-white"
+            >
+              Continue <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+
+          <p className="text-center">
+            <button 
+              onClick={() => setShowLifeStageHelper(false)}
+              className="text-sm text-muted-foreground hover:text-wellness-lilac underline-offset-4 hover:underline transition-colors"
+            >
+              Skip and choose manually instead
+            </button>
+          </p>
+        </div>
+      );
+    };
 
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
@@ -948,73 +1107,92 @@ export default function Onboarding() {
               <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
                 Your Life Stage
               </CardTitle>
-              <CardDescription>
-                Select the stage that best describes your current journey - hover for details about support available.
+              <CardDescription className="leading-relaxed">
+                Select the stage that best describes your current journey. 
+                Your body may be in transition — that's completely normal.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-              <div className="space-y-2">
-                <Label>Which life stage are you in?</Label>
-                <RadioGroup value={lifeStage} onValueChange={(value) => {
-                  setLifeStage(value);
-                  if (value !== "menstrual_cycle") {
-                    setMenstrualCondition("");
-                  }
-                }}>
-                  <div className="space-y-3">
-                    {lifeStages.map((stage) => (
-                      <Tooltip key={stage.value}>
-                        <TooltipTrigger asChild>
-                          <div className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-help">
-                            <RadioGroupItem value={stage.value} id={stage.value} className="mt-1" />
-                            <div className="flex-1">
-                              <Label htmlFor={stage.value} className="font-medium cursor-pointer flex items-center gap-2">
-                                <span className="text-xl">{stage.icon}</span>
-                                {stage.label}
-                                <HelpCircle className="h-3 w-3 text-muted-foreground" />
-                              </Label>
-                              <p className="text-sm text-muted-foreground mt-1">{stage.description}</p>
-                            </div>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-sm p-4">
-                          <p className="text-sm">{stage.tooltip}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    ))}
+              
+              {showLifeStageHelper ? (
+                <LifeStageHelperContent />
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <Label>Which life stage are you in?</Label>
+                    <RadioGroup value={lifeStage} onValueChange={(value) => {
+                      if (value === "not_sure") {
+                        setShowLifeStageHelper(true);
+                      } else {
+                        setLifeStage(value);
+                        if (value !== "menstrual_cycle") {
+                          setMenstrualCondition("");
+                        }
+                      }
+                    }}>
+                      <div className="space-y-3">
+                        {lifeStages.map((stage) => (
+                          <Tooltip key={stage.value}>
+                            <TooltipTrigger asChild>
+                              <div className={`flex items-start space-x-3 p-4 rounded-lg border transition-colors cursor-help ${
+                                stage.value === "not_sure" 
+                                  ? "border-wellness-lilac/30 bg-wellness-lilac/5 hover:bg-wellness-lilac/10" 
+                                  : "border-border hover:bg-accent/50"
+                              }`}>
+                                <RadioGroupItem value={stage.value} id={stage.value} className="mt-1" />
+                                <div className="flex-1">
+                                  <Label htmlFor={stage.value} className="font-medium cursor-pointer flex items-center gap-2">
+                                    <span className="text-xl">{stage.icon}</span>
+                                    {stage.label}
+                                    {stage.value === "not_sure" && (
+                                      <Sparkles className="h-4 w-4 text-wellness-lilac" />
+                                    )}
+                                    <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                                  </Label>
+                                  <p className="text-sm text-muted-foreground mt-1">{stage.description}</p>
+                                </div>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-sm p-4">
+                              <p className="text-sm">{stage.tooltip}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ))}
+                      </div>
+                    </RadioGroup>
                   </div>
-                </RadioGroup>
-              </div>
 
-              {lifeStage === "menstrual_cycle" && (
-                <div className="space-y-2 p-4 bg-accent/20 rounded-lg border border-border">
-                  <Label className="text-sm font-medium">Do you have any specific menstrual health conditions? (Optional)</Label>
-                  <RadioGroup value={menstrualCondition} onValueChange={setMenstrualCondition}>
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="none" id="none" />
-                        <Label htmlFor="none" className="cursor-pointer text-sm">None</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="pcos" id="pcos" />
-                        <Label htmlFor="pcos" className="cursor-pointer text-sm">PCOS (Polycystic Ovary Syndrome)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="endometriosis" id="endometriosis" />
-                        <Label htmlFor="endometriosis" className="cursor-pointer text-sm">Endometriosis</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="pmdd" id="pmdd" />
-                        <Label htmlFor="pmdd" className="cursor-pointer text-sm">PMDD (Premenstrual Dysphoric Disorder)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="irregular" id="irregular" />
-                        <Label htmlFor="irregular" className="cursor-pointer text-sm">Irregular or Heavy Periods</Label>
-                      </div>
+                  {lifeStage === "menstrual_cycle" && (
+                    <div className="space-y-2 p-4 bg-accent/20 rounded-lg border border-border">
+                      <Label className="text-sm font-medium">Do you have any specific menstrual health conditions? (Optional)</Label>
+                      <RadioGroup value={menstrualCondition} onValueChange={setMenstrualCondition}>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="none" id="none" />
+                            <Label htmlFor="none" className="cursor-pointer text-sm">None</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="pcos" id="pcos" />
+                            <Label htmlFor="pcos" className="cursor-pointer text-sm">PCOS (Polycystic Ovary Syndrome)</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="endometriosis" id="endometriosis" />
+                            <Label htmlFor="endometriosis" className="cursor-pointer text-sm">Endometriosis</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="pmdd" id="pmdd" />
+                            <Label htmlFor="pmdd" className="cursor-pointer text-sm">PMDD (Premenstrual Dysphoric Disorder)</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="irregular" id="irregular" />
+                            <Label htmlFor="irregular" className="cursor-pointer text-sm">Irregular or Heavy Periods</Label>
+                          </div>
+                        </div>
+                      </RadioGroup>
                     </div>
-                  </RadioGroup>
-                </div>
+                  )}
+                </>
               )}
 
               <div className="flex justify-between pt-4">
@@ -1030,7 +1208,7 @@ export default function Onboarding() {
                       setStep("dosha");
                     }
                   }}
-                  disabled={!lifeStage}
+                  disabled={!lifeStage || showLifeStageHelper}
                 >
                   Continue
                 </Button>
