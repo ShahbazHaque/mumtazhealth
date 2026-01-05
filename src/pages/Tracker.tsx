@@ -19,6 +19,7 @@ import { MenopauseEducation } from "@/components/MenopauseEducation";
 import { PregnancyEducation } from "@/components/PregnancyEducation";
 import { PostpartumEducation } from "@/components/PostpartumEducation";
 import { DailyRhythm } from "@/components/DailyRhythm";
+import { BodyChangingEducation } from "@/components/BodyChangingEducation";
 
 interface DailyPractice {
   id: string;
@@ -935,6 +936,10 @@ export default function Tracker() {
             <CardContent className="space-y-4">
               {/* Educational expandable section */}
               <MenopauseEducation lifeStage={lifeStage as 'perimenopause' | 'menopause' | 'post_menopause'} />
+              
+              {/* Body Changing Education - Deep dive into transition phases */}
+              <BodyChangingEducation />
+              
               <div>
                 <Label>Hot Flashes:</Label>
                 <Select value={menopauseHotFlashes} onValueChange={setMenopauseHotFlashes}>
