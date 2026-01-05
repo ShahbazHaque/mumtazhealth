@@ -6,19 +6,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Heart, HelpCircle, Settings as SettingsIcon } from "lucide-react";
+import { ArrowLeft, Heart, HelpCircle, Settings as SettingsIcon, Sparkles } from "lucide-react";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { Navigation } from "@/components/Navigation";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { AccountSettings } from "@/components/AccountSettings";
+import { LifeStageHelper } from "@/components/LifeStageHelper";
+
 const lifeStages = [
   { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling" },
   { value: "pregnancy", label: "Pregnancy", description: "Expecting a baby" },
   { value: "postpartum", label: "Postpartum", description: "After childbirth" },
-  { value: "perimenopause", label: "Perimenopause", description: "Transition to menopause" },
-  { value: "menopause", label: "Menopause", description: "End of menstrual cycles" },
-  { value: "post_menopause", label: "Post-Menopause", description: "After menopause" },
+  { value: "perimenopause", label: "Perimenopause", description: "Cycles changing or symptoms beginning" },
+  { value: "menopause", label: "Menopause", description: "No period for 12 months or more" },
+  { value: "post_menopause", label: "Post-Menopause / Beyond", description: "After menopause" },
+  { value: "not_sure", label: "I'm not sure / My body is changing", description: "Get gentle guidance" },
 ];
 
 export default function Settings() {
@@ -28,6 +31,7 @@ export default function Settings() {
   const [initialLifeStage, setInitialLifeStage] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
+  const [showHelper, setShowHelper] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -149,28 +153,55 @@ export default function Settings() {
                 <Heart className="w-5 h-5 text-primary" />
                 <Label className="text-lg font-semibold">Life Stage</Label>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Select the life stage that best describes your current journey. This helps us provide
-                personalized recommendations tailored to your needs.
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Select the life stage that best describes your current journey. 
+                Your body may be in transition — that's completely normal, and you can update this anytime.
               </p>
-              <RadioGroup value={lifeStage} onValueChange={setLifeStage}>
-                <div className="space-y-3">
-                  {lifeStages.map((stage) => (
-                    <div
-                      key={stage.value}
-                      className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
-                    >
-                      <RadioGroupItem value={stage.value} id={stage.value} className="mt-1" />
-                      <div className="flex-1">
-                        <Label htmlFor={stage.value} className="font-medium cursor-pointer">
-                          {stage.label}
-                        </Label>
-                        <p className="text-sm text-muted-foreground mt-1">{stage.description}</p>
+              
+              {showHelper ? (
+                <LifeStageHelper 
+                  onSelectStage={(stage) => {
+                    setLifeStage(stage);
+                    setShowHelper(false);
+                  }}
+                  onCancel={() => setShowHelper(false)}
+                />
+              ) : (
+                <RadioGroup 
+                  value={lifeStage} 
+                  onValueChange={(value) => {
+                    if (value === "not_sure") {
+                      setShowHelper(true);
+                    } else {
+                      setLifeStage(value);
+                    }
+                  }}
+                >
+                  <div className="space-y-3">
+                    {lifeStages.map((stage) => (
+                      <div
+                        key={stage.value}
+                        className={`flex items-start space-x-3 p-4 rounded-lg border transition-colors ${
+                          stage.value === "not_sure" 
+                            ? "border-wellness-lilac/30 bg-wellness-lilac/5 hover:bg-wellness-lilac/10" 
+                            : "border-border hover:bg-accent/50"
+                        }`}
+                      >
+                        <RadioGroupItem value={stage.value} id={stage.value} className="mt-1" />
+                        <div className="flex-1">
+                          <Label htmlFor={stage.value} className="font-medium cursor-pointer flex items-center gap-2">
+                            {stage.label}
+                            {stage.value === "not_sure" && (
+                              <Sparkles className="w-4 h-4 text-wellness-lilac" />
+                            )}
+                          </Label>
+                          <p className="text-sm text-muted-foreground mt-1">{stage.description}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </RadioGroup>
+                    ))}
+                  </div>
+                </RadioGroup>
+              )}
             </div>
 
             <Button
