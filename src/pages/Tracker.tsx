@@ -16,6 +16,9 @@ import { Navigation } from "@/components/Navigation";
 import { CyclePhaseHelper } from "@/components/CyclePhaseHelper";
 import { CyclePhaseEducation } from "@/components/CyclePhaseEducation";
 import { MenopauseEducation } from "@/components/MenopauseEducation";
+import { PregnancyEducation } from "@/components/PregnancyEducation";
+import { PostpartumEducation } from "@/components/PostpartumEducation";
+import { DailyRhythm } from "@/components/DailyRhythm";
 
 interface DailyPractice {
   id: string;
@@ -618,22 +621,30 @@ export default function Tracker() {
 
         {/* Trimester - Only show for pregnancy life stage */}
         {lifeStage === 'pregnancy' && (
-          <Card className="mb-6">
+          <Card className="mb-6 bg-wellness-lilac/10 border-wellness-lilac/20">
             <CardHeader>
-              <CardTitle className="text-xl">1. Trimester</CardTitle>
+              <CardTitle className="text-xl text-wellness-taupe">1. Your Pregnancy Journey</CardTitle>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                This is here to support you through this beautiful journey, not to add pressure.
+              </p>
             </CardHeader>
-            <CardContent>
-              <Label>Current Trimester:</Label>
-              <Select value={trimester} onValueChange={setTrimester}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Select Trimester" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Trimester 1 (Weeks 1-13)</SelectItem>
-                  <SelectItem value="2">Trimester 2 (Weeks 14-27)</SelectItem>
-                  <SelectItem value="3">Trimester 3 (Weeks 28-40)</SelectItem>
-                </SelectContent>
-              </Select>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Current Trimester:</Label>
+                <Select value={trimester} onValueChange={setTrimester}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select Trimester" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Trimester 1 (Weeks 1-13)</SelectItem>
+                    <SelectItem value="2">Trimester 2 (Weeks 14-27)</SelectItem>
+                    <SelectItem value="3">Trimester 3 (Weeks 28-40)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Educational section */}
+              {trimester && <PregnancyEducation trimester={trimester} />}
             </CardContent>
           </Card>
         )}
@@ -790,14 +801,17 @@ export default function Tracker() {
 
         {/* Postpartum Tracking - Only show for postpartum life stage */}
         {lifeStage === 'postpartum' && (
-          <Card className="mb-6 bg-wellness-sage/20 border-wellness-taupe/30">
+          <Card className="mb-6 bg-wellness-sage/10 border-wellness-sage/20">
             <CardHeader>
-              <CardTitle className="text-xl">1. Postpartum Tracking</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Track your recovery journey and daily well-being
+              <CardTitle className="text-xl text-wellness-taupe">1. Your Postpartum Recovery</CardTitle>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                This is here to support your healing, not to track perfection. 
+                You are doing an amazing job.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Educational section */}
+              <PostpartumEducation />
               <div>
                 <Label>Sleep Quality:</Label>
                 <Select value={postpartumSleep} onValueChange={setPostpartumSleep}>
@@ -1137,6 +1151,22 @@ export default function Tracker() {
             </CardContent>
           </Card>
         )}
+
+        {/* Daily Rhythm Section - Show for all life stages */}
+        <Card className="mb-6 bg-gradient-to-br from-wellness-lilac/5 to-wellness-sage/5 border-wellness-lilac/15">
+          <CardHeader>
+            <CardTitle className="text-xl text-wellness-taupe flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-wellness-lilac" />
+              Daily Rhythm
+            </CardTitle>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Ayurvedic wisdom for flowing with your body's natural rhythms throughout the day.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <DailyRhythm lifeStage={lifeStage} />
+          </CardContent>
+        </Card>
 
         {/* Daily Practices - Show for menstrual cycle tracking */}
         {lifeStage === 'menstrual_cycle' && (
