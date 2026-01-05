@@ -389,5 +389,33 @@ export function FirstTimeQuickCheckIn({ onComplete, onStartFullOnboarding }: Fir
     );
   }
 
-  return null;
+  // Fallback UI for any unhandled state - prevents blank screen
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm">
+        <CardHeader className="text-center">
+          <Logo size="lg" className="mx-auto mb-4" />
+          <CardTitle className="text-xl text-foreground">Something went wrong</CardTitle>
+          <p className="text-muted-foreground mt-2">
+            We encountered an issue. Please try again.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button 
+            onClick={() => setStep("choice")} 
+            className="w-full"
+          >
+            Try Again
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={onComplete} 
+            className="w-full"
+          >
+            Go to Dashboard
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

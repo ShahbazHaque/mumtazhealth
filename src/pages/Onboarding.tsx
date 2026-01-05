@@ -218,6 +218,8 @@ export default function Onboarding() {
   const [cyclePhase, setCyclePhase] = useState("");
   const [energyLevel, setEnergyLevel] = useState("");
   const [menstrualCondition, setMenstrualCondition] = useState("");
+  const [showLifeStageHelper, setShowLifeStageHelper] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const handleDoshaComplete = (primary: string, secondary: string) => {
     setPrimaryDosha(primary);
@@ -895,8 +897,6 @@ export default function Onboarding() {
   }
 
   if (step === "lifeStage") {
-    const [showLifeStageHelper, setShowLifeStageHelper] = useState(false);
-    
     const lifeStages = [
       { 
         value: "menstrual_cycle", 
@@ -2238,5 +2238,33 @@ export default function Onboarding() {
     );
   }
 
-  return null;
+  // Fallback UI for any unhandled state - prevents blank screen
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <Logo size="lg" className="mx-auto mb-4" />
+          <CardTitle className="text-xl text-foreground">Something went wrong</CardTitle>
+          <CardDescription>
+            We encountered an issue loading this step. Please try again.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button 
+            onClick={() => setStep("initial_choice")} 
+            className="w-full"
+          >
+            Start Over
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate("/")} 
+            className="w-full"
+          >
+            Go to Dashboard
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
