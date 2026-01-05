@@ -302,6 +302,7 @@ const ContentLibrary = () => {
     const filterParam = searchParams.get('filter');
     const pregnancyParam = searchParams.get('pregnancy');
     const stageParam = searchParams.get('stage');
+    const phaseParam = searchParams.get('phase');
     
     if (doshaParam) {
       setSelectedDosha(doshaParam);
@@ -320,6 +321,20 @@ const ContentLibrary = () => {
     }
     if (pregnancyParam || stageParam) {
       setSelectedLifePhase(pregnancyParam || stageParam || 'all');
+    }
+    // Handle cycle phase param (from CyclePhaseEducation link)
+    if (phaseParam) {
+      // Map phase names to life phase filter values
+      const phaseToLifePhase: Record<string, string> = {
+        'menstrual': 'menstrual',
+        'follicular': 'follicular',
+        'ovulatory': 'ovulatory',
+        'luteal': 'luteal',
+      };
+      const mappedPhase = phaseToLifePhase[phaseParam.toLowerCase()];
+      if (mappedPhase) {
+        setSelectedLifePhase(mappedPhase);
+      }
     }
   }, [searchParams]);
 
