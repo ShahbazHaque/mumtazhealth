@@ -18,7 +18,7 @@ import { FavoritesQuickAccess } from "@/components/FavoritesQuickAccess";
 import { RecentlyViewed } from "@/components/RecentlyViewed";
 import { ConfidenceJourney } from "@/components/ConfidenceJourney";
 import { ConfidenceMilestones } from "@/components/ConfidenceMilestones";
-
+import { LifeStageCheckInPrompt } from "@/components/LifeStageCheckInPrompt";
 interface UserProfile {
   username: string;
 }
@@ -343,6 +343,13 @@ const Index = () => {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* Monthly Life Stage Check-In Prompt */}
+          {wellnessProfile?.life_stage && (
+            <div className="max-w-3xl mx-auto">
+              <LifeStageCheckInPrompt currentStage={wellnessProfile.life_stage} />
+            </div>
           )}
 
           {/* Quick Check-In */}
