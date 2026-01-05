@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Navigation } from "@/components/Navigation";
 import { CyclePhaseHelper } from "@/components/CyclePhaseHelper";
+import { CyclePhaseEducation } from "@/components/CyclePhaseEducation";
 
 interface DailyPractice {
   id: string;
@@ -549,13 +550,14 @@ export default function Tracker() {
           </CardHeader>
         </Card>
 
-        {/* Cycle Phase - Only show for menstrual cycle life stage */}
+        {/* Cycle Phase Check-In - Only show for menstrual cycle life stage */}
         {lifeStage === 'menstrual_cycle' && (
-          <Card className="mb-6">
+          <Card className="mb-6 border-wellness-sage/20">
             <CardHeader>
-              <CardTitle className="text-xl">1. Cycle Phase Check</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Choose the phase that feels right for you today
+              <CardTitle className="text-xl text-wellness-taupe">1. Cycle Phase Check-In</CardTitle>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                This is here to help you understand your body, not to track perfection. 
+                Choose whatever feels right for you today.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -570,7 +572,7 @@ export default function Tracker() {
               ) : (
                 <>
                   <div>
-                    <Label>Current Cycle Phase:</Label>
+                    <Label className="text-wellness-taupe">How does your body feel today?</Label>
                     <Select value={cyclePhase} onValueChange={(value) => {
                       if (value === "not_sure") {
                         setShowCycleHelper(true);
@@ -578,14 +580,14 @@ export default function Tracker() {
                         setCyclePhase(value);
                       }
                     }}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue placeholder="Select Phase" />
+                      <SelectTrigger className="mt-2 border-wellness-sage/30">
+                        <SelectValue placeholder="Select your current phase" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Menstrual">Menstrual (Days 1-5)</SelectItem>
-                        <SelectItem value="Follicular">Follicular (Days 6-14)</SelectItem>
-                        <SelectItem value="Ovulatory">Ovulatory (Days 14-16)</SelectItem>
-                        <SelectItem value="Luteal">Luteal (Days 17-28)</SelectItem>
+                        <SelectItem value="Menstrual">Menstrual — resting & releasing</SelectItem>
+                        <SelectItem value="Follicular">Follicular — energy building</SelectItem>
+                        <SelectItem value="Ovulatory">Ovulatory — vibrant & expressive</SelectItem>
+                        <SelectItem value="Luteal">Luteal — winding down</SelectItem>
                         <SelectItem value="not_sure" className="text-wellness-sage font-medium">
                           I'm not sure — help me find out
                         </SelectItem>
@@ -594,12 +596,18 @@ export default function Tracker() {
                   </div>
                   
                   {cyclePhase && (
-                    <p className="text-sm text-muted-foreground bg-wellness-sage/10 p-3 rounded-lg">
-                      {cyclePhase === "Menstrual" && "A time for rest and gentle self-care. Honor what your body needs."}
-                      {cyclePhase === "Follicular" && "Energy is often building. A lovely time for fresh starts."}
-                      {cyclePhase === "Ovulatory" && "You may feel more vibrant and social during this phase."}
-                      {cyclePhase === "Luteal" && "Energy may be winding down. Focus on nourishing yourself."}
-                    </p>
+                    <div className="space-y-4">
+                      <div className="p-4 bg-wellness-sage/10 rounded-lg border border-wellness-sage/20">
+                        <p className="text-sm text-wellness-taupe/90 leading-relaxed">
+                          {cyclePhase === "Menstrual" && "A sacred time for rest and gentle self-care. Your body is doing important work — honour what it needs."}
+                          {cyclePhase === "Follicular" && "Energy is often building during this phase. A lovely time for fresh ideas and gentle momentum."}
+                          {cyclePhase === "Ovulatory" && "You may notice feeling more vibrant and connected. A beautiful time for expression and creativity."}
+                          {cyclePhase === "Luteal" && "Energy naturally winds down now. Focus on nourishing yourself and preparing for renewal."}
+                        </p>
+                      </div>
+                      
+                      <CyclePhaseEducation selectedPhase={cyclePhase} lifeStage={lifeStage} />
+                    </div>
                   )}
                 </>
               )}
