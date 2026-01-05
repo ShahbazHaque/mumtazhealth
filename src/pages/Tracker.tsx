@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Navigation } from "@/components/Navigation";
 import { CyclePhaseHelper } from "@/components/CyclePhaseHelper";
 import { CyclePhaseEducation } from "@/components/CyclePhaseEducation";
+import { MenopauseEducation } from "@/components/MenopauseEducation";
 
 interface DailyPractice {
   id: string;
@@ -909,14 +910,17 @@ export default function Tracker() {
 
         {/* Menopause Tracking - Only show for perimenopause, menopause, and post-menopause */}
         {(lifeStage === 'perimenopause' || lifeStage === 'menopause' || lifeStage === 'post_menopause') && (
-          <Card className="mb-6 bg-wellness-lilac/20 border-wellness-taupe/30">
+          <Card className="mb-6 bg-wellness-lilac/20 border-wellness-lilac/30">
             <CardHeader>
-              <CardTitle className="text-xl">1. Menopause Symptom Tracking</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Track your symptoms and how you're managing this transition
+              <CardTitle className="text-xl text-wellness-taupe">1. Your Wellness Check-In</CardTitle>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                This is here to help you understand your body, not to track perfection. 
+                Notice what feels true for you today.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Educational expandable section */}
+              <MenopauseEducation lifeStage={lifeStage as 'perimenopause' | 'menopause' | 'post_menopause'} />
               <div>
                 <Label>Hot Flashes:</Label>
                 <Select value={menopauseHotFlashes} onValueChange={setMenopauseHotFlashes}>
