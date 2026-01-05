@@ -13,6 +13,7 @@ import { LogOut, Save, Trash2, UserCog, BarChart3, Plus, X, Calendar, BookOpen, 
 import { Link } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Navigation } from "@/components/Navigation";
+import { CyclePhaseHelper } from "@/components/CyclePhaseHelper";
 
 interface DailyPractice {
   id: string;
@@ -54,6 +55,7 @@ export default function Tracker() {
   const [isMenstrual, setIsMenstrual] = useState(false);
   const [lifeStage, setLifeStage] = useState<string>('');
   const [trimester, setTrimester] = useState<string>('');
+  const [showCycleHelper, setShowCycleHelper] = useState(false);
   
   // Red Day Protocol fields
   const [painLevel, setPainLevel] = useState('');
@@ -552,20 +554,55 @@ export default function Tracker() {
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="text-xl">1. Cycle Phase Check</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Choose the phase that feels right for you today
+              </p>
             </CardHeader>
-            <CardContent>
-              <Label>Current Cycle Phase:</Label>
-              <Select value={cyclePhase} onValueChange={setCyclePhase}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Select Phase" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Menstrual">Menstrual (Days 1-5)</SelectItem>
-                  <SelectItem value="Follicular">Follicular (Days 6-14)</SelectItem>
-                  <SelectItem value="Ovulatory">Ovulatory (Days 14-16)</SelectItem>
-                  <SelectItem value="Luteal">Luteal (Days 17-28)</SelectItem>
-                </SelectContent>
-              </Select>
+            <CardContent className="space-y-4">
+              {showCycleHelper ? (
+                <CyclePhaseHelper
+                  onPhaseSelected={(phase) => {
+                    setCyclePhase(phase);
+                    setShowCycleHelper(false);
+                  }}
+                  onCancel={() => setShowCycleHelper(false)}
+                />
+              ) : (
+                <>
+                  <div>
+                    <Label>Current Cycle Phase:</Label>
+                    <Select value={cyclePhase} onValueChange={(value) => {
+                      if (value === "not_sure") {
+                        setShowCycleHelper(true);
+                      } else {
+                        setCyclePhase(value);
+                      }
+                    }}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select Phase" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Menstrual">Menstrual (Days 1-5)</SelectItem>
+                        <SelectItem value="Follicular">Follicular (Days 6-14)</SelectItem>
+                        <SelectItem value="Ovulatory">Ovulatory (Days 14-16)</SelectItem>
+                        <SelectItem value="Luteal">Luteal (Days 17-28)</SelectItem>
+                        <SelectItem value="not_sure" className="text-wellness-sage font-medium">
+                          I'm not sure — help me find out
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {cyclePhase && (
+                    <p className="text-sm text-muted-foreground bg-wellness-sage/10 p-3 rounded-lg">
+                      {cyclePhase === "Menstrual" && "A time for rest and gentle self-care. Honor what your body needs."}
+                      {cyclePhase === "Follicular" && "Energy is often building. A lovely time for fresh starts."}
+                      {cyclePhase === "Ovulatory" && "You may feel more vibrant and social during this phase."}
+                      {cyclePhase === "Luteal" && "Energy may be winding down. Focus on nourishing yourself."}
+                    </p>
+                  )}
+                </>
+              )}
             </CardContent>
           </Card>
         )}
