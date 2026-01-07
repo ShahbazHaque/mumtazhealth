@@ -19,6 +19,7 @@ import { RecentlyViewed } from "@/components/RecentlyViewed";
 import { ConfidenceJourney } from "@/components/ConfidenceJourney";
 import { ConfidenceMilestones } from "@/components/ConfidenceMilestones";
 import { LifeStageCheckInPrompt } from "@/components/LifeStageCheckInPrompt";
+import { WelcomeEntryDialog } from "@/components/WelcomeEntryDialog";
 interface UserProfile {
   username: string;
 }
@@ -53,6 +54,7 @@ const Index = () => {
   const [showTour, setShowTour] = useState(false);
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
   const [isReturningUser, setIsReturningUser] = useState(false);
+  const [showEntryDialog, setShowEntryDialog] = useState(false);
 
   useEffect(() => {
     checkUserProfile();
@@ -559,8 +561,13 @@ const Index = () => {
 
   // Show welcome screen for non-authenticated or non-onboarded users
 
+  const openEntryDialog = () => setShowEntryDialog(true);
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Welcome Entry Dialog */}
+      <WelcomeEntryDialog open={showEntryDialog} onOpenChange={setShowEntryDialog} />
+      
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-wellness-sage-light via-background to-wellness-lilac-light py-20 md:py-32">
         <div className="container mx-auto px-4">
@@ -577,16 +584,16 @@ const Index = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button 
                   size="lg"
-                  onClick={() => navigate('/onboarding')}
+                  onClick={openEntryDialog}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all"
                 >
                   <Download className="mr-2 h-5 w-5" />
-                  Download Now
+                  Get Started
                 </Button>
                 <Button 
                   size="lg"
                   variant="outline"
-                  onClick={() => navigate('/auth')}
+                  onClick={openEntryDialog}
                   className="border-2 border-primary/50 text-foreground hover:bg-primary/10 text-lg px-8 py-6"
                 >
                   <Users className="mr-2 h-5 w-5" />
@@ -658,10 +665,10 @@ const Index = () => {
             {/* Feature 1: Life-Phase Tracker */}
             <Card 
               className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group cursor-pointer active:scale-[0.98] hover:border-primary/30"
-              onClick={() => navigate('/auth')}
+              onClick={openEntryDialog}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && navigate('/auth')}
+              onKeyDown={(e) => e.key === 'Enter' && openEntryDialog()}
             >
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -678,10 +685,10 @@ const Index = () => {
             {/* Feature 2: Holistic Guidance */}
             <Card 
               className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group cursor-pointer active:scale-[0.98] hover:border-accent/30"
-              onClick={() => navigate('/auth')}
+              onClick={openEntryDialog}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && navigate('/auth')}
+              onKeyDown={(e) => e.key === 'Enter' && openEntryDialog()}
             >
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -698,10 +705,10 @@ const Index = () => {
             {/* Feature 3: Movement & Rehab */}
             <Card 
               className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group cursor-pointer active:scale-[0.98] hover:border-primary/30"
-              onClick={() => navigate('/auth')}
+              onClick={openEntryDialog}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && navigate('/auth')}
+              onKeyDown={(e) => e.key === 'Enter' && openEntryDialog()}
             >
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -718,10 +725,10 @@ const Index = () => {
             {/* Feature 4: The Mumtaz Community */}
             <Card 
               className="bg-card/90 backdrop-blur-sm border-border hover:shadow-xl transition-all group cursor-pointer active:scale-[0.98] hover:border-accent/30"
-              onClick={() => navigate('/auth')}
+              onClick={openEntryDialog}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && navigate('/auth')}
+              onKeyDown={(e) => e.key === 'Enter' && openEntryDialog()}
             >
               <CardHeader>
                 <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -753,7 +760,7 @@ const Index = () => {
               <Button 
                 size="lg"
                 variant="outline"
-                onClick={() => navigate('/onboarding')}
+                onClick={openEntryDialog}
                 className="border-2 border-primary/50 hover:bg-primary/10 h-auto py-6 flex flex-col gap-2"
               >
                 <Users className="h-6 w-6" />
@@ -763,7 +770,7 @@ const Index = () => {
               <Button 
                 size="lg"
                 variant="outline"
-                onClick={() => navigate('/bookings')}
+                onClick={openEntryDialog}
                 className="border-2 border-accent/50 hover:bg-accent/10 h-auto py-6 flex flex-col gap-2"
               >
                 <Sparkles className="h-6 w-6" />
@@ -772,11 +779,11 @@ const Index = () => {
 
               <Button 
                 size="lg"
-                onClick={() => navigate('/onboarding')}
+                onClick={openEntryDialog}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground h-auto py-6 flex flex-col gap-2 shadow-lg"
               >
                 <Download className="h-6 w-6" />
-                <span className="font-semibold">Download the<br />Mumtaz Health App</span>
+                <span className="font-semibold">Get Started<br />with Mumtaz Health</span>
               </Button>
             </div>
 
