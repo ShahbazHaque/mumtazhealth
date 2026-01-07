@@ -4,14 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sparkles, Send, Loader2, History, Trash2, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import mumtazAvatar from "@/assets/mumtaz-avatar.jpeg";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface Message {
   role: "user" | "assistant";
@@ -43,7 +43,7 @@ export function MumtazWisdomGuide() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeTab, setActiveTab] = useState<"chat" | "history">("chat");
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const location = useLocation();
 
@@ -76,10 +76,11 @@ export function MumtazWisdomGuide() {
   }, [open, userProfile]);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    // Auto-scroll to bottom when messages change
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, loading]);
 
   const fetchUserProfile = async () => {
     try {
@@ -308,9 +309,18 @@ export function MumtazWisdomGuide() {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl h-[600px] p-0 gap-0 animate-scale-in">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "chat" | "history")} className="h-full flex flex-col">
-          <CardHeader className="pb-3 border-b bg-gradient-to-r from-wellness-lilac/10 to-wellness-sage/10">
+      <DialogContent 
+        className="sm:max-w-2xl p-0 gap-0 animate-scale-in max-h-[90vh] h-[600px] flex flex-col overflow-hidden"
+        aria-describedby="chatbot-description"
+      >
+        <VisuallyHidden>
+          <DialogTitle>Mumtaz Wisdom Guide</DialogTitle>
+          <DialogDescription id="chatbot-description">
+            Your personal wellness companion chatbot
+          </DialogDescription>
+        </VisuallyHidden>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "chat" | "history")} className="flex flex-col h-full min-h-0">
+          <CardHeader className="pb-3 border-b bg-gradient-to-r from-wellness-lilac/10 to-wellness-sage/10 shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12 border-2 border-accent">
@@ -339,8 +349,9 @@ export function MumtazWisdomGuide() {
             </div>
           </CardHeader>
 
-          <TabsContent value="chat" className="flex-1 flex flex-col m-0 h-[calc(600px-80px)]">
-            <ScrollArea ref={scrollRef} className="flex-1 p-4">
+          <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
+            {/* Scrollable messages area */}
+            <div className="flex-1 overflow-y-auto p-4 min-h-0">
               <div className="space-y-4">
                 {messages.map((message, index) => (
                   <div
@@ -350,7 +361,7 @@ export function MumtazWisdomGuide() {
                     }`}
                   >
                     {message.role === "assistant" && (
-                      <Avatar className="h-8 w-8 border border-accent/30">
+                      <Avatar className="h-8 w-8 border border-accent/30 shrink-0">
                         <AvatarImage src={mumtazAvatar} />
                         <AvatarFallback className="bg-accent/20">
                           <Sparkles className="h-4 w-4 text-accent" />
@@ -364,13 +375,13 @@ export function MumtazWisdomGuide() {
                           : "bg-muted"
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                     </div>
                   </div>
                 ))}
                 {loading && (
                   <div className="flex gap-3 justify-start">
-                    <Avatar className="h-8 w-8 border border-accent/30">
+                    <Avatar className="h-8 w-8 border border-accent/30 shrink-0">
                       <AvatarFallback className="bg-accent/20">
                         <Sparkles className="h-4 w-4 text-accent" />
                       </AvatarFallback>
@@ -380,9 +391,12 @@ export function MumtazWisdomGuide() {
                     </div>
                   </div>
                 )}
+                {/* Scroll anchor */}
+                <div ref={messagesEndRef} />
               </div>
-            </ScrollArea>
-            <div className="p-4 border-t bg-background">
+            </div>
+            {/* Fixed input area at bottom */}
+            <div className="p-4 border-t bg-background shrink-0 pb-safe">
               <div className="flex gap-2 mb-2">
                 <Button
                   variant="outline"
@@ -415,47 +429,45 @@ export function MumtazWisdomGuide() {
             </div>
           </TabsContent>
 
-          <TabsContent value="history" className="flex-1 m-0 h-[calc(600px-80px)]">
-            <ScrollArea className="h-full">
-              <div className="p-4 space-y-2">
-                {conversations.length === 0 ? (
-                  <div className="text-center text-muted-foreground py-8">
-                    <History className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>No conversation history yet</p>
-                    <p className="text-sm">Start a chat to save your conversations</p>
-                  </div>
-                ) : (
-                  conversations.map((conv) => (
-                    <div
-                      key={conv.id}
-                      className="flex items-start gap-2 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+          <TabsContent value="history" className="flex-1 m-0 min-h-0 overflow-hidden">
+            <div className="h-full overflow-y-auto p-4 space-y-2">
+              {conversations.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  <History className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>No conversation history yet</p>
+                  <p className="text-sm">Start a chat to save your conversations</p>
+                </div>
+              ) : (
+                conversations.map((conv) => (
+                  <div
+                    key={conv.id}
+                    className="flex items-start gap-2 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+                  >
+                    <button
+                      onClick={() => loadConversation(conv.id)}
+                      className="flex-1 text-left"
                     >
-                      <button
-                        onClick={() => loadConversation(conv.id)}
-                        className="flex-1 text-left"
-                      >
-                        <p className="text-sm font-medium">{conv.preview}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(conv.created_at).toLocaleDateString()} at{" "}
-                          {new Date(conv.created_at).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
-                      </button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteConversation(conv.id)}
-                        className="h-8 w-8"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
+                      <p className="text-sm font-medium">{conv.preview}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(conv.created_at).toLocaleDateString()} at{" "}
+                        {new Date(conv.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteConversation(conv.id)}
+                      className="h-8 w-8"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>
