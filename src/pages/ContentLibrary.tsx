@@ -1172,11 +1172,37 @@ const ContentLibrary = () => {
                   className="h-auto py-4 flex flex-col items-center gap-2 bg-background/60 hover:bg-background border-wellness-sage/30"
                   onClick={() => {
                     const lastActivity = localStorage.getItem('mumtaz_last_activity');
+                    const recentlyViewed = localStorage.getItem('mumtaz_recently_viewed');
+                    
                     if (lastActivity) {
-                      const activity = JSON.parse(lastActivity);
-                      navigate(activity.path);
-                    } else {
-                      toast.info("You might like to explore something new today");
+                      try {
+                        const activity = JSON.parse(lastActivity);
+                        if (activity.path) {
+                          navigate(activity.path);
+                          return;
+                        }
+                      } catch (e) {
+                        // Fall through to recent items
+                      }
+                    }
+                    
+                    // Try recently viewed as fallback
+                    if (recentlyViewed) {
+                      try {
+                        const recent = JSON.parse(recentlyViewed);
+                        if (Array.isArray(recent) && recent.length > 0 && recent[0].id) {
+                          navigate(`/content-library?highlight=${recent[0].id}`);
+                          return;
+                        }
+                      } catch (e) {
+                        // Fall through to library
+                      }
+                    }
+                    
+                    // Default: scroll to content section
+                    const contentSection = document.querySelector('[data-content-grid]');
+                    if (contentSection) {
+                      contentSection.scrollIntoView({ behavior: 'smooth' });
                     }
                   }}
                 >
@@ -1188,7 +1214,24 @@ const ContentLibrary = () => {
                 <Button 
                   variant="outline" 
                   className="h-auto py-4 flex flex-col items-center gap-2 bg-background/60 hover:bg-background border-wellness-lilac/30"
-                  onClick={() => navigate('/content-library?filter=favorites')}
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSelectedCategory("all");
+                    setSelectedDosha("all");
+                    setSelectedLifePhase("all");
+                    setSelectedMobility("all");
+                    setSelectedConcern("all");
+                    setSelectedCompletion("all");
+                    setActiveQuickFilters(new Set());
+                    // Navigate to favorites tab
+                    const favoritesTab = document.querySelector('[value="saved"]') as HTMLButtonElement;
+                    if (favoritesTab) {
+                      favoritesTab.click();
+                      setTimeout(() => {
+                        favoritesTab.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }
+                  }}
                 >
                   <Heart className="h-5 w-5 text-wellness-lilac" />
                   <span className="text-sm font-medium">Your saved practices</span>
@@ -1207,6 +1250,13 @@ const ContentLibrary = () => {
                     setSelectedConcern("all");
                     setSelectedCompletion("all");
                     setActiveQuickFilters(new Set());
+                    // Scroll to content section
+                    setTimeout(() => {
+                      const contentSection = document.querySelector('[data-content-grid]');
+                      if (contentSection) {
+                        contentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }, 100);
                   }}
                 >
                   <BookOpen className="h-5 w-5 text-primary" />
@@ -1585,7 +1635,7 @@ const ContentLibrary = () => {
             {loading ? (
               <ContentGridSkeleton count={6} />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-content-grid>
             {filteredContent.map((item) => {
             const isLocked = !isContentUnlocked(item);
             
