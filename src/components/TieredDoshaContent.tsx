@@ -796,14 +796,37 @@ export function TieredDoshaContent({ userTier, primaryDosha, secondaryDosha, lif
         />
       )}
       
-      {/* Practitioner relationship messaging */}
+      {/* Practitioner relationship messaging - App as companion, not replacement */}
       <Card className="border-wellness-sage/30 bg-wellness-sage/5">
-        <CardContent className="p-5 space-y-3">
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            <strong className="text-foreground">This app doesn't replace personal guidance.</strong> It introduces you to a way of understanding yourself — and invites you to learn more with expert support when you're ready.
+        <CardContent className="p-5 space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-full bg-wellness-sage/20 flex-shrink-0">
+              <Shield className="h-4 w-4 text-wellness-sage" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">
+                Your wellness companion — not a replacement for care
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                This app offers educational content and supportive guidance to help you understand your body. 
+                It is designed to complement — not replace — qualified practitioners, medical professionals, or personalised treatment plans.
+              </p>
+            </div>
+          </div>
+          
+          <div className="p-3 rounded-lg bg-wellness-lilac/10 border border-wellness-lilac/20">
+            <p className="text-sm text-muted-foreground">
+              <strong className="text-foreground">Ready for deeper support?</strong> For personalised Ayurvedic consultations, 
+              tailored herbal remedies, workshops, retreats, or teacher training — work directly with Mumtaz as your practitioner.
+            </p>
+          </div>
+          
+          <p className="text-xs text-muted-foreground italic text-center">
+            Guided by 30+ years of holistic expertise. Human wisdom, gently delivered through digital care.
           </p>
-          <p className="text-xs text-muted-foreground italic">
-            Guided by experience. Supported by technology.
+          
+          <p className="text-xs text-center text-muted-foreground">
+            This is not medical advice. Please seek doctor clearance when needed.
           </p>
         </CardContent>
       </Card>
