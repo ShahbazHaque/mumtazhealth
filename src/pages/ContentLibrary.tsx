@@ -1719,7 +1719,7 @@ const ContentLibrary = () => {
                       </div>
                     )}
                     
-                    {/* Other Badges */}
+                    {/* Content Type, Duration, Difficulty */}
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="secondary" className="capitalize">
                         {item.content_type}
@@ -1731,6 +1731,36 @@ const ContentLibrary = () => {
                         <Badge variant="outline">{item.duration_minutes} min</Badge>
                       )}
                     </div>
+                    
+                    {/* Life Phases & Pregnancy Statuses */}
+                    {((item.cycle_phases && item.cycle_phases.length > 0) || 
+                      (item.pregnancy_statuses && item.pregnancy_statuses.length > 0)) && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {item.cycle_phases?.slice(0, 2).map((phase) => (
+                          <Badge 
+                            key={phase} 
+                            variant="outline" 
+                            className="text-xs capitalize bg-wellness-lilac-light/30"
+                          >
+                            {phase.replace(/-/g, ' ').replace(/_/g, ' ')}
+                          </Badge>
+                        ))}
+                        {item.cycle_phases && item.cycle_phases.length > 2 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{item.cycle_phases.length - 2}
+                          </Badge>
+                        )}
+                        {item.pregnancy_statuses?.slice(0, 2).map((status) => (
+                          <Badge 
+                            key={status} 
+                            variant="outline" 
+                            className="text-xs capitalize bg-pink-50 dark:bg-pink-900/20"
+                          >
+                            {status.replace(/-/g, ' ').replace(/_/g, ' ')}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex gap-2">
@@ -1933,6 +1963,7 @@ const ContentLibrary = () => {
                       
                       <CardContent>
                         <div className="space-y-3 mb-4">
+                          {/* Dosha Icons */}
                           {item.doshas && item.doshas.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                               {item.doshas.map((dosha) => (
@@ -1941,6 +1972,7 @@ const ContentLibrary = () => {
                             </div>
                           )}
                           
+                          {/* Content Type, Duration, Difficulty */}
                           <div className="flex flex-wrap gap-2">
                             <Badge variant="secondary" className="capitalize">
                               {item.content_type}
@@ -1952,6 +1984,36 @@ const ContentLibrary = () => {
                               <Badge variant="outline">{item.duration_minutes} min</Badge>
                             )}
                           </div>
+                          
+                          {/* Life Phases & Pregnancy Statuses */}
+                          {((item.cycle_phases && item.cycle_phases.length > 0) || 
+                            (item.pregnancy_statuses && item.pregnancy_statuses.length > 0)) && (
+                            <div className="flex flex-wrap gap-1.5">
+                              {item.cycle_phases?.slice(0, 2).map((phase) => (
+                                <Badge 
+                                  key={phase} 
+                                  variant="outline" 
+                                  className="text-xs capitalize bg-wellness-lilac-light/30"
+                                >
+                                  {phase.replace(/-/g, ' ').replace(/_/g, ' ')}
+                                </Badge>
+                              ))}
+                              {item.cycle_phases && item.cycle_phases.length > 2 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{item.cycle_phases.length - 2}
+                                </Badge>
+                              )}
+                              {item.pregnancy_statuses?.slice(0, 2).map((status) => (
+                                <Badge 
+                                  key={status} 
+                                  variant="outline" 
+                                  className="text-xs capitalize bg-pink-50 dark:bg-pink-900/20"
+                                >
+                                  {status.replace(/-/g, ' ').replace(/_/g, ' ')}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         
                         <div className="flex gap-2">
