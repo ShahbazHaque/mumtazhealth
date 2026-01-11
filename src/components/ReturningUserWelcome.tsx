@@ -21,6 +21,7 @@ import {
   Flower2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { WELCOME_MESSAGES, JOURNEY_MESSAGES, PRACTITIONER_MESSAGES } from "@/constants/appMessaging";
 
 interface ReturningUserWelcomeProps {
   onClose: () => void;
@@ -132,10 +133,10 @@ export function ReturningUserWelcome({ onClose }: ReturningUserWelcomeProps) {
         <DialogHeader>
           <DialogTitle className="text-2xl flex items-center gap-2">
             <Flower2 className="h-6 w-6 text-primary" />
-            Welcome Back{username ? `, ${username}` : ""}!
+            {WELCOME_MESSAGES.returningUser}{username ? `, ${username}` : ""}!
           </DialogTitle>
           <DialogDescription className="text-base">
-            Your wellness journey adapts as you change. Choose how you'd like to continue today.
+            {JOURNEY_MESSAGES.phaseEvolution} {WELCOME_MESSAGES.entryPrompt}
           </DialogDescription>
         </DialogHeader>
 
@@ -184,7 +185,7 @@ export function ReturningUserWelcome({ onClose }: ReturningUserWelcomeProps) {
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground">Update My Stage</h3>
                 <p className="text-sm text-muted-foreground">
-                  Life has changed? Update your preferences
+                  {JOURNEY_MESSAGES.phaseUpdate}
                 </p>
               </div>
               <ArrowRight className="h-5 w-5 text-muted-foreground" />
@@ -219,11 +220,10 @@ export function ReturningUserWelcome({ onClose }: ReturningUserWelcomeProps) {
             <Sparkles className="h-5 w-5 text-primary mt-0.5" />
             <div>
               <p className="text-sm text-foreground font-medium">
-                Your needs evolve, and so does this app
+                {JOURNEY_MESSAGES.phaseEvolution}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Whether you're moving from fertility to pregnancy, or perimenopause to post-menopause, 
-                we're here to support your unique journey.
+                {JOURNEY_MESSAGES.phaseReassurance}
               </p>
             </div>
           </div>
