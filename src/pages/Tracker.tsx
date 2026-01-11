@@ -20,6 +20,7 @@ import { PregnancyEducation } from "@/components/PregnancyEducation";
 import { PostpartumEducation } from "@/components/PostpartumEducation";
 import { DailyRhythm } from "@/components/DailyRhythm";
 import { BodyChangingEducation } from "@/components/BodyChangingEducation";
+import { AppCompanionDisclaimer } from "@/components/AppCompanionDisclaimer";
 
 interface DailyPractice {
   id: string;
@@ -1321,6 +1322,9 @@ export default function Tracker() {
           </CardContent>
         </Card>
         )}
+
+        {/* Companion Disclaimer */}
+        <AppCompanionDisclaimer variant="subtle" className="mt-8 mb-24 text-center" />
 
         {/* Fixed Footer */}
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t shadow-2xl p-4">
