@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Joyride, { CallBackProps, STATUS, Step } from "react-joyride";
 import { supabase } from "@/integrations/supabase/client";
+import { ONBOARDING_MESSAGES, JOURNEY_MESSAGES } from "@/constants/appMessaging";
 
 interface OnboardingTourProps {
   run: boolean;
@@ -11,38 +12,38 @@ export function OnboardingTour({ run, onComplete }: OnboardingTourProps) {
   const steps: Step[] = [
     {
       target: "body",
-      content: "Welcome to Mumtaz Health! Let me show you around your personalized wellness journey. 🌸",
+      content: ONBOARDING_MESSAGES.welcome + " 🌸",
       placement: "center",
       disableBeacon: true,
     },
     {
       target: '[data-tour="profile-summary"]',
-      content: "Here's your wellness profile at a glance - your life stage, dosha type, and spiritual path.",
+      content: ONBOARDING_MESSAGES.profileIntro,
       placement: "bottom",
     },
     {
       target: '[data-tour="progress-tracker"]',
-      content: "Track your wellness journey with check-ins and milestones. Watch your progress grow! 📈",
+      content: ONBOARDING_MESSAGES.trackingIntro + " 📈",
       placement: "bottom",
     },
     {
       target: '[data-tour="daily-tracker"]',
-      content: "Start your day here - log your wellness entries and track how you're feeling.",
+      content: "Start your day here — log your wellness entries and understand your patterns over time.",
       placement: "top",
     },
     {
       target: '[data-tour="symptom-tracker"]',
-      content: "Track PCOS, Endometriosis, and other symptoms to understand patterns over time.",
+      content: "Track symptoms to understand patterns — " + JOURNEY_MESSAGES.progressUnlocking,
       placement: "top",
     },
     {
       target: '[data-tour="content-library"]',
-      content: "Explore personalized yoga, meditation, nutrition, and wellness content tailored to your dosha and life stage. 🧘‍♀️",
+      content: ONBOARDING_MESSAGES.libraryIntro + " 🧘‍♀️",
       placement: "top",
     },
     {
       target: '[data-tour="insights"]',
-      content: "View your wellness insights and AI-powered analysis to make informed decisions about your health.",
+      content: ONBOARDING_MESSAGES.insightsIntro,
       placement: "top",
     },
   ];
@@ -93,7 +94,7 @@ export function OnboardingTour({ run, onComplete }: OnboardingTourProps) {
       locale={{
         back: "Back",
         close: "Close",
-        last: "Finish",
+        last: "Begin Your Journey",
         next: "Next",
         skip: "Skip tour",
       }}

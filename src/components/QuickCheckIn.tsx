@@ -6,6 +6,7 @@ import { Heart, X, Sparkles, ArrowRight, Star, StarOff, TrendingUp } from "lucid
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { CHECKIN_MESSAGES, JOURNEY_MESSAGES } from "@/constants/appMessaging";
 
 const feelingOptions = [
   { id: "tired", label: "Tired", emoji: "😴", color: "from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30" },

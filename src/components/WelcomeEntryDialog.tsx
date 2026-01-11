@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Heart, BookOpen, Activity, Sparkles, ArrowRight } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { CORE_MESSAGES, WELCOME_MESSAGES, JOURNEY_MESSAGES } from "@/constants/appMessaging";
 
 interface WelcomeEntryDialogProps {
   open: boolean;
@@ -24,7 +25,7 @@ export function WelcomeEntryDialog({ open, onOpenChange }: WelcomeEntryDialogPro
     {
       id: "quick-checkin",
       title: "Quick check-in",
-      description: "Tell me how you're feeling right now — it only takes a moment.",
+      description: WELCOME_MESSAGES.quickCheckInInvite,
       icon: Heart,
       color: "accent",
       path: "/onboarding?mode=quick",
@@ -32,7 +33,7 @@ export function WelcomeEntryDialog({ open, onOpenChange }: WelcomeEntryDialogPro
     {
       id: "explore-library",
       title: "Explore the library",
-      description: "Browse yoga, nutrition, and wellness content at your own pace.",
+      description: WELCOME_MESSAGES.exploreInvite,
       icon: BookOpen,
       color: "primary",
       path: "/auth?redirect=content-library",
@@ -40,7 +41,7 @@ export function WelcomeEntryDialog({ open, onOpenChange }: WelcomeEntryDialogPro
     {
       id: "begin-tracking",
       title: "Begin tracking",
-      description: "Start tracking your symptoms, mood, and wellness journey.",
+      description: WELCOME_MESSAGES.trackingInvite,
       icon: Activity,
       color: "primary",
       path: "/onboarding",
@@ -48,7 +49,7 @@ export function WelcomeEntryDialog({ open, onOpenChange }: WelcomeEntryDialogPro
     {
       id: "update-journey",
       title: "Update my journey",
-      description: "Already have an account? Sign in to continue your wellness path.",
+      description: WELCOME_MESSAGES.journeyUpdate,
       icon: Sparkles,
       color: "accent",
       path: "/auth",
@@ -71,10 +72,10 @@ export function WelcomeEntryDialog({ open, onOpenChange }: WelcomeEntryDialogPro
         <div className="bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20 p-6 text-center border-b">
           <Logo size="lg" className="mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-2">
-            Welcome to Mumtaz Health
+            {WELCOME_MESSAGES.newUser}
           </h2>
           <p className="text-muted-foreground">
-            How would you like to get started?
+            {WELCOME_MESSAGES.entryPrompt}
           </p>
         </div>
 
@@ -120,7 +121,7 @@ export function WelcomeEntryDialog({ open, onOpenChange }: WelcomeEntryDialogPro
 
         <div className="p-4 pt-2 border-t bg-muted/30">
           <p className="text-xs text-center text-muted-foreground">
-            No pressure — explore at your own pace. Your wellness journey starts when you're ready.
+            {CORE_MESSAGES.paceMessage}
           </p>
         </div>
       </DialogContent>
