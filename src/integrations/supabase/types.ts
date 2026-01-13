@@ -350,6 +350,48 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_practices: {
+        Row: {
+          created_at: string
+          id: string
+          is_favorite: boolean | null
+          last_used_at: string | null
+          practice_data: Json | null
+          practice_description: string | null
+          practice_title: string
+          practice_type: string
+          times_used: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          last_used_at?: string | null
+          practice_data?: Json | null
+          practice_description?: string | null
+          practice_title: string
+          practice_type: string
+          times_used?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          last_used_at?: string | null
+          practice_data?: Json | null
+          practice_description?: string | null
+          practice_title?: string
+          practice_type?: string
+          times_used?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           category: string
@@ -392,6 +434,66 @@ export type Database = {
           price?: number
           title?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      support_plan_logs: {
+        Row: {
+          action_taken: string | null
+          created_at: string
+          entry_date: string
+          helped_digestion: boolean | null
+          helped_energy: boolean | null
+          helped_mood: boolean | null
+          helped_pain: boolean | null
+          helped_sleep: boolean | null
+          id: string
+          notes: string | null
+          recommendation_description: string | null
+          recommendation_id: string | null
+          recommendation_title: string
+          recommendation_type: string
+          support_rating: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string
+          entry_date?: string
+          helped_digestion?: boolean | null
+          helped_energy?: boolean | null
+          helped_mood?: boolean | null
+          helped_pain?: boolean | null
+          helped_sleep?: boolean | null
+          id?: string
+          notes?: string | null
+          recommendation_description?: string | null
+          recommendation_id?: string | null
+          recommendation_title: string
+          recommendation_type: string
+          support_rating?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string
+          entry_date?: string
+          helped_digestion?: boolean | null
+          helped_energy?: boolean | null
+          helped_mood?: boolean | null
+          helped_pain?: boolean | null
+          helped_sleep?: boolean | null
+          id?: string
+          notes?: string | null
+          recommendation_description?: string | null
+          recommendation_id?: string | null
+          recommendation_title?: string
+          recommendation_type?: string
+          support_rating?: number | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -654,6 +756,60 @@ export type Database = {
           unlock_after_completions?: number | null
           updated_at?: string | null
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      wellness_effectiveness: {
+        Row: {
+          created_at: string
+          current_symptoms: string[] | null
+          digestion_improvement: boolean | null
+          energy_improvement: boolean | null
+          entry_date: string
+          id: string
+          life_stage: string | null
+          mood_improvement: boolean | null
+          overall_effectiveness: number | null
+          pain_improvement: boolean | null
+          practices_tried: string[] | null
+          reflections: string | null
+          sleep_improvement: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_symptoms?: string[] | null
+          digestion_improvement?: boolean | null
+          energy_improvement?: boolean | null
+          entry_date?: string
+          id?: string
+          life_stage?: string | null
+          mood_improvement?: boolean | null
+          overall_effectiveness?: number | null
+          pain_improvement?: boolean | null
+          practices_tried?: string[] | null
+          reflections?: string | null
+          sleep_improvement?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_symptoms?: string[] | null
+          digestion_improvement?: boolean | null
+          energy_improvement?: boolean | null
+          entry_date?: string
+          id?: string
+          life_stage?: string | null
+          mood_improvement?: boolean | null
+          overall_effectiveness?: number | null
+          pain_improvement?: boolean | null
+          practices_tried?: string[] | null
+          reflections?: string | null
+          sleep_improvement?: boolean | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
