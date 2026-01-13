@@ -21,6 +21,7 @@ import { PostpartumEducation } from "@/components/PostpartumEducation";
 import { DailyRhythm } from "@/components/DailyRhythm";
 import { BodyChangingEducation } from "@/components/BodyChangingEducation";
 import { AppCompanionDisclaimer } from "@/components/AppCompanionDisclaimer";
+import { SupportPlanModal } from "@/components/SupportPlan";
 
 interface DailyPractice {
   id: string;
@@ -124,6 +125,10 @@ export default function Tracker() {
   const [menopauseJointPain, setMenopauseJointPain] = useState('');
   const [menopauseDigestion, setMenopauseDigestion] = useState('');
   
+  // Support Plan modal state
+  const [showSupportPlan, setShowSupportPlan] = useState(false);
+  const [userDosha, setUserDosha] = useState<string | undefined>();
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -162,7 +167,7 @@ export default function Tracker() {
     
     const { data, error } = await supabase
       .from('user_wellness_profiles')
-      .select('onboarding_completed, life_stage')
+      .select('onboarding_completed, life_stage, primary_dosha')
       .eq('user_id', user.id)
       .maybeSingle();
     
@@ -171,9 +176,12 @@ export default function Tracker() {
       return;
     }
     
-    // Set life stage if available
+    // Set life stage and dosha if available
     if (data?.life_stage) {
       setLifeStage(data.life_stage);
+    }
+    if (data?.primary_dosha) {
+      setUserDosha(data.primary_dosha);
     }
     
     // If no profile exists or onboarding not completed, redirect to onboarding
@@ -419,6 +427,8 @@ export default function Tracker() {
       if (error) throw error;
       
       toast.success(`Progress saved for ${selectedDate}!`);
+      // Show the Support Plan modal after saving
+      setShowSupportPlan(true);
     } catch (error) {
       console.error('Error saving data:', error);
       toast.error('Error saving data. Please try again.');
@@ -1347,6 +1357,19 @@ export default function Tracker() {
           </div>
         </div>
       </div>
+      
+      {/* Support Plan Modal */}
+      {user && (
+        <SupportPlanModal
+          open={showSupportPlan}
+          onOpenChange={setShowSupportPlan}
+          userId={user.id}
+          entryDate={selectedDate}
+          lifeStage={lifeStage}
+          symptoms={[emotionalState, physicalSymptoms, vataCrash].filter(Boolean)}
+          dosha={userDosha}
+        />
+      )}
     </div>
   );
 }
