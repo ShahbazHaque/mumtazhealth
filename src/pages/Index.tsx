@@ -575,11 +575,11 @@ const Index = () => {
             {/* Left: Copy */}
             <div className="text-center lg:text-left order-2 lg:order-1">
               <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-                Mumtaz Health: Your Sanctuary for Holistic Wellness
+                Mumtaz Health: A Safe Space for Your Wellness Journey
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-                Built on 30+ years of personal experience in Yoga, Ayurveda, and spiritual guidance. 
-                Support for every woman, in every phase.
+                Every woman's journey is unique. Built on 30+ years of holistic expertise in Yoga, Ayurveda, and 
+                spiritual guidance — this app evolves with you through every phase of life.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button 
@@ -622,7 +622,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-8">
-              Guided by Experience, Not Judgment
+              A Safe Space Without Judgment
             </h2>
             <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
               <p>
@@ -632,17 +632,22 @@ const Index = () => {
                 child healing and hands-on rehabilitation.
               </p>
               <p>
-                I created Mumtaz Health because I understand the journey—having navigated fertility challenges, 
-                postpartum mental health, peri-menopause, and recovery through hysterectomy rehab. This app introduces 
-                my personalized, one-size-does-not-fit-all approach to women's holistic wellness.
+                I created Mumtaz Health because I have faced many challenges myself and have been honoured to 
+                support countless women through their unique journeys — fertility, pregnancy, postpartum, 
+                menopause, recovery, and beyond. This app reflects my personalized, one-size-does-not-fit-all 
+                approach to women's holistic wellness.
               </p>
               <p className="text-2xl font-semibold text-foreground italic">
-                "I'm here to help, not judge. You are not alone."
+                "I'm here to support, not judge. Your journey is yours, and you are not alone."
               </p>
               <p>
-                Every challenge you face, I've walked through myself. This isn't just knowledge from books—
-                it's wisdom earned through lived experience, deep study, and decades of supporting women 
-                just like you.
+                This isn't just knowledge from books — it's wisdom earned through lived experience, deep study, 
+                and decades of walking alongside women just like you. While I may not have experienced everything 
+                personally, I have held space for many who have.
+              </p>
+              <p className="text-base text-muted-foreground/80 italic">
+                This app offers supportive guidance and is not a substitute for professional medical advice. 
+                Please consult your healthcare provider for medical concerns.
               </p>
             </div>
           </div>
@@ -654,10 +659,11 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
-              Integrated Support for Your Unique Journey
+              An App That Evolves With You
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Comprehensive guidance that honors the complexity of your life, your body, and your spirit
+              The more you engage, the more you unlock tailored guidance suited to your current needs. 
+              Changing phases is natural — this app is designed to support you without pressure or comparison.
             </p>
           </div>
 
@@ -676,8 +682,9 @@ const Index = () => {
                 </div>
                 <CardTitle className="text-2xl mb-3 group-hover:text-primary transition-colors">Life-Phase Tracker</CardTitle>
                 <CardDescription className="text-base leading-relaxed">
-                  Track symptoms, mood, and health goals specific to your current phase (Fertility, 
-                  Postpartum, Peri-Menopause). Understand your patterns and honor your body's wisdom.
+                  Track symptoms, mood, and wellness goals specific to your current phase — fertility, 
+                  pregnancy, postpartum, menopause, recovery, and more. Understand your patterns and 
+                  unlock insights that grow with you.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -696,8 +703,8 @@ const Index = () => {
                 </div>
                 <CardTitle className="text-2xl mb-3 group-hover:text-accent transition-colors">Holistic Guidance</CardTitle>
                 <CardDescription className="text-base leading-relaxed">
-                  Tap into curated guidance across Yoga, Ayurvedic Nutrition, and Spiritual Wisdom—
-                  available on demand for every challenge you face on your journey.
+                  Explore curated guidance across Yoga, Ayurveda-inspired nutrition, and spiritual wellness — 
+                  at your own pace, with no pressure. The more you explore, the more personalized it becomes.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -714,10 +721,10 @@ const Index = () => {
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Activity className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle className="text-2xl mb-3 group-hover:text-primary transition-colors">Movement & Rehab</CardTitle>
+                <CardTitle className="text-2xl mb-3 group-hover:text-primary transition-colors">Movement & Recovery</CardTitle>
                 <CardDescription className="text-base leading-relaxed">
-                  Access video flows and mobility work designed for sensitive life moments, like 
-                  hysterectomy rehab or postpartum recovery. Gentle, therapeutic, and deeply nurturing.
+                  Access gentle movement flows and supportive practices designed for sensitive life moments — 
+                  whether you're building confidence, recovering, or simply seeking nurturing movement.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -734,10 +741,10 @@ const Index = () => {
                 <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Users className="w-8 h-8 text-accent" />
                 </div>
-                <CardTitle className="text-2xl mb-3 group-hover:text-accent transition-colors">The Mumtaz Community</CardTitle>
+                <CardTitle className="text-2xl mb-3 group-hover:text-accent transition-colors">A Supportive Community</CardTitle>
                 <CardDescription className="text-base leading-relaxed">
-                  Connect, study, and share with like-minded women in a non-judgmental space. 
-                  Feel valued, supported, and inspired on your wellness journey.
+                  Connect with like-minded women in a safe, non-judgmental space. Share, learn, and 
+                  feel supported — without comparison or pressure. Everyone's path is unique.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -750,10 +757,15 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-8">
-              Deepen Your Connection
+              Begin Your Journey — At Your Own Pace
             </h2>
-            <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
-              Your life, your journey is a privilege. Let us help you celebrate it.
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+              This app is here to support your understanding, self-compassion, and growth. 
+              Explore at your own pace — there's no rush, no comparison, just gentle guidance.
+            </p>
+            <p className="text-lg text-muted-foreground mb-12 leading-relaxed">
+              As you continue using the app, you'll unlock more tailored insights suited to where you are right now. 
+              Changing phases is natural and not a failure — it's simply the next chapter of your story.
             </p>
 
             <div className="grid sm:grid-cols-3 gap-6 mb-12">
@@ -788,7 +800,7 @@ const Index = () => {
             </div>
 
             <p className="text-lg text-foreground italic font-medium">
-              Your life, your journey is a privilege. Let us help you celebrate it.
+              Your journey is unique and worthy of celebration. I'm here to walk alongside you.
             </p>
           </div>
         </div>
