@@ -155,39 +155,82 @@ export function SupportPlanModal({
           </div>
         </ScrollArea>
 
-        <div className="p-4 border-t bg-muted/30 flex justify-between items-center">
+        <div className="p-4 border-t bg-muted/30">
           {step === 'recommendations' ? (
-            <>
-              <Button
-                variant="ghost"
-                onClick={() => onOpenChange(false)}
-              >
-                Maybe Later
-              </Button>
-              <Button
-                onClick={() => setStep('log')}
-                className="bg-wellness-taupe hover:bg-wellness-taupe/90"
-              >
-                Continue to Reflection
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </>
+            <div className="flex flex-col gap-3">
+              <div className="flex justify-between items-center">
+                <Button
+                  variant="ghost"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Maybe Later
+                </Button>
+                <Button
+                  onClick={() => setStep('log')}
+                  className="bg-wellness-taupe hover:bg-wellness-taupe/90"
+                >
+                  Continue to Reflection
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </div>
           ) : (
-            <>
-              <Button
-                variant="ghost"
-                onClick={() => setStep('recommendations')}
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Back to Suggestions
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => onOpenChange(false)}
-              >
-                Skip for Now
-              </Button>
-            </>
+            <div className="flex flex-col gap-4">
+              <div className="flex justify-between items-center">
+                <Button
+                  variant="ghost"
+                  onClick={() => setStep('recommendations')}
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" />
+                  Back to Suggestions
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Skip for Now
+                </Button>
+              </div>
+              
+              {/* Navigation Options */}
+              <div className="pt-3 border-t border-border/50">
+                <p className="text-sm text-muted-foreground text-center mb-3">
+                  Where would you like to go next?
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1 text-sm"
+                    onClick={() => {
+                      onOpenChange(false);
+                      navigate('/my-daily-practice');
+                    }}
+                  >
+                    Continue Where I Left Off
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1 text-sm"
+                    onClick={() => {
+                      onOpenChange(false);
+                      navigate('/content-library?tab=favorites');
+                    }}
+                  >
+                    Go to My Favourites
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1 text-sm"
+                    onClick={() => {
+                      onOpenChange(false);
+                      navigate('/content-library');
+                    }}
+                  >
+                    Browse the Library
+                  </Button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </DialogContent>
