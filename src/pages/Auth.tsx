@@ -122,10 +122,6 @@ export default function Auth() {
     }
     
     if (isLogin) {
-      // Admin passwordless login
-      if (email.toLowerCase() === "mumtazhaque07@gmail.com") {
-        return email.trim().length > 0 && !validateField('email', email);
-      }
       return email.trim().length > 0 && 
              password.length > 0 && 
              !validateField('email', email) && 
@@ -206,7 +202,7 @@ export default function Auth() {
     const emailError = validateField('email', email);
     if (emailError) errors.push({ field: 'email', message: emailError });
     
-    if (!isResetPassword && email.toLowerCase() !== "mumtazhaque07@gmail.com") {
+    if (!isResetPassword) {
       const passwordError = validateField('password', password);
       if (passwordError) errors.push({ field: 'password', message: passwordError });
     }
@@ -240,33 +236,21 @@ export default function Auth() {
         setResetEmailSent(true);
         setResendCooldown(RESEND_COOLDOWN_SECONDS);
       } else if (isLogin) {
-        if (email.toLowerCase() === "mumtazhaque07@gmail.com") {
-          const { error } = await supabase.auth.signInWithOtp({
-            email,
-            options: {
-              emailRedirectTo: `${authBase}/`,
-            },
-          });
+        const { error, data } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-          if (error) throw error;
-          toast.success("Magic link sent! Check your email to log in.");
-        } else {
-          const { error, data } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-
-          if (error) {
-            if (error.message.includes("Invalid login credentials")) {
-              throw new Error("The email or password doesn't seem right. Please try again.");
-            }
-            throw error;
+        if (error) {
+          if (error.message.includes("Invalid login credentials")) {
+            throw new Error("The email or password doesn't seem right. Please try again.");
           }
+          throw error;
+        }
 
-          if (data.user) {
-            toast.success("Welcome back!");
-            navigate("/");
-          }
+        if (data.user) {
+          toast.success("Welcome back!");
+          navigate("/");
         }
       } else {
         const { error, data } = await supabase.auth.signUp({
@@ -428,7 +412,7 @@ export default function Auth() {
             </div>
 
             {/* Password field */}
-            {!isResetPassword && email.toLowerCase() !== "mumtazhaque07@gmail.com" && (
+            {!isResetPassword && (
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">
                   Password
@@ -511,12 +495,6 @@ export default function Auth() {
                     </div>
                   </div>
                 )}
-              </div>
-            )}
-
-            {isLogin && email.toLowerCase() === "mumtazhaque07@gmail.com" && (
-              <div className="p-3 bg-wellness-sage/10 border border-wellness-sage/20 rounded-md">
-                <p className="text-sm text-wellness-sage">🔓 Passwordless access - a magic link will be sent to your email</p>
               </div>
             )}
 

@@ -232,7 +232,18 @@ export function MumtazWisdomGuide() {
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
 
-    const userMessage: Message = { role: "user", content: input };
+    // Validate input length
+    const trimmedInput = input.trim();
+    if (trimmedInput.length > 2000) {
+      toast({
+        title: "Message too long",
+        description: "Please keep your message under 2000 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const userMessage: Message = { role: "user", content: trimmedInput };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);

@@ -1,9 +1,73 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+const MAX_MESSAGE_LENGTH = 2000;
+const MAX_MESSAGES = 50;
+
+// Validate and sanitize input
+function validateRequest(body: unknown): { 
+  valid: true; 
+  data: { messages: Array<{role: string; content: string}>; userName?: string; primaryDosha?: string; secondaryDosha?: string; lifeStage?: string }; 
+} | { valid: false; error: string } {
+  if (!body || typeof body !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  
+  const { messages, userName, primaryDosha, secondaryDosha, lifeStage } = body as Record<string, unknown>;
+  
+  // Validate messages array
+  if (!Array.isArray(messages)) {
+    return { valid: false, error: 'Messages must be an array' };
+  }
+  
+  if (messages.length > MAX_MESSAGES) {
+    return { valid: false, error: `Too many messages (max ${MAX_MESSAGES})` };
+  }
+  
+  const validatedMessages = [];
+  for (const msg of messages) {
+    if (!msg || typeof msg !== 'object') {
+      return { valid: false, error: 'Invalid message format' };
+    }
+    
+    const { role, content } = msg as Record<string, unknown>;
+    
+    if (typeof role !== 'string' || !['user', 'assistant', 'system'].includes(role)) {
+      return { valid: false, error: 'Invalid message role' };
+    }
+    
+    if (typeof content !== 'string') {
+      return { valid: false, error: 'Message content must be a string' };
+    }
+    
+    if (content.length > MAX_MESSAGE_LENGTH) {
+      return { valid: false, error: `Message too long (max ${MAX_MESSAGE_LENGTH} characters)` };
+    }
+    
+    validatedMessages.push({ role, content: content.trim() });
+  }
+  
+  // Validate optional fields
+  const validDoshas = ['vata', 'pitta', 'kapha'];
+  
+  return {
+    valid: true,
+    data: {
+      messages: validatedMessages,
+      userName: typeof userName === 'string' ? userName.substring(0, 100) : undefined,
+      primaryDosha: typeof primaryDosha === 'string' && validDoshas.includes(primaryDosha.toLowerCase()) 
+        ? primaryDosha.toLowerCase() : undefined,
+      secondaryDosha: typeof secondaryDosha === 'string' && validDoshas.includes(secondaryDosha.toLowerCase()) 
+        ? secondaryDosha.toLowerCase() : undefined,
+      lifeStage: typeof lifeStage === 'string' ? lifeStage.substring(0, 50) : undefined,
+    }
+  };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -11,7 +75,44 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, userName, primaryDosha, secondaryDosha, lifeStage } = await req.json();
+    // Authentication check - require valid auth token
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify the user is authenticated
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error("Auth error:", authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate request body
+    const body = await req.json();
+    const validation = validateRequest(body);
+    
+    if (!validation.valid) {
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { messages, userName, primaryDosha, secondaryDosha, lifeStage } = validation.data;
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -22,11 +123,12 @@ serve(async (req) => {
     const doshaGuidance = getDoshaGuidance(primaryDosha, secondaryDosha);
     const lifeStageGuidance = getLifeStageGuidance(lifeStage);
     
-    const systemPrompt = `You are Mumtaz, a warm and nurturing wellness guide with 30+ years of experience in Ayurveda, Yoga, and holistic healing. You're speaking with ${userName || "a beautiful soul"}.
+    const displayName = userName || "beautiful soul";
+    const systemPrompt = `You are Mumtaz, a warm and nurturing wellness guide with 30+ years of experience in Ayurveda, Yoga, and holistic healing. You're speaking with ${displayName}.
 
 Your approach:
 - Speak with genuine warmth and compassion - "I'm here to help, not judge"
-- Use the user's name naturally in conversation: "${userName}"
+- Use the user's name naturally in conversation: "${displayName}"
 - Provide practical, actionable guidance based on their unique constitution
 - Keep responses concise (2-3 paragraphs max) and encouraging
 - Reference specific Ayurvedic principles when relevant
@@ -36,7 +138,7 @@ ${doshaGuidance}
 
 ${lifeStageGuidance}
 
-Remember: Every woman's journey is unique. Honor where ${userName} is right now, and guide with support, not pressure.`;
+Remember: Every woman's journey is unique. Honor where ${displayName} is right now, and guide with support, not pressure.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -81,7 +183,7 @@ Remember: Every woman's journey is unique. Honor where ${userName} is right now,
   } catch (error) {
     console.error("Error in mumtaz-wisdom-guide:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: "An error occurred. Please try again." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
