@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Heart, Leaf, Moon, Sun, Activity, ChevronLeft, ChevronRight, Flame, Droplets, Mountain, Calendar } from "lucide-react";
+import { Sparkles, Heart, Leaf, Moon, Sun, Activity, ChevronLeft, ChevronRight, Flame, Droplets, Mountain, Calendar, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 // Import Mumtaz brand pose images
 import { 
@@ -18,6 +19,11 @@ import {
   mumtazYoga9, 
   mumtazYoga10 
 } from "@/assets/brandImages";
+
+interface UserProfile {
+  primaryDosha: string | null;
+  lifeStage: string | null;
+}
 
 interface PoseData {
   id: string;
@@ -362,13 +368,97 @@ const getDoshaColor = (dosha: string) => {
 export const PoseOfTheDay = () => {
   const navigate = useNavigate();
   const [currentPoseIndex, setCurrentPoseIndex] = useState(0);
+  const [userProfile, setUserProfile] = useState<UserProfile>({ primaryDosha: null, lifeStage: null });
+  const [isPersonalized, setIsPersonalized] = useState(false);
 
   useEffect(() => {
-    // Select pose based on day of year for consistency
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        // No user - use day-based selection
+        selectDayBasedPose();
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("user_wellness_profiles")
+        .select("primary_dosha, life_stage")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching user profile for pose:", error);
+        selectDayBasedPose();
+        return;
+      }
+
+      if (data?.primary_dosha || data?.life_stage) {
+        setUserProfile({
+          primaryDosha: data.primary_dosha,
+          lifeStage: data.life_stage
+        });
+        selectPersonalizedPose(data.primary_dosha, data.life_stage);
+      } else {
+        selectDayBasedPose();
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      selectDayBasedPose();
+    }
+  };
+
+  const selectDayBasedPose = () => {
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
     const poseIndex = dayOfYear % poseLibrary.length;
     setCurrentPoseIndex(poseIndex);
-  }, []);
+    setIsPersonalized(false);
+  };
+
+  const selectPersonalizedPose = (dosha: string | null, lifeStage: string | null) => {
+    // Score poses based on user's dosha and life stage
+    const scoredPoses = poseLibrary.map((pose, index) => {
+      let score = 0;
+      
+      // Match dosha
+      if (dosha && pose.doshaAlignment.primary.toLowerCase() === dosha.toLowerCase()) {
+        score += 3;
+      }
+      
+      // Match life stage
+      if (lifeStage) {
+        const stageMapping: Record<string, string[]> = {
+          menstrual_cycle: ["Menstrual", "Follicular", "Ovulatory", "Luteal"],
+          pregnancy: ["Pregnancy"],
+          postpartum: ["Postpartum"],
+          perimenopause: ["Perimenopause"],
+          menopause: ["Menopause"],
+          post_menopause: ["Post-Menopause"],
+        };
+        
+        const relevantPhases = stageMapping[lifeStage] || [];
+        if (pose.lifePhases.some(phase => 
+          relevantPhases.some(rp => phase.toLowerCase().includes(rp.toLowerCase()))
+        )) {
+          score += 2;
+        }
+      }
+      
+      // Add day-based variation to break ties
+      const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+      score += ((dayOfYear + index) % 10) / 10; // Small variation
+      
+      return { index, score };
+    });
+    
+    // Sort by score and pick the best match
+    scoredPoses.sort((a, b) => b.score - a.score);
+    setCurrentPoseIndex(scoredPoses[0].index);
+    setIsPersonalized(scoredPoses[0].score > 1);
+  };
 
   const currentPose = poseLibrary[currentPoseIndex];
 
@@ -387,6 +477,12 @@ export const PoseOfTheDay = () => {
           <div className="flex items-center gap-2">
             <Sun className="h-6 w-6 text-accent" />
             <span className="text-xl font-semibold">Pose of the Day</span>
+            {isPersonalized && (
+              <Badge variant="secondary" className="text-xs gap-1">
+                <User className="h-3 w-3" />
+                For you
+              </Badge>
+            )}
           </div>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" onClick={goToPrevious} className="h-8 w-8">
