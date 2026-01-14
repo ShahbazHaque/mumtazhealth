@@ -6,13 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ArrowLeft, Heart, HelpCircle, Settings as SettingsIcon, Sparkles } from "lucide-react";
+import { ArrowLeft, Heart, HelpCircle, Settings as SettingsIcon, Sparkles, Crown } from "lucide-react";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { Navigation } from "@/components/Navigation";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { AccountSettings } from "@/components/AccountSettings";
 import { LifeStageHelper } from "@/components/LifeStageHelper";
+import { SubscriptionManagement } from "@/components/SubscriptionManagement";
 
 const lifeStages = [
   { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling" },
@@ -217,6 +218,15 @@ export default function Settings() {
         <NotificationSettings />
         
         <DarkModeToggle />
+
+        {/* Subscription Management Section */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Crown className="w-5 h-5 text-primary" />
+            Subscription
+          </h2>
+          <SubscriptionManagement />
+        </div>
 
         {/* Account Settings Section */}
         <div className="mt-6">

@@ -9,6 +9,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// Admin email for notifications
+const ADMIN_EMAIL = "mumtazhaque07@gmail.com";
+
 interface WelcomeEmailRequest {
   userEmail: string;
   userName?: string;
@@ -22,11 +25,14 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { userEmail, userName }: WelcomeEmailRequest = await req.json();
 
+    console.log(`[send-welcome-email] Starting email send for: ${userEmail}`);
+
     const greeting = userName ? `Hello ${userName}` : "Hello beautiful";
 
-    const emailResponse = await resend.emails.send({
+    // Send welcome email to user
+    const userEmailResponse = await resend.emails.send({
       from: "Mumtaz Health <onboarding@resend.dev>",
-      reply_to: "mumtazhaque07@gmail.com",
+      reply_to: ADMIN_EMAIL,
       to: [userEmail],
       subject: "Welcome to Mumtaz Health 💜",
       html: `
@@ -54,15 +60,47 @@ const handler = async (req: Request): Promise<Response> => {
           <p style="line-height: 1.6; margin-bottom: 4px; color: #666; font-size: 14px;">Founder, Mumtaz Health</p>
           
           <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e5e5; text-align: center;">
-            <p style="color: #999; font-size: 12px;">Reply to this email: mumtazhaque07@gmail.com</p>
+            <p style="color: #999; font-size: 12px;">Reply to this email: ${ADMIN_EMAIL}</p>
           </div>
         </div>
       `,
     });
 
-    console.log("Welcome email sent successfully:", emailResponse);
+    console.log("[send-welcome-email] User welcome email sent:", userEmailResponse);
 
-    return new Response(JSON.stringify(emailResponse), {
+    // Send admin notification about new signup
+    try {
+      const adminNotificationResponse = await resend.emails.send({
+        from: "Mumtaz Health <onboarding@resend.dev>",
+        to: [ADMIN_EMAIL],
+        subject: `🎉 New User Signup: ${userName || userEmail}`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #333;">
+            <h1 style="color: #9B87C7; font-size: 24px; margin-bottom: 20px;">New User Registration 🎉</h1>
+            
+            <div style="background: #f8f5fc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <p style="margin: 0 0 10px 0;"><strong>Email:</strong> ${userEmail}</p>
+              ${userName ? `<p style="margin: 0 0 10px 0;"><strong>Username:</strong> ${userName}</p>` : ''}
+              <p style="margin: 0;"><strong>Registered at:</strong> ${new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' })}</p>
+            </div>
+            
+            <p style="color: #666; font-size: 14px;">
+              A new user has completed registration on Mumtaz Health. Their welcome email has been sent successfully.
+            </p>
+          </div>
+        `,
+      });
+
+      console.log("[send-welcome-email] Admin notification sent:", adminNotificationResponse);
+    } catch (adminError) {
+      // Log but don't fail the whole request if admin notification fails
+      console.error("[send-welcome-email] Admin notification failed (non-critical):", adminError);
+    }
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      userEmail: userEmailResponse 
+    }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
@@ -70,9 +108,12 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error("Error in send-welcome-email function:", error);
+    console.error("[send-welcome-email] Error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: "Failed to send welcome email. The user account was still created successfully."
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
