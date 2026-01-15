@@ -18,8 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { symptomTrackingSchema, validateInput, truncateText } from "@/lib/validation";
 
-type ConditionType = "pcos" | "endometriosis" | "pmdd" | "irregular" | "other";
+type ConditionType = "pcos" | "endometriosis" | "pmdd" | "irregular" | "arthritis" | "general";
 
 interface SymptomEntry {
   id: string;
@@ -123,15 +124,31 @@ export default function ConditionTracker() {
         return;
       }
 
+      // Validate input before saving
+      const validation = validateInput(symptomTrackingSchema, {
+        condition_type: selectedCondition,
+        pain_level: painLevel,
+        notes: notes.trim() || null,
+        symptoms: selectedSymptoms.slice(0, 50).map(s => truncateText(s, 100)),
+      });
+
+      if (!validation.success) {
+        toast.error((validation as { success: false; error: string }).error);
+        setLoading(false);
+        return;
+      }
+
+      const validatedData = validation.data;
+
       const { error } = await supabase
         .from("condition_symptom_tracking")
         .upsert({
           user_id: user.id,
-          condition_type: selectedCondition,
+          condition_type: validatedData.condition_type,
           entry_date: entryDate,
-          pain_level: painLevel,
-          symptoms: selectedSymptoms,
-          notes: notes.trim() || null,
+          pain_level: validatedData.pain_level,
+          symptoms: validatedData.symptoms,
+          notes: validatedData.notes,
         }, { onConflict: 'user_id,condition_type,entry_date' });
 
       if (error) throw error;

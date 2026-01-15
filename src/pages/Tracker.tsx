@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { wellnessEntrySchema, validateInput, truncateText } from "@/lib/validation";
 import { LogOut, Save, Trash2, UserCog, BarChart3, Plus, X, Calendar, BookOpen, Sparkles, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -357,55 +358,79 @@ export default function Tracker() {
     if (!user) return;
     
     try {
+      // Validate text inputs before saving
+      const validation = validateInput(wellnessEntrySchema, {
+        emotional_state: emotionalState || null,
+        physical_symptoms: physicalSymptoms || null,
+        spiritual_anchor: spiritualAnchor || null,
+        vata_crash: vataCrash || null,
+        tweak_plan: tweakPlan || null,
+        monthly_reflection: monthlyReflection || null,
+        pain_level: painLevel ? parseInt(painLevel) : null,
+        emotional_score: emotionalScore ? parseInt(emotionalScore) : null,
+        trimester: trimester ? parseInt(trimester) : null,
+      });
+
+      if (!validation.success) {
+        toast.error((validation as { success: false; error: string }).error);
+        return;
+      }
+
+      const validatedData = validation.data;
+
       const entryData = {
         user_id: user.id,
         entry_date: selectedDate,
-        cycle_phase: cyclePhase,
-        trimester: trimester ? parseInt(trimester) : null,
-        pain_level: painLevel ? parseInt(painLevel) : null,
-        emotional_score: emotionalScore ? parseInt(emotionalScore) : null,
-        spiritual_anchor: spiritualAnchor,
-        emotional_state: emotionalState,
-        physical_symptoms: physicalSymptoms,
-        vata_crash: vataCrash,
-        tweak_plan: tweakPlan,
-        monthly_reflection: monthlyReflection,
+        cycle_phase: truncateText(cyclePhase, 50),
+        trimester: validatedData.trimester,
+        pain_level: validatedData.pain_level,
+        emotional_score: validatedData.emotional_score,
+        spiritual_anchor: validatedData.spiritual_anchor,
+        emotional_state: validatedData.emotional_state,
+        physical_symptoms: validatedData.physical_symptoms,
+        vata_crash: validatedData.vata_crash,
+        tweak_plan: validatedData.tweak_plan,
+        monthly_reflection: validatedData.monthly_reflection,
         daily_practices: practices,
         pregnancy_tracking: {
-          nausea: pregnancyNausea,
-          fatigue: pregnancyFatigue,
-          sleep: pregnancySleep,
-          mood: pregnancyMood,
-          backPain: pregnancyBackPain,
-          digestion: pregnancyDigestion,
-          babyMovement: pregnancyBabyMovement,
-          notes: pregnancyNotes,
+          nausea: truncateText(pregnancyNausea, 100),
+          fatigue: truncateText(pregnancyFatigue, 100),
+          sleep: truncateText(pregnancySleep, 100),
+          mood: truncateText(pregnancyMood, 100),
+          backPain: truncateText(pregnancyBackPain, 100),
+          digestion: truncateText(pregnancyDigestion, 100),
+          babyMovement: truncateText(pregnancyBabyMovement, 100),
+          notes: truncateText(pregnancyNotes, 500),
         },
         postpartum_tracking: {
-          sleep: postpartumSleep,
-          mood: postpartumMood,
-          energy: postpartumEnergy,
-          pain: postpartumPain,
-          feeding: postpartumFeeding,
-          notes: postpartumNotes,
+          sleep: truncateText(postpartumSleep, 100),
+          mood: truncateText(postpartumMood, 100),
+          energy: truncateText(postpartumEnergy, 100),
+          pain: truncateText(postpartumPain, 100),
+          feeding: truncateText(postpartumFeeding, 100),
+          notes: truncateText(postpartumNotes, 500),
         },
         menopause_tracking: {
-          hotFlashes: menopauseHotFlashes,
-          nightSweats: menopauseNightSweats,
-          mood: menopauseMood,
-          brainFog: menopauseBrainFog,
-          energy: menopauseEnergy,
-          sleep: menopauseSleep,
-          jointPain: menopauseJointPain,
-          digestion: menopauseDigestion,
+          hotFlashes: truncateText(menopauseHotFlashes, 100),
+          nightSweats: truncateText(menopauseNightSweats, 100),
+          mood: truncateText(menopauseMood, 100),
+          brainFog: truncateText(menopauseBrainFog, 100),
+          energy: truncateText(menopauseEnergy, 100),
+          sleep: truncateText(menopauseSleep, 100),
+          jointPain: truncateText(menopauseJointPain, 100),
+          digestion: truncateText(menopauseDigestion, 100),
         },
         yoga_practice: {
-          style: yogaStyle,
-          duration: yogaDuration,
-          poses: yogaPoses,
+          style: truncateText(yogaStyle, 100),
+          duration: truncateText(yogaDuration, 50),
+          poses: truncateText(yogaPoses, 500),
         },
         nutrition_log: {
-          meals: meals,
+          meals: meals.slice(0, 10).map(m => ({
+            name: truncateText(m.name, 100),
+            time: truncateText(m.time, 20),
+            doshaNotes: truncateText(m.doshaNotes, 200),
+          })),
         },
         spiritual_practices: {
           fajr: fajr,
@@ -413,8 +438,8 @@ export default function Tracker() {
           asr: asr,
           maghrib: maghrib,
           isha: isha,
-          mantras: mantras,
-          meditationMinutes: meditationMinutes,
+          mantras: truncateText(mantras, 500),
+          meditationMinutes: truncateText(meditationMinutes, 10),
         },
       };
       
