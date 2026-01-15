@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, Leaf, Moon, Sun, Activity, ChevronLeft, ChevronRight, Flame, Droplets, Mountain, Calendar, User, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { usePregnancySafeMode } from "@/hooks/usePregnancySafeMode";
+import { usePregnancySafeMode, isPoseExcludedForPregnancy } from "@/hooks/usePregnancySafeMode";
 
 // Import Mumtaz brand pose images
 import { 
@@ -378,6 +378,11 @@ export const PoseOfTheDay = () => {
     if (!isPregnancySafeMode) return poseLibrary;
     
     return poseLibrary.filter(pose => {
+      // First, check if pose should be excluded based on comprehensive criteria
+      if (isPoseExcludedForPregnancy(pose, trimester)) {
+        return false;
+      }
+      
       // Check if pose explicitly supports pregnancy
       const hasPregnancySupport = pose.lifePhases.some(phase => {
         const lowerPhase = phase.toLowerCase();
@@ -387,8 +392,10 @@ export const PoseOfTheDay = () => {
       });
       
       // Also include gentle, restorative poses that are generally safe
-      const isSafeCategory = ['Restorative Yoga', 'Gentle Yoga', 'Stretching'].includes(pose.category);
+      const safeCategories = ['Restorative Yoga', 'Gentle Yoga', 'Stretching', 'Standing Yoga', 'Flexibility & Mobility'];
+      const isSafeCategory = safeCategories.includes(pose.category);
       
+      // Exclude if neither pregnancy-specific nor a safe category
       return hasPregnancySupport || isSafeCategory;
     });
   };
