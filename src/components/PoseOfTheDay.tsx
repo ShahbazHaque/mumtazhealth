@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Heart, Leaf, Moon, Sun, Activity, ChevronLeft, ChevronRight, Flame, Droplets, Mountain, Calendar, User } from "lucide-react";
+import { Sparkles, Heart, Leaf, Moon, Sun, Activity, ChevronLeft, ChevronRight, Flame, Droplets, Mountain, Calendar, User, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { usePregnancySafeMode } from "@/hooks/usePregnancySafeMode";
 
 // Import Mumtaz brand pose images
 import { 
@@ -370,10 +371,33 @@ export const PoseOfTheDay = () => {
   const [currentPoseIndex, setCurrentPoseIndex] = useState(0);
   const [userProfile, setUserProfile] = useState<UserProfile>({ primaryDosha: null, lifeStage: null });
   const [isPersonalized, setIsPersonalized] = useState(false);
+  const { isPregnancySafeMode, trimester } = usePregnancySafeMode();
+
+  // Filter poses for pregnancy safety when in pregnancy safe mode
+  const getAvailablePoses = () => {
+    if (!isPregnancySafeMode) return poseLibrary;
+    
+    return poseLibrary.filter(pose => {
+      // Check if pose explicitly supports pregnancy
+      const hasPregnancySupport = pose.lifePhases.some(phase => {
+        const lowerPhase = phase.toLowerCase();
+        return lowerPhase.includes('pregnancy') || 
+               lowerPhase.includes('trimester') ||
+               lowerPhase.includes('prenatal');
+      });
+      
+      // Also include gentle, restorative poses that are generally safe
+      const isSafeCategory = ['Restorative Yoga', 'Gentle Yoga', 'Stretching'].includes(pose.category);
+      
+      return hasPregnancySupport || isSafeCategory;
+    });
+  };
+
+  const availablePoses = getAvailablePoses();
 
   useEffect(() => {
     fetchUserProfile();
-  }, []);
+  }, [isPregnancySafeMode]);
 
   const fetchUserProfile = async () => {
     try {
@@ -413,19 +437,32 @@ export const PoseOfTheDay = () => {
 
   const selectDayBasedPose = () => {
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-    const poseIndex = dayOfYear % poseLibrary.length;
-    setCurrentPoseIndex(poseIndex);
+    const poseIndex = dayOfYear % availablePoses.length;
+    // Find the actual index in the full library
+    const actualIndex = poseLibrary.findIndex(p => p.id === availablePoses[poseIndex]?.id);
+    setCurrentPoseIndex(actualIndex >= 0 ? actualIndex : 0);
     setIsPersonalized(false);
   };
 
   const selectPersonalizedPose = (dosha: string | null, lifeStage: string | null) => {
-    // Score poses based on user's dosha and life stage
-    const scoredPoses = poseLibrary.map((pose, index) => {
+    // Score poses based on user's dosha and life stage, using only available poses
+    const scoredPoses = availablePoses.map((pose) => {
+      const originalIndex = poseLibrary.findIndex(p => p.id === pose.id);
       let score = 0;
       
       // Match dosha
       if (dosha && pose.doshaAlignment.primary.toLowerCase() === dosha.toLowerCase()) {
         score += 3;
+      }
+      
+      // Boost score for pregnancy-specific poses when in pregnancy safe mode
+      if (isPregnancySafeMode) {
+        const hasPregnancySupport = pose.lifePhases.some(phase => 
+          phase.toLowerCase().includes('pregnancy') || phase.toLowerCase().includes('trimester')
+        );
+        if (hasPregnancySupport) {
+          score += 4; // Higher priority for pregnancy-specific poses
+        }
       }
       
       // Match life stage
@@ -449,11 +486,10 @@ export const PoseOfTheDay = () => {
       
       // Add day-based variation to break ties
       const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-      score += ((dayOfYear + index) % 10) / 10; // Small variation
+      score += ((dayOfYear + originalIndex) % 10) / 10; // Small variation
       
-      return { index, score };
+      return { index: originalIndex, score };
     });
-    
     // Sort by score and pick the best match
     scoredPoses.sort((a, b) => b.score - a.score);
     setCurrentPoseIndex(scoredPoses[0].index);
@@ -463,11 +499,27 @@ export const PoseOfTheDay = () => {
   const currentPose = poseLibrary[currentPoseIndex];
 
   const goToPrevious = () => {
-    setCurrentPoseIndex((prev) => (prev === 0 ? poseLibrary.length - 1 : prev - 1));
+    if (isPregnancySafeMode) {
+      // Navigate only through available poses
+      const currentAvailableIndex = availablePoses.findIndex(p => p.id === currentPose?.id);
+      const prevIndex = currentAvailableIndex <= 0 ? availablePoses.length - 1 : currentAvailableIndex - 1;
+      const actualIndex = poseLibrary.findIndex(p => p.id === availablePoses[prevIndex]?.id);
+      setCurrentPoseIndex(actualIndex >= 0 ? actualIndex : 0);
+    } else {
+      setCurrentPoseIndex((prev) => (prev === 0 ? poseLibrary.length - 1 : prev - 1));
+    }
   };
 
   const goToNext = () => {
-    setCurrentPoseIndex((prev) => (prev === poseLibrary.length - 1 ? 0 : prev + 1));
+    if (isPregnancySafeMode) {
+      // Navigate only through available poses
+      const currentAvailableIndex = availablePoses.findIndex(p => p.id === currentPose?.id);
+      const nextIndex = currentAvailableIndex >= availablePoses.length - 1 ? 0 : currentAvailableIndex + 1;
+      const actualIndex = poseLibrary.findIndex(p => p.id === availablePoses[nextIndex]?.id);
+      setCurrentPoseIndex(actualIndex >= 0 ? actualIndex : 0);
+    } else {
+      setCurrentPoseIndex((prev) => (prev === poseLibrary.length - 1 ? 0 : prev + 1));
+    }
   };
 
   return (
@@ -477,7 +529,13 @@ export const PoseOfTheDay = () => {
           <div className="flex items-center gap-2">
             <Sun className="h-6 w-6 text-accent" />
             <span className="text-xl font-semibold">Pose of the Day</span>
-            {isPersonalized && (
+            {isPregnancySafeMode && (
+              <Badge variant="outline" className="text-xs gap-1 border-pink-300 text-pink-600 dark:border-pink-500 dark:text-pink-400">
+                <Shield className="h-3 w-3" />
+                Pregnancy Safe
+              </Badge>
+            )}
+            {isPersonalized && !isPregnancySafeMode && (
               <Badge variant="secondary" className="text-xs gap-1">
                 <User className="h-3 w-3" />
                 For you
@@ -489,7 +547,7 @@ export const PoseOfTheDay = () => {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-xs text-muted-foreground px-2">
-              {currentPoseIndex + 1} / {poseLibrary.length}
+              {currentPoseIndex + 1} / {availablePoses.length}
             </span>
             <Button variant="ghost" size="icon" onClick={goToNext} className="h-8 w-8">
               <ChevronRight className="h-4 w-4" />

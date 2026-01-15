@@ -67,10 +67,14 @@ Deno.serve(async (req) => {
 
     const cyclePhase = recentEntry?.cycle_phase || 'follicular';
     const pregnancyStatus = profile.pregnancy_status || 'not_pregnant';
+    const lifeStage = profile.life_stage || null;
     const primaryDosha = profile.primary_dosha;
     const secondaryDosha = profile.secondary_dosha;
+    
+    // Determine if pregnancy safe mode should be enabled
+    const isPregnancySafeMode = lifeStage === 'pregnancy' || pregnancyStatus === 'pregnant';
 
-    console.log('User profile:', { cyclePhase, pregnancyStatus, primaryDosha, secondaryDosha });
+    console.log('User profile:', { cyclePhase, pregnancyStatus, lifeStage, primaryDosha, secondaryDosha, isPregnancySafeMode });
 
     // Build query for matching content
     let contentQuery = supabaseClient
@@ -78,13 +82,16 @@ Deno.serve(async (req) => {
       .select('*')
       .eq('is_active', true);
 
-    // Filter by pregnancy status
-    if (pregnancyStatus) {
+    // Filter by pregnancy status - prioritize pregnancy-safe content when in pregnancy safe mode
+    if (isPregnancySafeMode) {
+      // In pregnancy safe mode, filter for pregnancy-safe content
+      contentQuery = contentQuery.contains('pregnancy_statuses', ['pregnant']);
+    } else if (pregnancyStatus) {
       contentQuery = contentQuery.contains('pregnancy_statuses', [pregnancyStatus]);
     }
 
-    // Filter by cycle phase (only if not pregnant)
-    if (pregnancyStatus === 'not_pregnant' || pregnancyStatus === 'trying_to_conceive') {
+    // Filter by cycle phase (only if not in pregnancy safe mode)
+    if (!isPregnancySafeMode && (pregnancyStatus === 'not_pregnant' || pregnancyStatus === 'trying_to_conceive')) {
       contentQuery = contentQuery.contains('cycle_phases', [cyclePhase]);
     }
 
@@ -202,6 +209,8 @@ Deno.serve(async (req) => {
           cycle_phase: cyclePhase,
           pregnancy_status: pregnancyStatus,
           primary_dosha: primaryDosha,
+          life_stage: lifeStage,
+          pregnancy_safe_mode: isPregnancySafeMode,
         },
       }),
       {
