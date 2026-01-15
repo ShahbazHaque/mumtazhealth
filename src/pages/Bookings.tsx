@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ArrowLeft, Calendar, Clock, Users, Check, Filter, X } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
+import { bookingSchema, validateInput } from "@/lib/validation";
 
 interface Service {
   id: string;
@@ -125,13 +126,27 @@ export default function Bookings() {
       return;
     }
 
+    // Validate booking input
+    const validation = validateInput(bookingSchema, {
+      service_id: selectedService.id,
+      booking_date: bookingDate,
+      notes: bookingNotes || null,
+    });
+
+    if (!validation.success) {
+      toast.error((validation as { success: false; error: string }).error);
+      return;
+    }
+
+    const validatedData = validation.data;
+
     const { data: bookingData, error } = await supabase
       .from('bookings')
       .insert({
         user_id: user.id,
-        service_id: selectedService.id,
-        booking_date: new Date(bookingDate).toISOString(),
-        notes: bookingNotes || null,
+        service_id: validatedData.service_id,
+        booking_date: new Date(validatedData.booking_date).toISOString(),
+        notes: validatedData.notes,
         status: 'pending',
       })
       .select()
