@@ -23,6 +23,13 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { AppCompanionDisclaimer } from "@/components/AppCompanionDisclaimer";
 import { PractitionerSupportCTA } from "@/components/PractitionerSupportCTA";
+import { 
+  JourneyTimeline, 
+  JourneyPhaseCard, 
+  PregnancySafePoseGrid,
+  ConnectWithBabyMeditation,
+  JourneySafetyReminder 
+} from "@/components/journey";
 
 interface PregnancyEducationProps {
   trimester: string;
@@ -349,16 +356,40 @@ export function PregnancyEducation({ trimester }: PregnancyEducationProps) {
     navigate('/bookings');
   };
 
+  // Define journey phases for timeline
+  const journeyPhases = [
+    { id: "1", label: "First Trimester", subtitle: "Quiet beginnings", isActive: trimester === "1" },
+    { id: "2", label: "Second Trimester", subtitle: "Finding rhythm", isActive: trimester === "2" },
+    { id: "3", label: "Third Trimester", subtitle: "Preparing", isActive: trimester === "3" },
+  ];
+
+  // Phase card data for current trimester
+  const phaseCardData = {
+    phaseId: trimester,
+    title: `This phase of your pregnancy`,
+    subtitle: trimesterInfo.subtitle,
+    description: trimesterInfo.meaning,
+    babySize: {
+      metaphor: trimesterInfo.babySize.metaphor,
+      emoji: trimester === "1" ? "🫘" : trimester === "2" ? "🍋" : "🍈",
+      description: trimesterInfo.babySize.description,
+    },
+    whatYouMayNotice: [
+      trimesterInfo.energyMood,
+      trimesterInfo.bodyResponse,
+    ],
+    holisticNote: userDosha ? trimesterInfo.doshaGuidance[userDosha as keyof typeof trimesterInfo.doshaGuidance]?.text : undefined,
+    visualTheme: trimesterInfo.visualTheme,
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Safety Reminder - Always visible */}
-      <div className="flex items-start gap-2.5 p-3 rounded-lg bg-wellness-sage/5 border border-wellness-sage/20">
-        <Shield className="w-4 h-4 text-wellness-sage flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          This app offers supportive, educational guidance only. It does not replace medical advice 
-          or a qualified teacher. If unsure, please seek medical guidance.
-        </p>
-      </div>
+      <JourneySafetyReminder 
+        journeyType="pregnancy" 
+        showPractitionerCTA={false}
+        variant="compact"
+      />
 
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
@@ -384,20 +415,20 @@ export function PregnancyEducation({ trimester }: PregnancyEducationProps) {
           </button>
         </CollapsibleTrigger>
 
-        <CollapsibleContent className="pt-4 space-y-5">
-          {/* Reassuring intro */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-wellness-lilac/5 to-wellness-sage/5 border border-wellness-sage/20">
-            <div className="flex items-start gap-3">
-              <Heart className="w-5 h-5 text-wellness-lilac flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-foreground/80 italic leading-relaxed">
-                This is here to support you, not to add pressure. Every pregnancy is unique, 
-                and your body knows what it's doing.
-              </p>
-            </div>
-          </div>
+        <CollapsibleContent className="pt-4 space-y-6">
+          {/* Visual Timeline */}
+          <JourneyTimeline 
+            phases={journeyPhases}
+            currentPhase={trimester}
+            journeyType="pregnancy"
+          />
 
-          {/* Baby size metaphor with visual */}
-          <BabySizeVisual trimester={trimester} babySize={trimesterInfo.babySize} />
+          {/* Phase Card with reflection */}
+          <JourneyPhaseCard 
+            phaseData={phaseCardData}
+            journeyType="pregnancy"
+            userDosha={userDosha}
+          />
 
           {/* Where you are in your journey */}
           <div className="space-y-2">
@@ -497,6 +528,15 @@ export function PregnancyEducation({ trimester }: PregnancyEducationProps) {
             </div>
           </div>
 
+          {/* Pregnancy-safe pose cards */}
+          <PregnancySafePoseGrid 
+            trimester={parseInt(trimester)} 
+            maxPoses={4} 
+          />
+
+          {/* Connect with baby meditation */}
+          <ConnectWithBabyMeditation />
+
           {/* CTA to Content Library */}
           <div className="pt-3 border-t border-border/50">
             <Link 
@@ -513,15 +553,13 @@ export function PregnancyEducation({ trimester }: PregnancyEducationProps) {
             </Link>
           </div>
 
-          {/* Practitioner CTA */}
-          <div className="pt-2">
-            <PractitionerSupportCTA 
-              variant="inline"
-              serviceType="consultation"
-              lifeStage="pregnancy"
-              onAction={handlePractitionerAction}
-            />
-          </div>
+          {/* Full safety reminder with practitioner CTA */}
+          <JourneySafetyReminder 
+            journeyType="pregnancy" 
+            showPractitionerCTA={true}
+            onPractitionerClick={handlePractitionerAction}
+            variant="card"
+          />
 
           {/* App Companion Disclaimer */}
           <AppCompanionDisclaimer variant="subtle" className="pt-2" />
