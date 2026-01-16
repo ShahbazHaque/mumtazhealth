@@ -72,6 +72,9 @@ import { PoseImageSequence } from "@/components/PoseImageSequence";
 import { FavoritesQuickAccess } from "@/components/FavoritesQuickAccess";
 import { trackLastActivity } from "@/components/ReturningUserWelcome";
 import { trackRecentActivity } from "@/components/RecentlyViewed";
+import { usePregnancySafeMode } from "@/hooks/usePregnancySafeMode";
+import { PregnancySafetyIndicator, PregnancySafetyBadge, getContentPregnancySafety } from "@/components/PregnancySafetyIndicator";
+import { TrimesterPoseRecommendations } from "@/components/TrimesterPoseRecommendations";
 interface WellnessContent {
   id: string;
   title: string;
@@ -135,6 +138,9 @@ const ContentLibrary = () => {
   const [savedContentIds, setSavedContentIds] = useState<Set<string>>(new Set());
   const [completedContentIds, setCompletedContentIds] = useState<Set<string>>(new Set());
   const [progressStats, setProgressStats] = useState({ total: 0, completed: 0 });
+  
+  // Pregnancy safe mode
+  const { isPregnancySafeMode, trimester } = usePregnancySafeMode();
   
   // Filters
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -719,8 +725,16 @@ const ContentLibrary = () => {
   // Reusable content card renderer
   const renderContentCard = (item: WellnessContent) => {
     const isLocked = !isContentUnlocked(item);
+    const pregnancySafety = isPregnancySafeMode ? getContentPregnancySafety(item, trimester) : null;
+    const isExcludedForPregnancy = pregnancySafety?.status === 'excluded';
+    
     return (
-      <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow relative">
+      <Card 
+        key={item.id} 
+        className={`overflow-hidden hover:shadow-lg transition-shadow relative ${
+          isExcludedForPregnancy ? 'opacity-60 ring-2 ring-red-200 dark:ring-red-800' : ''
+        }`}
+      >
         <div className="h-40 overflow-hidden bg-muted relative">
           <img 
             src={getContentImage(item.content_type, item.tags, item.image_url)}
@@ -739,6 +753,12 @@ const ContentLibrary = () => {
           <Badge className="absolute top-2 left-2 capitalize text-xs">
             {item.content_type}
           </Badge>
+          {/* Pregnancy safety badge on image */}
+          <PregnancySafetyBadge 
+            content={item}
+            trimester={trimester}
+            isPregnancySafeMode={isPregnancySafeMode}
+          />
         </div>
         
         <CardHeader className="pb-2">
@@ -766,6 +786,14 @@ const ContentLibrary = () => {
             ))}
             {item.duration_minutes && (
               <Badge variant="outline" className="text-xs">{item.duration_minutes} min</Badge>
+            )}
+            {/* Pregnancy safety indicator with tooltip */}
+            {isPregnancySafeMode && item.content_type === 'yoga' && (
+              <PregnancySafetyIndicator
+                content={item}
+                trimester={trimester}
+                isPregnancySafeMode={isPregnancySafeMode}
+              />
             )}
           </div>
           
@@ -2605,6 +2633,17 @@ const ContentLibrary = () => {
                 </div>
               </CardContent>
             </Card>
+            
+            {/* Trimester-specific recommendations */}
+            {isPregnancySafeMode && (
+              <TrimesterPoseRecommendations 
+                onSelectPractice={(practiceId) => {
+                  // Could navigate to specific content or filter
+                  console.log('Selected practice:', practiceId);
+                }}
+              />
+            )}
+            
             {loading ? (
               <ContentGridSkeleton count={6} />
             ) : (
