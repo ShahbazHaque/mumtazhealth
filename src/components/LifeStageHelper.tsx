@@ -16,13 +16,17 @@ export function LifeStageHelper({ onSelectStage, onCancel }: LifeStageHelperProp
   const getSuggestedStage = (): { stage: string; label: string } => {
     switch (periodStatus) {
       case "yes":
-        return { stage: "menstrual_cycle", label: "Menstrual Cycle" };
+        return { stage: "menstrual_cycle", label: "Regular Menstrual Cycle" };
+      case "changing":
+        return { stage: "cycle_changes", label: "Cycle Changes / Hormonal Shifts" };
       case "sometimes":
         return { stage: "perimenopause", label: "Perimenopause" };
+      case "rarely":
+        return { stage: "peri_menopause_transition", label: "Peri → Menopause Transition" };
       case "no":
         return { stage: "menopause", label: "Menopause or Post-Menopause" };
       default:
-        return { stage: "perimenopause", label: "Perimenopause" };
+        return { stage: "cycle_changes", label: "Cycle Changes / Hormonal Shifts" };
     }
   };
 
@@ -128,13 +132,25 @@ export function LifeStageHelper({ onSelectStage, onCancel }: LifeStageHelperProp
               <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/50 hover:bg-wellness-sage/5 transition-colors">
                 <RadioGroupItem value="yes" id="periods-yes" />
                 <Label htmlFor="periods-yes" className="cursor-pointer text-sm flex-1">
-                  Yes
+                  Yes, regularly
+                </Label>
+              </div>
+              <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/50 hover:bg-wellness-sage/5 transition-colors">
+                <RadioGroupItem value="changing" id="periods-changing" />
+                <Label htmlFor="periods-changing" className="cursor-pointer text-sm flex-1">
+                  Yes, but changing (shorter, longer, heavier, lighter)
                 </Label>
               </div>
               <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/50 hover:bg-wellness-sage/5 transition-colors">
                 <RadioGroupItem value="sometimes" id="periods-sometimes" />
                 <Label htmlFor="periods-sometimes" className="cursor-pointer text-sm flex-1">
                   Sometimes / Irregular
+                </Label>
+              </div>
+              <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/50 hover:bg-wellness-sage/5 transition-colors">
+                <RadioGroupItem value="rarely" id="periods-rarely" />
+                <Label htmlFor="periods-rarely" className="cursor-pointer text-sm flex-1">
+                  Rarely / Very infrequent
                 </Label>
               </div>
               <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/50 hover:bg-wellness-sage/5 transition-colors">

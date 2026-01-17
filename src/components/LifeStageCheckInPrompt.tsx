@@ -7,15 +7,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 const LIFE_STAGE_LABELS: Record<string, string> = {
-  menstrual_cycle: "Menstrual Cycle",
+  menstrual_cycle: "Regular Menstrual Cycle",
+  cycle_changes: "Cycle Changes / Hormonal Shifts",
+  perimenopause: "Perimenopause",
+  peri_menopause_transition: "Peri → Menopause Transition",
+  menopause: "Menopause",
+  post_menopause: "Post-Menopause",
   pregnancy: "Pregnancy",
   postpartum: "Postpartum",
-  perimenopause: "Perimenopause",
-  menopause: "Menopause",
-  post_menopause: "Post-Menopause / Beyond",
+  not_sure: "Exploring",
 };
 
-const TRANSITION_STAGES = ["perimenopause", "menopause", "post_menopause", "menstrual_cycle"];
+const TRANSITION_STAGES = ["menstrual_cycle", "cycle_changes", "perimenopause", "peri_menopause_transition", "menopause", "post_menopause"];
 
 interface LifeStageCheckInPromptProps {
   currentStage: string | null;
@@ -109,11 +112,15 @@ export function LifeStageCheckInPrompt({ currentStage, onDismiss }: LifeStageChe
     // Show relevant transitions based on current stage
     switch (currentStage) {
       case "menstrual_cycle":
-        return ["perimenopause", "menopause"];
+        return ["cycle_changes", "perimenopause"];
+      case "cycle_changes":
+        return ["menstrual_cycle", "perimenopause", "peri_menopause_transition"];
       case "perimenopause":
-        return ["menstrual_cycle", "menopause", "post_menopause"];
+        return ["cycle_changes", "peri_menopause_transition", "menopause"];
+      case "peri_menopause_transition":
+        return ["perimenopause", "menopause"];
       case "menopause":
-        return ["perimenopause", "post_menopause"];
+        return ["peri_menopause_transition", "post_menopause"];
       case "post_menopause":
         return ["menopause"];
       default:
@@ -212,10 +219,12 @@ export function LifeStageCheckInPrompt({ currentStage, onDismiss }: LifeStageChe
                         {LIFE_STAGE_LABELS[stage]}
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {stage === "perimenopause" && "Cycles changing or symptoms beginning"}
+                        {stage === "menstrual_cycle" && "Consistent monthly cycling"}
+                        {stage === "cycle_changes" && "Experiencing changes in your cycle"}
+                        {stage === "perimenopause" && "Cycles becoming irregular, symptoms beginning"}
+                        {stage === "peri_menopause_transition" && "Moving from perimenopause toward menopause"}
                         {stage === "menopause" && "No period for 12 months or more"}
-                        {stage === "post_menopause" && "Settled into this new phase"}
-                        {stage === "menstrual_cycle" && "Regular monthly cycles"}
+                        {stage === "post_menopause" && "Settled into life after menopause"}
                       </p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />

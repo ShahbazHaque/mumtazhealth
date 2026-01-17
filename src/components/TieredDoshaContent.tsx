@@ -379,12 +379,15 @@ const StandardTierContent = ({ primaryDosha, lifeStage }: { primaryDosha?: strin
   
   const getLifePhaseLabel = (stage?: string) => {
     const labels: Record<string, string> = {
-      menstrual_cycle: "Menstrual Cycle",
+      menstrual_cycle: "Regular Menstrual Cycle",
+      cycle_changes: "Cycle Changes / Hormonal Shifts",
       perimenopause: "Perimenopause",
+      peri_menopause_transition: "Peri → Menopause Transition",
       menopause: "Menopause",
       post_menopause: "Post-Menopause",
       pregnancy: "Pregnancy",
-      postpartum: "Postpartum"
+      postpartum: "Postpartum",
+      not_sure: "your current phase"
     };
     return stage ? labels[stage] || stage : "your current phase";
   };

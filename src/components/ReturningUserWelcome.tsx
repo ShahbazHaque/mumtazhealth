@@ -35,12 +35,15 @@ interface LastActivity {
 }
 
 const lifeStageLabels: Record<string, string> = {
-  menstrual_cycle: "Menstrual Cycle",
-  pregnancy: "Pregnancy",
-  postpartum: "Postpartum",
+  menstrual_cycle: "Regular Menstrual Cycle",
+  cycle_changes: "Cycle Changes / Hormonal Shifts",
   perimenopause: "Perimenopause",
+  peri_menopause_transition: "Peri → Menopause Transition",
   menopause: "Menopause",
   post_menopause: "Post-Menopause",
+  pregnancy: "Pregnancy",
+  postpartum: "Postpartum",
+  not_sure: "Exploring",
 };
 
 export function ReturningUserWelcome({ onClose }: ReturningUserWelcomeProps) {

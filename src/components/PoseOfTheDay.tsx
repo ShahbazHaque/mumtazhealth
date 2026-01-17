@@ -476,11 +476,14 @@ export const PoseOfTheDay = () => {
       if (lifeStage) {
         const stageMapping: Record<string, string[]> = {
           menstrual_cycle: ["Menstrual", "Follicular", "Ovulatory", "Luteal"],
-          pregnancy: ["Pregnancy"],
-          postpartum: ["Postpartum"],
+          cycle_changes: ["Menstrual", "Follicular", "Ovulatory", "Luteal", "Perimenopause"],
           perimenopause: ["Perimenopause"],
+          peri_menopause_transition: ["Perimenopause", "Menopause"],
           menopause: ["Menopause"],
           post_menopause: ["Post-Menopause"],
+          pregnancy: ["Pregnancy"],
+          postpartum: ["Postpartum"],
+          not_sure: ["Menstrual", "Follicular", "Ovulatory", "Luteal", "Perimenopause", "Menopause"],
         };
         
         const relevantPhases = stageMapping[lifeStage] || [];

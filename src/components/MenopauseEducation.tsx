@@ -28,7 +28,7 @@ import { AppCompanionDisclaimer } from "@/components/AppCompanionDisclaimer";
 import { PractitionerSupportCTA } from "@/components/PractitionerSupportCTA";
 
 interface MenopauseEducationProps {
-  lifeStage: 'perimenopause' | 'menopause' | 'post_menopause';
+  lifeStage: 'cycle_changes' | 'perimenopause' | 'peri_menopause_transition' | 'menopause' | 'post_menopause';
 }
 
 interface StageInfo {
@@ -57,6 +57,39 @@ interface StageInfo {
 }
 
 const STAGE_EDUCATION: Record<string, StageInfo> = {
+  cycle_changes: {
+    title: "Cycle Changes",
+    subtitle: "Awareness of shifting rhythms",
+    meaning: "You may be noticing subtle or not-so-subtle changes in your cycle — this is your body communicating with you. These shifts are completely natural and often mark the beginning of a transition.",
+    energyMood: "Energy and mood may fluctuate differently than before. Some months feel familiar, others feel new. This is a time for gentle observation and self-compassion.",
+    bodyResponse: "Your cycle length, flow, or symptoms may be shifting. Sleep, digestion, and body temperature might also feel different. These are signs your body is evolving.",
+    visualTheme: {
+      gradient: "from-teal-100/40 via-teal-50/20 to-wellness-sage/10",
+      borderColor: "border-teal-300/40",
+      iconBg: "bg-teal-100",
+      accentColor: "text-teal-600"
+    },
+    doshaGuidance: {
+      vata: { 
+        text: "Changes can feel destabilising for Vata. Focus on warmth, routine, and grounding practices to feel anchored during this time.",
+        suggestions: ["Warm, regular meals", "Consistent sleep schedule", "Grounding morning rituals"]
+      },
+      pitta: { 
+        text: "Notice any heat symptoms and respond with cooling practices. Patience and self-compassion are your allies now.",
+        suggestions: ["Cooling foods", "Gentle outdoor walks", "Evening wind-down practices"]
+      },
+      kapha: { 
+        text: "Keep energy flowing with gentle, regular movement. Light foods and stimulating practices prevent sluggishness.",
+        suggestions: ["Morning movement", "Light, spiced meals", "Invigorating breathwork"]
+      },
+    },
+    lifestyleSuggestions: {
+      yoga: "Gentle, observational practice. Notice what feels different and honour your body's changing needs.",
+      rhythm: "Begin tracking changes without judgment. This awareness will guide you through this transition.",
+      breath: "Simple, calming breaths to anchor you during times of uncertainty."
+    },
+    libraryTags: ["hormonal", "grounding", "gentle"],
+  },
   perimenopause: {
     title: "Perimenopause",
     subtitle: "The transition begins",
@@ -89,6 +122,39 @@ const STAGE_EDUCATION: Record<string, StageInfo> = {
       breath: "Cooling breaths for hot moments, grounding breaths for restless energy. Always gentle, never forced."
     },
     libraryTags: ["perimenopause", "hormonal", "grounding"],
+  },
+  peri_menopause_transition: {
+    title: "Peri → Menopause Transition",
+    subtitle: "The threshold approaches",
+    meaning: "You're in a unique in-between space — periods have become very infrequent, but it hasn't been 12 months yet. This threshold time calls for extra gentleness and patience.",
+    energyMood: "You may experience the most variability here. Some days feel settled, others feel unpredictable. Trust that your body knows what it's doing.",
+    bodyResponse: "Symptoms may intensify or shift unpredictably. Sleep, temperature regulation, and mood may all be in flux. This is temporary, and you will find your new rhythm.",
+    visualTheme: {
+      gradient: "from-rose-100/40 via-amber-50/20 to-wellness-lilac/10",
+      borderColor: "border-rose-300/40",
+      iconBg: "bg-rose-100",
+      accentColor: "text-rose-600"
+    },
+    doshaGuidance: {
+      vata: { 
+        text: "This threshold can feel unsettling for Vata. Extra grounding, warmth, and routine are essential now.",
+        suggestions: ["Daily abhyanga", "Warm, nourishing foods", "Very consistent routines"]
+      },
+      pitta: { 
+        text: "Heat symptoms may peak during this time. Prioritise cooling practices and patience with yourself.",
+        suggestions: ["Cool compresses", "Cooling breath practices", "Gentle, non-competitive movement"]
+      },
+      kapha: { 
+        text: "Keep energy moving but don't overexert. Balance gentle activity with adequate rest.",
+        suggestions: ["Moderate daily walks", "Light, warm meals", "Gentle morning movement"]
+      },
+    },
+    lifestyleSuggestions: {
+      yoga: "Restorative and deeply supportive practices. Focus on nervous system regulation and surrender.",
+      rhythm: "Embrace radical gentleness. This is not a time to push — it's a time to receive.",
+      breath: "Calming, cooling, and grounding breaths. Whatever soothes your nervous system."
+    },
+    libraryTags: ["perimenopause", "menopause", "restorative"],
   },
   menopause: {
     title: "Menopause",
@@ -161,8 +227,12 @@ const STAGE_EDUCATION: Record<string, StageInfo> = {
 // Phase-specific icons
 const PhaseIcon = ({ phase }: { phase: string }) => {
   switch (phase) {
+    case "cycle_changes":
+      return <Droplets className="w-5 h-5" />;
     case "perimenopause":
       return <Flame className="w-5 h-5" />;
+    case "peri_menopause_transition":
+      return <CloudSun className="w-5 h-5" />;
     case "menopause":
       return <Sun className="w-5 h-5" />;
     case "post_menopause":
@@ -301,8 +371,10 @@ export function MenopauseEducation({ lifeStage }: MenopauseEducationProps) {
 
   // Define journey phases for timeline
   const journeyPhases = [
+    { id: "cycle_changes", label: "Cycle Changes", subtitle: "Awareness", isActive: lifeStage === "cycle_changes" },
     { id: "perimenopause", label: "Perimenopause", subtitle: "Transition", isActive: lifeStage === "perimenopause" },
-    { id: "menopause", label: "Menopause", subtitle: "Threshold", isActive: lifeStage === "menopause" },
+    { id: "peri_menopause_transition", label: "Peri → Menopause", subtitle: "Threshold", isActive: lifeStage === "peri_menopause_transition" },
+    { id: "menopause", label: "Menopause", subtitle: "Arrival", isActive: lifeStage === "menopause" },
     { id: "post_menopause", label: "Post-Menopause", subtitle: "Wisdom", isActive: lifeStage === "post_menopause" },
   ];
 
