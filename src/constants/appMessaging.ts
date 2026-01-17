@@ -46,11 +46,23 @@ export const JOURNEY_MESSAGES = {
   phaseNatural: "Changing phases is natural — the app is designed to support you without judgment",
   phaseUpdate: "Your body may be changing, and that's okay. Update your stage anytime and the guidance adapts to meet you where you are",
   
+  // In-between phase specific messaging (cycle_changes, peri_menopause_transition)
+  inBetweenSupport: "Your body is in transition — gentle, stabilizing practices support you as patterns shift",
+  inBetweenReassurance: "Many women experience changes gradually. This in-between time is natural and temporary.",
+  inBetweenNervousSystem: "Prioritizing your nervous system during transitions helps everything else fall into place",
+  inBetweenNoRush: "There's no rush to figure it all out. Simply notice what feels supportive.",
+  inBetweenGentle: "Gentle practices can be more powerful than intense ones during times of change",
+  
   // Progress encouragement (non-metric based)
   progressGentle: "Every step you take is meaningful",
   progressNoJudgment: "There's no right pace — only your pace",
   progressUnlocking: "The more you explore, the more tailored your journey becomes",
   progressCelebration: "You're building a deeper understanding of yourself",
+  
+  // Non-streak based encouragement (for in-between phases)
+  consistencyGentle: "Regular, gentle practice supports your body's natural rhythms",
+  restIsProductve: "Rest is productive — your body does its best healing work during downtime",
+  honorYourPace: "Honor whatever pace feels right today",
   
   // Continuity messages
   continueWhere: "Pick up right where you left off",
@@ -102,6 +114,11 @@ export const TRACKER_MESSAGES = {
   pregnancySupport: "Each trimester brings new needs — your guidance adapts with you",
   menopauseSupport: "This transition is natural — the app supports you through each stage",
   recoverySupport: "Healing takes time — we're here for the gentle journey back",
+  
+  // In-between phase specific
+  inBetweenTracking: "Track what you notice, not what you achieve — patterns reveal themselves over time",
+  cycleChangesSupport: "Changes in your cycle are natural signals. Tracking helps you understand your body's new language.",
+  transitionTracking: "Your body is finding its new rhythm — gentle observation is all that's needed",
 };
 
 // ============= Practitioner Connection Messages =============

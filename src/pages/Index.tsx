@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Download, Users, Flower2, Activity, Clock, ArrowRight } from "lucide-react";
+import { Heart, Calendar, BookOpen, BarChart3, User, Sparkles, TrendingUp, Download, Users, Flower2, Activity, Clock, ArrowRight, Waves } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,7 @@ import { ConfidenceJourney } from "@/components/ConfidenceJourney";
 import { ConfidenceMilestones } from "@/components/ConfidenceMilestones";
 import { LifeStageCheckInPrompt } from "@/components/LifeStageCheckInPrompt";
 import { WelcomeEntryDialog } from "@/components/WelcomeEntryDialog";
+import { InBetweenPhaseBanner } from "@/components/InBetweenPhaseBanner";
 interface UserProfile {
   username: string;
 }
@@ -219,6 +220,34 @@ const Index = () => {
             </p>
           </div>
 
+          {/* Hormonal Transition Quick Access - for in-between phase users */}
+          {(wellnessProfile?.life_stage === 'cycle_changes' || wellnessProfile?.life_stage === 'peri_menopause_transition') && (
+            <Card 
+              className="max-w-3xl mx-auto bg-gradient-to-br from-teal-50/60 to-teal-100/30 dark:from-teal-900/20 dark:to-teal-800/10 border-teal-200/50 dark:border-teal-800/50 hover:shadow-lg hover:border-teal-300/60 transition-all cursor-pointer group active:scale-[0.99]"
+              onClick={() => navigate("/hormonal-transition")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate("/hormonal-transition")}
+            >
+              <CardContent className="py-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Waves className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-foreground mb-0.5 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      Your Transition Tracker
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Gently observe your hormonal journey with supportive tools
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-teal-600 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Gentle Entry Cards - 4 Maximum */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto" data-tour="entry-cards">
             {/* Card 1: Check in with yourself */}
@@ -354,6 +383,13 @@ const Index = () => {
           {wellnessProfile?.life_stage && (
             <div className="max-w-3xl mx-auto">
               <LifeStageCheckInPrompt currentStage={wellnessProfile.life_stage} />
+            </div>
+          )}
+
+          {/* In-Between Phase Support Banner */}
+          {wellnessProfile?.life_stage && (
+            <div className="max-w-3xl mx-auto">
+              <InBetweenPhaseBanner lifeStage={wellnessProfile.life_stage} />
             </div>
           )}
 
