@@ -16,6 +16,7 @@ import Settings from "./pages/Settings";
 import ConditionTracker from "./pages/ConditionTracker";
 import MyDailyPractice from "./pages/MyDailyPractice";
 import ResetPassword from "./pages/ResetPassword";
+import HormonalTransitionTracker from "./pages/HormonalTransitionTracker";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
         <Route path="/condition-tracker" element={<ConditionTracker />} />
         <Route path="/my-daily-practice" element={<MyDailyPractice />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/hormonal-transition" element={<HormonalTransitionTracker />} />
         <Route path="/admin" element={<Admin />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
