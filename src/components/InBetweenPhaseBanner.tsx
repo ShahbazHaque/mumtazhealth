@@ -6,6 +6,7 @@ import { JOURNEY_MESSAGES } from "@/constants/appMessaging";
 
 interface InBetweenPhaseBannerProps {
   lifeStage: string | null | undefined;
+  lifePhases?: string[] | null;
   compact?: boolean;
   className?: string;
 }
@@ -16,8 +17,8 @@ interface InBetweenPhaseBannerProps {
  * 
  * Displays gentle, stabilizing messaging and nervous system support focus
  */
-export function InBetweenPhaseBanner({ lifeStage, compact = false, className = "" }: InBetweenPhaseBannerProps) {
-  const config = useInBetweenPhaseSupport(lifeStage);
+export function InBetweenPhaseBanner({ lifeStage, lifePhases, compact = false, className = "" }: InBetweenPhaseBannerProps) {
+  const config = useInBetweenPhaseSupport(lifeStage, lifePhases);
 
   if (!config.isInBetweenPhase) {
     return null;
@@ -87,8 +88,8 @@ export function InBetweenPhaseBanner({ lifeStage, compact = false, className = "
 /**
  * A simple badge indicating in-between phase status
  */
-export function InBetweenPhaseBadge({ lifeStage }: { lifeStage: string | null | undefined }) {
-  const config = useInBetweenPhaseSupport(lifeStage);
+export function InBetweenPhaseBadge({ lifeStage, lifePhases }: { lifeStage: string | null | undefined; lifePhases?: string[] | null }) {
+  const config = useInBetweenPhaseSupport(lifeStage, lifePhases);
 
   if (!config.isInBetweenPhase) {
     return null;

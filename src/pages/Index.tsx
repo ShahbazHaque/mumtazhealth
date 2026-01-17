@@ -32,6 +32,8 @@ interface WellnessProfile {
   onboarding_completed: boolean | null;
   pregnancy_status: string | null;
   spiritual_preference: string | null;
+  primary_focus: string[] | null;
+  life_phases: string[] | null;
 }
 
 interface WellnessEntry {
@@ -118,10 +120,10 @@ const Index = () => {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      // Fetch wellness profile
+      // Fetch wellness profile including new multi-select fields
       const { data: wellness } = await supabase
         .from("user_wellness_profiles")
-        .select("life_stage, primary_dosha, secondary_dosha, onboarding_completed, pregnancy_status, spiritual_preference")
+        .select("life_stage, primary_dosha, secondary_dosha, onboarding_completed, pregnancy_status, spiritual_preference, primary_focus, life_phases")
         .eq("user_id", user.id)
         .maybeSingle();
 
@@ -221,7 +223,10 @@ const Index = () => {
           </div>
 
           {/* Hormonal Transition Quick Access - for in-between phase users */}
-          {(wellnessProfile?.life_stage === 'cycle_changes' || wellnessProfile?.life_stage === 'peri_menopause_transition') && (
+          {(wellnessProfile?.life_stage === 'cycle_changes' || 
+            wellnessProfile?.life_stage === 'peri_menopause_transition' ||
+            wellnessProfile?.life_phases?.includes('cycle_changes') ||
+            wellnessProfile?.life_phases?.includes('peri_menopause_transition')) && (
             <Card 
               className="max-w-3xl mx-auto bg-gradient-to-br from-teal-50/60 to-teal-100/30 dark:from-teal-900/20 dark:to-teal-800/10 border-teal-200/50 dark:border-teal-800/50 hover:shadow-lg hover:border-teal-300/60 transition-all cursor-pointer group active:scale-[0.99]"
               onClick={() => navigate("/hormonal-transition")}

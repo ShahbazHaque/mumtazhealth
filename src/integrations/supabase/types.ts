@@ -625,11 +625,13 @@ export type Database = {
           due_date: string | null
           focus_areas: string[] | null
           id: string
+          life_phases: string[] | null
           life_stage: string | null
           onboarding_completed: boolean | null
           preferred_yoga_style: string | null
           pregnancy_status: string | null
           primary_dosha: string | null
+          primary_focus: string[] | null
           secondary_dosha: string | null
           spiritual_preference: string | null
           subscription_tier: string | null
@@ -645,11 +647,13 @@ export type Database = {
           due_date?: string | null
           focus_areas?: string[] | null
           id?: string
+          life_phases?: string[] | null
           life_stage?: string | null
           onboarding_completed?: boolean | null
           preferred_yoga_style?: string | null
           pregnancy_status?: string | null
           primary_dosha?: string | null
+          primary_focus?: string[] | null
           secondary_dosha?: string | null
           spiritual_preference?: string | null
           subscription_tier?: string | null
@@ -665,11 +669,13 @@ export type Database = {
           due_date?: string | null
           focus_areas?: string[] | null
           id?: string
+          life_phases?: string[] | null
           life_stage?: string | null
           onboarding_completed?: boolean | null
           preferred_yoga_style?: string | null
           pregnancy_status?: string | null
           primary_dosha?: string | null
+          primary_focus?: string[] | null
           secondary_dosha?: string | null
           spiritual_preference?: string | null
           subscription_tier?: string | null
