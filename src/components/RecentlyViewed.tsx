@@ -102,13 +102,13 @@ export function RecentlyViewed() {
             className="w-full justify-between h-auto py-3 px-3 hover:bg-accent/10"
             onClick={() => navigate(item.path)}
           >
-            <div className="flex items-center gap-3">
-              {getTypeIcon(item.type)}
-              <div className="text-left">
-                <p className="text-sm font-medium text-foreground line-clamp-1">
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 mt-0.5">{getTypeIcon(item.type)}</div>
+              <div className="text-left min-w-0 flex-1">
+                <p className="text-sm font-medium text-foreground leading-snug break-words hyphens-auto">
                   {item.title}
                 </p>
-                <p className="text-xs text-muted-foreground capitalize">
+                <p className="text-xs text-muted-foreground capitalize mt-0.5">
                   {item.type.replace('_', ' ')}
                 </p>
               </div>

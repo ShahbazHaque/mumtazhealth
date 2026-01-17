@@ -324,11 +324,11 @@ export function PersonalizedRecommendations() {
                       {content.content_type}
                     </Badge>
                   </div>
-                  <h4 className="font-medium text-foreground group-hover:text-wellness-lilac transition-colors line-clamp-1">
+                  <h4 className="font-medium text-foreground group-hover:text-wellness-lilac transition-colors text-sm sm:text-base leading-snug break-words hyphens-auto">
                     {content.title}
                   </h4>
                   {content.description && (
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1 leading-relaxed">
                       {content.description}
                     </p>
                   )}
