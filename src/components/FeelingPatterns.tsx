@@ -46,12 +46,16 @@ const cyclePhaseLabels: Record<string, string> = {
 
 const lifeStageLabels: Record<string, string> = {
   menstrual: "Menstrual",
+  menstrual_cycle: "Regular Menstrual Cycle",
+  cycle_changes: "Cycle Changes / Hormonal Shifts",
   fertility: "Fertility Journey",
   pregnancy: "Pregnancy",
   postpartum: "Postpartum",
   perimenopause: "Perimenopause",
+  peri_menopause_transition: "Peri → Menopause Transition",
   menopause: "Menopause",
   post_menopause: "Post-Menopause",
+  not_sure: "Exploring",
 };
 
 // Educational insights explaining why feelings are common during specific phases

@@ -151,12 +151,15 @@ const Index = () => {
   const getLifeStageDisplay = (stage: string | null) => {
     if (!stage) return "Not set";
     const stages: Record<string, string> = {
-      menstrual_cycle: "Menstrual Cycle",
-      pregnancy: "Pregnancy",
-      postpartum: "Postpartum",
+      menstrual_cycle: "Regular Menstrual Cycle",
+      cycle_changes: "Cycle Changes / Hormonal Shifts",
       perimenopause: "Perimenopause",
+      peri_menopause_transition: "Peri → Menopause Transition",
       menopause: "Menopause",
       post_menopause: "Post-Menopause",
+      pregnancy: "Pregnancy",
+      postpartum: "Postpartum",
+      not_sure: "Exploring",
     };
     return stages[stage] || stage;
   };

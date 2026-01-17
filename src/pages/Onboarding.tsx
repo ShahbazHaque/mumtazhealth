@@ -900,10 +900,45 @@ export default function Onboarding() {
     const lifeStages = [
       { 
         value: "menstrual_cycle", 
-        label: "Menstrual Cycle", 
-        description: "Regular monthly cycling", 
+        label: "Regular Menstrual Cycle", 
+        description: "Consistent monthly cycling", 
         icon: "🌸",
         tooltip: "Experience the natural rhythm of your monthly cycle. We provide guidance for cycle tracking, managing symptoms, understanding hormonal changes, and supporting conditions like PCOS and endometriosis."
+      },
+      { 
+        value: "cycle_changes", 
+        label: "In-between: Cycle Changes / Hormonal Shifts", 
+        description: "Experiencing changes in your cycle", 
+        icon: "🌊",
+        tooltip: "Your body may be shifting — cycles becoming shorter, longer, or unpredictable. This is a natural part of hormonal evolution and we're here to support you through it."
+      },
+      { 
+        value: "perimenopause", 
+        label: "Perimenopause", 
+        description: "Cycles becoming irregular, symptoms beginning", 
+        icon: "🌅",
+        tooltip: "Navigate this transitional phase with confidence. Access tools for managing irregular cycles, hot flashes, mood changes, and hormonal fluctuations through holistic practices."
+      },
+      { 
+        value: "peri_menopause_transition", 
+        label: "In-between: Peri → Menopause Transition", 
+        description: "Moving from perimenopause toward menopause", 
+        icon: "🌄",
+        tooltip: "You're in the threshold between phases — periods becoming very infrequent but not yet stopped for 12 months. We'll help you navigate this unique in-between time."
+      },
+      { 
+        value: "menopause", 
+        label: "Menopause", 
+        description: "No period for 12 months or more", 
+        icon: "🌙",
+        tooltip: "Embrace this new chapter. Find support for managing symptoms like hot flashes, sleep issues, bone health, and rediscovering vitality through Ayurvedic wisdom and yoga."
+      },
+      { 
+        value: "post_menopause", 
+        label: "Post-Menopause", 
+        description: "Settled into life after menopause", 
+        icon: "✨",
+        tooltip: "Thrive in your wisdom years. Access practices for maintaining bone health, cardiovascular wellness, cognitive vitality, and cultivating purpose and joy in this empowered stage."
       },
       { 
         value: "pregnancy", 
@@ -920,29 +955,8 @@ export default function Onboarding() {
         tooltip: "Support your recovery and adjustment to motherhood. Find resources for physical healing, postpartum yoga, managing emotions, breastfeeding support, and reconnecting with yourself."
       },
       { 
-        value: "perimenopause", 
-        label: "Perimenopause", 
-        description: "Cycles changing or symptoms beginning", 
-        icon: "🌅",
-        tooltip: "Navigate this transitional phase with confidence. Access tools for managing irregular cycles, hot flashes, mood changes, and hormonal fluctuations through holistic practices."
-      },
-      { 
-        value: "menopause", 
-        label: "Menopause", 
-        description: "No period for 12 months or more", 
-        icon: "🌙",
-        tooltip: "Embrace this new chapter. Find support for managing symptoms like hot flashes, sleep issues, bone health, and rediscovering vitality through Ayurvedic wisdom and yoga."
-      },
-      { 
-        value: "post_menopause", 
-        label: "Post-Menopause / Beyond", 
-        description: "After menopause", 
-        icon: "✨",
-        tooltip: "Thrive in your wisdom years. Access practices for maintaining bone health, cardiovascular wellness, cognitive vitality, and cultivating purpose and joy in this empowered stage."
-      },
-      { 
         value: "not_sure", 
-        label: "I'm not sure / My body is changing", 
+        label: "Not sure / Exploring", 
         description: "Get gentle guidance to find what fits", 
         icon: "💫",
         tooltip: "Many women move through phases gradually. We'll help you find what feels right with a few optional questions."

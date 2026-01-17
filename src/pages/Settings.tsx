@@ -16,13 +16,15 @@ import { LifeStageHelper } from "@/components/LifeStageHelper";
 import { SubscriptionManagement } from "@/components/SubscriptionManagement";
 
 const lifeStages = [
-  { value: "menstrual_cycle", label: "Menstrual Cycle", description: "Regular monthly cycling" },
+  { value: "menstrual_cycle", label: "Regular Menstrual Cycle", description: "Consistent monthly cycling" },
+  { value: "cycle_changes", label: "In-between: Cycle Changes / Hormonal Shifts", description: "Experiencing changes in your cycle" },
+  { value: "perimenopause", label: "Perimenopause", description: "Cycles becoming irregular, symptoms beginning" },
+  { value: "peri_menopause_transition", label: "In-between: Peri → Menopause Transition", description: "Moving from perimenopause toward menopause" },
+  { value: "menopause", label: "Menopause", description: "No period for 12 months or more" },
+  { value: "post_menopause", label: "Post-Menopause", description: "Settled into life after menopause" },
   { value: "pregnancy", label: "Pregnancy", description: "Expecting a baby" },
   { value: "postpartum", label: "Postpartum", description: "After childbirth" },
-  { value: "perimenopause", label: "Perimenopause", description: "Cycles changing or symptoms beginning" },
-  { value: "menopause", label: "Menopause", description: "No period for 12 months or more" },
-  { value: "post_menopause", label: "Post-Menopause / Beyond", description: "After menopause" },
-  { value: "not_sure", label: "I'm not sure / My body is changing", description: "Get gentle guidance" },
+  { value: "not_sure", label: "Not sure / Exploring", description: "Get gentle guidance to find what fits" },
 ];
 
 export default function Settings() {

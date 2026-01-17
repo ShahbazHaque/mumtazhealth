@@ -1549,13 +1549,14 @@ const ContentLibrary = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Phases</SelectItem>
-                          <SelectItem value="menstrual">Menstrual</SelectItem>
-                          <SelectItem value="fertility">Fertility</SelectItem>
-                          <SelectItem value="pregnancy">Pregnancy</SelectItem>
-                          <SelectItem value="postpartum">Postpartum</SelectItem>
+                          <SelectItem value="menstrual">Menstrual Cycle</SelectItem>
+                          <SelectItem value="cycle_changes">Cycle Changes</SelectItem>
                           <SelectItem value="perimenopause">Perimenopause</SelectItem>
+                          <SelectItem value="peri_menopause_transition">Peri → Menopause</SelectItem>
                           <SelectItem value="menopause">Menopause</SelectItem>
                           <SelectItem value="post-menopause">Post-menopause</SelectItem>
+                          <SelectItem value="pregnancy">Pregnancy</SelectItem>
+                          <SelectItem value="postpartum">Postpartum</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
