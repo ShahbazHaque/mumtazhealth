@@ -130,7 +130,7 @@ const IntroScreen = ({
   currentIntro?: number;
   totalIntros?: number;
 }) => (
-  <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+  <div className="min-h-screen flex items-center justify-center px-3 py-6 sm:p-4 bg-background">
     <div 
       key={animationKey}
       className="w-full max-w-2xl animate-in fade-in slide-in-from-right-4 duration-500"
@@ -138,42 +138,42 @@ const IntroScreen = ({
       {currentIntro && totalIntros && (
         <IntroProgressIndicator current={currentIntro} total={totalIntros} />
       )}
-      <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm">
-        <CardHeader className="text-center space-y-6 pb-4 pt-10">
+      <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm overflow-hidden">
+        <CardHeader className="text-center space-y-4 sm:space-y-6 pb-3 sm:pb-4 pt-8 sm:pt-10 px-4 sm:px-6 relative">
           {onSkip && (
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
               <Button 
                 variant="ghost" 
                 onClick={onSkip} 
-                className="text-muted-foreground hover:text-foreground text-sm"
+                className="text-muted-foreground hover:text-foreground text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-9"
               >
-                Skip to Profile Setup
+                Skip to Profile
               </Button>
             </div>
           )}
-          <div className="flex justify-center">
-            <div className="p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20 transition-transform duration-300 hover:scale-105">
+          <div className="flex justify-center pt-2 sm:pt-0">
+            <div className="p-3 sm:p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20 transition-transform duration-300 hover:scale-105">
               {icon}
             </div>
           </div>
-          <CardTitle className="text-2xl md:text-3xl font-bold text-mumtaz-plum leading-tight font-accent">
+          <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-mumtaz-plum leading-snug sm:leading-tight font-accent px-2 break-words hyphens-auto">
             {title}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 pb-10">
-          <div className="text-center space-y-4 text-muted-foreground leading-relaxed">
+        <CardContent className="space-y-4 sm:space-y-6 pb-8 sm:pb-10 px-4 sm:px-6">
+          <div className="text-center space-y-3 sm:space-y-4 text-muted-foreground text-sm sm:text-base leading-relaxed break-words">
             {children}
           </div>
-          <div className="flex justify-between pt-6">
+          <div className="flex justify-between pt-4 sm:pt-6 gap-2">
             {showBack && onBack ? (
-              <Button variant="ghost" onClick={onBack} className="gap-2 transition-all duration-200 hover:-translate-x-1">
-                <ArrowLeft className="h-4 w-4" /> Back
+              <Button variant="ghost" onClick={onBack} className="gap-1.5 sm:gap-2 transition-all duration-200 hover:-translate-x-1 text-sm sm:text-base px-3 sm:px-4 h-10 sm:h-11 min-w-0 shrink-0">
+                <ArrowLeft className="h-4 w-4 shrink-0" /> <span className="hidden xs:inline">Back</span>
               </Button>
             ) : (
               <div />
             )}
-            <Button onClick={onNext} className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-200 hover:translate-x-1">
-              {nextLabel} <ArrowRight className="h-4 w-4" />
+            <Button onClick={onNext} className="gap-1.5 sm:gap-2 bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-200 hover:translate-x-1 text-sm sm:text-base px-4 sm:px-6 h-10 sm:h-11 min-w-0">
+              {nextLabel} <ArrowRight className="h-4 w-4 shrink-0" />
             </Button>
           </div>
         </CardContent>
@@ -333,36 +333,36 @@ export default function Onboarding() {
   // Intro Screen 1: Welcome
   if (step === "intro1") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="min-h-screen flex items-center justify-center px-3 py-6 sm:p-4 bg-background">
         <div key="intro1" className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
           <IntroProgressIndicator current={1} total={11} />
-          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm relative">
-            <div className="absolute top-4 right-4">
+          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm relative overflow-hidden">
+            <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
               <Button 
                 variant="ghost" 
                 onClick={skipToProfile} 
-                className="text-muted-foreground hover:text-foreground text-sm"
+                className="text-muted-foreground hover:text-foreground text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-9"
               >
-                Skip to Profile Setup
+                Skip to Profile
               </Button>
             </div>
-            <CardHeader className="text-center space-y-8 pb-6 pt-12">
+            <CardHeader className="text-center space-y-6 sm:space-y-8 pb-4 sm:pb-6 pt-10 sm:pt-12 px-4 sm:px-6">
               <Logo size="xl" className="mx-auto" />
-              <CardTitle className="text-3xl md:text-4xl font-bold text-mumtaz-plum leading-tight font-accent">
+              <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-bold text-mumtaz-plum leading-snug sm:leading-tight font-accent px-2 break-words">
                 Welcome to Mumtaz Health
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-8 pb-12">
-              <p className="text-center text-lg text-muted-foreground leading-relaxed">
+            <CardContent className="space-y-6 sm:space-y-8 pb-10 sm:pb-12 px-4 sm:px-6">
+              <p className="text-center text-base sm:text-lg text-muted-foreground leading-relaxed px-2 break-words">
                 A gentle space created to support women through every phase of life — with care, compassion, and wisdom.
               </p>
-              <div className="flex justify-center pt-4">
+              <div className="flex justify-center pt-2 sm:pt-4">
                 <Button 
                   onClick={() => setStep("intro2")} 
                   size="lg"
-                  className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-8 transition-all duration-200 hover:translate-x-1"
+                  className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-6 sm:px-8 h-11 sm:h-12 text-sm sm:text-base transition-all duration-200 hover:translate-x-1"
                 >
-                  Begin <ArrowRight className="h-4 w-4" />
+                  Begin <ArrowRight className="h-4 w-4 shrink-0" />
                 </Button>
               </div>
             </CardContent>
