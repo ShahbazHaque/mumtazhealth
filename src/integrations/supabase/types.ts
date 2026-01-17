@@ -623,6 +623,7 @@ export type Database = {
           dietary_restrictions: Json | null
           dosha_assessment_date: string | null
           due_date: string | null
+          focus_areas: string[] | null
           id: string
           life_stage: string | null
           onboarding_completed: boolean | null
@@ -642,6 +643,7 @@ export type Database = {
           dietary_restrictions?: Json | null
           dosha_assessment_date?: string | null
           due_date?: string | null
+          focus_areas?: string[] | null
           id?: string
           life_stage?: string | null
           onboarding_completed?: boolean | null
@@ -661,6 +663,7 @@ export type Database = {
           dietary_restrictions?: Json | null
           dosha_assessment_date?: string | null
           due_date?: string | null
+          focus_areas?: string[] | null
           id?: string
           life_stage?: string | null
           onboarding_completed?: boolean | null

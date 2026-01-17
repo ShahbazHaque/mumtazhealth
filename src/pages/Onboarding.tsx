@@ -13,12 +13,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import DoshaAssessment from "@/components/DoshaAssessment";
 import { Logo } from "@/components/Logo";
 import { FirstTimeQuickCheckIn } from "@/components/FirstTimeQuickCheckIn";
+import { CycleChangesOnboarding } from "@/components/CycleChangesOnboarding";
 
 type OnboardingStep = 
   | "initial_choice" | "quick_checkin"
   | "intro1" | "intro2" | "intro3" | "intro4" | "intro5" 
   | "intro6" | "intro7" | "intro8" | "intro9" | "intro10" | "intro11"
-  | "welcome" | "lifeStage" | "cycle" | "dosha" | "doshaResults" 
+  | "welcome" | "lifeStage" | "cycle_changes_focus" | "cycle" | "dosha" | "doshaResults" 
   | "spiritual" | "pregnancy" | "preferences" | "complete";
 
 const ProgressIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => (
@@ -196,6 +197,7 @@ export default function Onboarding() {
       intro6: 0, intro7: 0, intro8: 0, intro9: 0, intro10: 0, intro11: 0,
       welcome: 1,
       lifeStage: 2,
+      cycle_changes_focus: 3,
       cycle: 3,
       dosha: 4,
       doshaResults: 5,
@@ -219,6 +221,7 @@ export default function Onboarding() {
   const [energyLevel, setEnergyLevel] = useState("");
   const [menstrualCondition, setMenstrualCondition] = useState("");
   const [showLifeStageHelper, setShowLifeStageHelper] = useState(false);
+  const [focusAreas, setFocusAreas] = useState<string[]>([]);
   const [hasError, setHasError] = useState(false);
 
   const handleDoshaComplete = (primary: string, secondary: string) => {
@@ -269,6 +272,7 @@ export default function Onboarding() {
         due_date: pregnancyStatus === "pregnant" ? dueDate : null,
         current_trimester: currentTrimester,
         preferred_yoga_style: yogaStyle,
+        focus_areas: focusAreas.length > 0 ? focusAreas : null,
         onboarding_completed: true,
         dosha_assessment_date: new Date().toISOString(),
       }, { onConflict: 'user_id' });
@@ -289,7 +293,12 @@ export default function Onboarding() {
       }
 
       toast.success("Your wellness profile is complete! Let's start tracking your journey.");
-      navigate("/");
+      // Redirect cycle_changes users to Hormonal Transition Tracker
+      if (lifeStage === "cycle_changes") {
+        navigate("/hormonal-transition");
+      } else {
+        navigate("/");
+      }
     } catch (error: any) {
       toast.error(error.message || "Failed to save profile");
     } finally {
@@ -1215,9 +1224,11 @@ export default function Onboarding() {
                 </Button>
                 <Button
                   onClick={() => {
-                    // Skip menstrual cycle questions for non-menstrual life stages
+                    // Handle different life stage paths
                     if (lifeStage === 'menstrual_cycle') {
                       setStep("cycle");
+                    } else if (lifeStage === 'cycle_changes') {
+                      setStep("cycle_changes_focus");
                     } else {
                       setStep("dosha");
                     }
@@ -1230,6 +1241,33 @@ export default function Onboarding() {
             </CardContent>
           </Card>
         </TooltipProvider>
+      </div>
+    );
+  }
+
+  if (step === "cycle_changes_focus") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-teal-50/50 via-background to-wellness-sage-light dark:from-teal-950/20 dark:via-background dark:to-wellness-sage/5">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-2xl bg-gradient-to-r from-teal-600 to-wellness-sage bg-clip-text text-transparent">
+              Your Body is Speaking
+            </CardTitle>
+            <CardDescription>
+              Let's understand what changes you're noticing so we can support you better
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+            <CycleChangesOnboarding
+              onComplete={(areas) => {
+                setFocusAreas(areas);
+                setStep("dosha");
+              }}
+              onBack={() => setStep("lifeStage")}
+            />
+          </CardContent>
+        </Card>
       </div>
     );
   }
