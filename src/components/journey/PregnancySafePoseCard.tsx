@@ -150,12 +150,12 @@ export function PregnancySafePoseCard({ pose, currentTrimester = 1, className }:
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3">
+      <div className="p-3 sm:p-4 space-y-2.5 sm:space-y-3">
         <div>
-          <h4 className="font-medium text-foreground text-sm leading-tight">
+          <h4 className="font-medium text-foreground text-sm sm:text-base leading-snug break-words hyphens-auto">
             {pose.name}
           </h4>
-          <p className="text-xs text-muted-foreground mt-1 italic">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 italic leading-relaxed break-words">
             {pose.caption}
           </p>
         </div>

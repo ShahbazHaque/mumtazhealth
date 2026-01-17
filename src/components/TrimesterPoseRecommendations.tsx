@@ -318,8 +318,8 @@ export function TrimesterPoseRecommendations({ onSelectPractice }: TrimesterPose
                     </Badge>
                     <Heart className="h-4 w-4 text-muted-foreground hover:text-primary" />
                   </div>
-                  <CardTitle className="text-sm">{practice.title}</CardTitle>
-                  <CardDescription className="text-xs line-clamp-2">
+                  <CardTitle className="text-sm sm:text-base leading-snug break-words hyphens-auto">{practice.title}</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm leading-relaxed mt-1">
                     {practice.description}
                   </CardDescription>
                 </CardHeader>

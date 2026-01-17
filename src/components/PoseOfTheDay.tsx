@@ -567,15 +567,21 @@ export const PoseOfTheDay = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Pose Image */}
-        <div className="relative rounded-xl overflow-hidden aspect-[4/3] max-h-[300px]">
-          <img
-            src={currentPose.image}
-            alt={currentPose.name}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4">
-            <h3 className="text-2xl font-bold text-white">{currentPose.name}</h3>
-            <p className="text-sm text-white/80 italic">{currentPose.sanskritName}</p>
+        <div className="relative rounded-xl overflow-hidden">
+          <div className="aspect-[4/3] max-h-[300px]">
+            <img
+              src={currentPose.image}
+              alt={currentPose.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 sm:p-4 pt-8 sm:pt-12">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white leading-snug break-words hyphens-auto">
+              {currentPose.name}
+            </h3>
+            <p className="text-xs sm:text-sm text-white/80 italic mt-0.5 sm:mt-1 break-words">
+              {currentPose.sanskritName}
+            </p>
           </div>
         </div>
 

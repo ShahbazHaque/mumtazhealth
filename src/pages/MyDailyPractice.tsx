@@ -475,18 +475,18 @@ export default function MyDailyPractice() {
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 p-4">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="text-lg font-semibold text-foreground">
+                        <div className="flex-1 p-3 sm:p-4">
+                          <div className="flex items-start justify-between gap-2 sm:gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start gap-2 mb-1">
+                                <h3 className="text-base sm:text-lg font-semibold text-foreground leading-snug break-words hyphens-auto">
                                   {reminder.content?.title || 'Unknown Practice'}
                                 </h3>
                                 {reminder.completedToday && (
-                                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+                                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0 mt-0.5" />
                                 )}
                               </div>
-                              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2 sm:mb-3">
                                 {reminder.content?.description}
                               </p>
                               

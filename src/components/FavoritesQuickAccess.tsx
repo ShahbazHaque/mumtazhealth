@@ -211,13 +211,13 @@ export function FavoritesQuickAccess() {
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             {/* Title */}
-                            <h4 className="font-medium text-foreground line-clamp-2 mb-1.5">
+                            <h4 className="font-medium text-foreground text-sm sm:text-base leading-snug break-words hyphens-auto mb-1.5">
                               {content.title}
                             </h4>
                             
                             {/* Description */}
                             {content.description && (
-                              <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                              <p className="text-xs text-muted-foreground leading-relaxed mb-2">
                                 {content.description}
                               </p>
                             )}

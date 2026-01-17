@@ -1707,30 +1707,32 @@ const ContentLibrary = () => {
                   )}
                 </div>
                 
-                <CardHeader>
+                <CardHeader className="pb-2 sm:pb-3">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2 flex-1">
-                      {getContentIcon(item.content_type)}
-                      <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
+                    <div className="flex items-start gap-2 flex-1 min-w-0">
+                      <div className="shrink-0 mt-0.5">{getContentIcon(item.content_type)}</div>
+                      <CardTitle className="text-base sm:text-lg leading-snug break-words hyphens-auto">
+                        {item.title}
+                      </CardTitle>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                       {user && completedContentIds.has(item.id) && (
-                        <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                        <Badge variant="default" className="bg-green-600 hover:bg-green-700 h-6 px-1.5">
                           <CheckCircle2 className="h-3 w-3" />
                         </Badge>
                       )}
                       <Button
                         variant={savedContentIds.has(item.id) ? "default" : "outline"}
                         size="sm"
-                        className={`text-xs ${savedContentIds.has(item.id) ? 'bg-primary/90 hover:bg-primary' : ''}`}
+                        className={`text-xs h-7 sm:h-8 px-2 sm:px-3 shrink-0 ${savedContentIds.has(item.id) ? 'bg-primary/90 hover:bg-primary' : ''}`}
                         onClick={(e) => { e.stopPropagation(); toggleSaveContent(item.id); }}
                       >
-                        <Heart className={`h-3.5 w-3.5 mr-1.5 ${savedContentIds.has(item.id) ? 'fill-white' : ''}`} />
-                        {savedContentIds.has(item.id) ? 'Saved ✓' : 'Save'}
+                        <Heart className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${savedContentIds.has(item.id) ? 'fill-white' : ''}`} />
+                        <span className="hidden xs:inline ml-1">{savedContentIds.has(item.id) ? 'Saved' : 'Save'}</span>
                       </Button>
                     </div>
                   </div>
-                  <CardDescription className="line-clamp-2">
+                  <CardDescription className="text-xs sm:text-sm leading-relaxed mt-1.5 sm:mt-2">
                     {isLocked && item.preview_content ? item.preview_content : item.description}
                   </CardDescription>
                 </CardHeader>
