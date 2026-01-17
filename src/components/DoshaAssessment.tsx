@@ -8,7 +8,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface QuestionOption {
   value: string;
   label: string;
-  dosha: "vata" | "pitta" | "kapha" | "vata-pitta" | "pitta-kapha" | "vata-kapha";
+  description?: string;
+  dosha: "vata" | "pitta" | "kapha" | "vata-pitta" | "pitta-kapha" | "vata-kapha" | "tri-dosha";
 }
 
 interface Question {
@@ -22,74 +23,82 @@ const doshaQuestions: Question[] = [
     id: "body_frame",
     question: "How would you describe your natural body frame?",
     options: [
-      { value: "thin", label: "Thin", dosha: "vata" },
-      { value: "medium", label: "Medium", dosha: "pitta" },
-      { value: "sturdy", label: "Sturdy", dosha: "kapha" },
+      { value: "thin", label: "Thin", description: "Slender build, long limbs, light bones", dosha: "vata" },
+      { value: "medium", label: "Medium", description: "Athletic build, moderate frame", dosha: "pitta" },
+      { value: "sturdy", label: "Sturdy", description: "Solid build, strong bones, gains weight easily", dosha: "kapha" },
+      { value: "not_sure", label: "Not sure", description: "I'm not certain which fits me best", dosha: "tri-dosha" },
     ],
   },
   {
     id: "skin",
     question: "How does your skin usually feel?",
     options: [
-      { value: "dry", label: "Dry or rough", dosha: "vata" },
-      { value: "warm", label: "Warm or sensitive", dosha: "pitta" },
-      { value: "oily", label: "Oily or smooth", dosha: "kapha" },
-      { value: "combo_dry_oily", label: "Mix of dry and oily areas", dosha: "vata-kapha" },
-      { value: "combo_tzone", label: "Oily T-zone with dry cheeks", dosha: "vata-pitta" },
+      { value: "dry", label: "Dry or rough", description: "Tends to feel tight, may get flaky or cracked", dosha: "vata" },
+      { value: "warm", label: "Warm or sensitive", description: "Prone to redness, irritation, or breakouts", dosha: "pitta" },
+      { value: "oily", label: "Oily or smooth", description: "Naturally moisturized, may feel greasy by end of day", dosha: "kapha" },
+      { value: "combo_dry_oily", label: "Mix of dry and oily", description: "Some areas dry, others oily—varies by season", dosha: "vata-kapha" },
+      { value: "combo_tzone", label: "Oily T-zone, dry cheeks", description: "Forehead and nose are oily while cheeks feel dry", dosha: "vata-pitta" },
+      { value: "not_sure", label: "Not sure", description: "I'm not certain which fits me best", dosha: "tri-dosha" },
     ],
   },
   {
     id: "digestion",
     question: "Which description fits your digestion most days?",
     options: [
-      { value: "irregular", label: "Irregular", dosha: "vata" },
-      { value: "strong", label: "Strong", dosha: "pitta" },
-      { value: "slow", label: "Slow", dosha: "kapha" },
+      { value: "irregular", label: "Irregular", description: "Appetite and digestion vary day to day", dosha: "vata" },
+      { value: "strong", label: "Strong", description: "Good appetite, can digest most foods easily", dosha: "pitta" },
+      { value: "slow", label: "Slow", description: "Takes time to digest, may feel heavy after eating", dosha: "kapha" },
+      { value: "not_sure", label: "Not sure", description: "I'm not certain which fits me best", dosha: "tri-dosha" },
     ],
   },
   {
     id: "energy",
     question: "How would you describe your general energy?",
     options: [
-      { value: "variable", label: "Variable", dosha: "vata" },
-      { value: "strong", label: "Strong", dosha: "pitta" },
-      { value: "steady", label: "Steady", dosha: "kapha" },
+      { value: "variable", label: "Variable", description: "Energy comes in bursts, then fades quickly", dosha: "vata" },
+      { value: "strong", label: "Strong", description: "High energy, driven, goal-oriented", dosha: "pitta" },
+      { value: "steady", label: "Steady", description: "Consistent energy throughout the day", dosha: "kapha" },
+      { value: "not_sure", label: "Not sure", description: "I'm not certain which fits me best", dosha: "tri-dosha" },
     ],
   },
   {
     id: "sleep",
     question: "How is your sleep most nights?",
     options: [
-      { value: "light", label: "Light", dosha: "vata" },
-      { value: "moderate", label: "Moderate", dosha: "pitta" },
-      { value: "deep", label: "Deep", dosha: "kapha" },
+      { value: "light", label: "Light", description: "Wake easily, may have trouble falling asleep", dosha: "vata" },
+      { value: "moderate", label: "Moderate", description: "Sleep well but may wake if overheated", dosha: "pitta" },
+      { value: "deep", label: "Deep", description: "Sleep soundly, hard to wake up in morning", dosha: "kapha" },
+      { value: "not_sure", label: "Not sure", description: "I'm not certain which fits me best", dosha: "tri-dosha" },
     ],
   },
   {
     id: "emotional",
     question: "Which best describes your emotional response?",
     options: [
-      { value: "worry", label: "Worry", dosha: "vata" },
-      { value: "irritability", label: "Irritability", dosha: "pitta" },
-      { value: "calm", label: "Calm", dosha: "kapha" },
+      { value: "worry", label: "Worry", description: "Tend toward anxiety or overthinking", dosha: "vata" },
+      { value: "irritability", label: "Irritability", description: "Can feel frustrated or impatient easily", dosha: "pitta" },
+      { value: "calm", label: "Calm", description: "Generally relaxed, slow to anger", dosha: "kapha" },
+      { value: "not_sure", label: "Not sure", description: "I'm not certain which fits me best", dosha: "tri-dosha" },
     ],
   },
   {
     id: "climate",
     question: "Which climate makes you feel your best?",
     options: [
-      { value: "warm_humid", label: "Warm and humid", dosha: "vata" },
-      { value: "cool_airy", label: "Cool and airy", dosha: "pitta" },
-      { value: "warm_dry", label: "Warm and dry", dosha: "kapha" },
+      { value: "warm_humid", label: "Warm and humid", description: "Feel best when it's warm and moist", dosha: "vata" },
+      { value: "cool_airy", label: "Cool and airy", description: "Prefer cooler temperatures and fresh air", dosha: "pitta" },
+      { value: "warm_dry", label: "Warm and dry", description: "Thrive in warm but not humid conditions", dosha: "kapha" },
+      { value: "not_sure", label: "Not sure", description: "I'm not certain which fits me best", dosha: "tri-dosha" },
     ],
   },
   {
     id: "activity",
     question: "How does your body feel during physical activity?",
     options: [
-      { value: "gentle", label: "Loves gentle movement", dosha: "vata" },
-      { value: "competitive", label: "Strong and competitive", dosha: "pitta" },
-      { value: "motivated", label: "Needs motivation but then steady", dosha: "kapha" },
+      { value: "gentle", label: "Loves gentle movement", description: "Prefer walking, stretching, or light yoga", dosha: "vata" },
+      { value: "competitive", label: "Strong and competitive", description: "Enjoy intense workouts and challenges", dosha: "pitta" },
+      { value: "motivated", label: "Needs motivation but steady", description: "Takes effort to start but can sustain once going", dosha: "kapha" },
+      { value: "not_sure", label: "Not sure", description: "I'm not certain which fits me best", dosha: "tri-dosha" },
     ],
   },
 ];
@@ -132,8 +141,12 @@ export default function DoshaAssessment({ onComplete, onBack, currentStep = 2, t
       const question = doshaQuestions.find((q) => q.id === questionId);
       const option = question?.options.find((opt) => opt.value === value);
       if (option) {
-        // Handle combination doshas - split points between both
-        if (option.dosha === "vata-pitta") {
+        // Handle combination and tri-doshas - split points accordingly
+        if (option.dosha === "tri-dosha") {
+          scores.vata += 0.33;
+          scores.pitta += 0.33;
+          scores.kapha += 0.34;
+        } else if (option.dosha === "vata-pitta") {
           scores.vata += 0.5;
           scores.pitta += 0.5;
         } else if (option.dosha === "pitta-kapha") {
@@ -195,11 +208,20 @@ export default function DoshaAssessment({ onComplete, onBack, currentStep = 2, t
               {question.options.map((option) => (
                 <div
                   key={option.value}
-                  className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary transition-colors"
+                  className={`flex items-start space-x-3 p-3 sm:p-4 rounded-lg border transition-colors ${
+                    currentAnswer === option.value 
+                      ? "border-primary bg-primary/5" 
+                      : "border-border hover:border-primary/50"
+                  }`}
                 >
-                  <RadioGroupItem value={option.value} id={option.value} />
+                  <RadioGroupItem value={option.value} id={option.value} className="mt-0.5" />
                   <Label htmlFor={option.value} className="flex-1 cursor-pointer">
-                    {option.label}
+                    <span className="block text-sm sm:text-base font-medium leading-snug">{option.label}</span>
+                    {option.description && (
+                      <span className="block text-xs sm:text-sm text-muted-foreground mt-1 leading-relaxed">
+                        {option.description}
+                      </span>
+                    )}
                   </Label>
                 </div>
               ))}
