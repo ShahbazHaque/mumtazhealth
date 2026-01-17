@@ -70,11 +70,31 @@ Deno.serve(async (req) => {
     const lifeStage = profile.life_stage || null;
     const primaryDosha = profile.primary_dosha;
     const secondaryDosha = profile.secondary_dosha;
+    const focusAreas = profile.focus_areas || [];
     
-    // Determine if pregnancy safe mode should be enabled
+    // Determine special modes
     const isPregnancySafeMode = lifeStage === 'pregnancy' || pregnancyStatus === 'pregnant';
+    const isInBetweenPhase = lifeStage === 'cycle_changes' || lifeStage === 'peri_menopause_transition';
 
-    console.log('User profile:', { cyclePhase, pregnancyStatus, lifeStage, primaryDosha, secondaryDosha, isPregnancySafeMode });
+    console.log('User profile:', { 
+      cyclePhase, pregnancyStatus, lifeStage, primaryDosha, secondaryDosha, 
+      isPregnancySafeMode, isInBetweenPhase, focusAreas 
+    });
+
+    // Keywords for in-between phase content prioritization
+    const GENTLE_KEYWORDS = [
+      'gentle', 'restorative', 'calming', 'grounding', 'stabilizing',
+      'soothing', 'nurturing', 'supportive', 'relaxing', 'balancing',
+      'nervous system', 'rest', 'restore', 'ease', 'soft',
+      'slow', 'mindful', 'breathwork', 'meditation', 'yin',
+      'chair', 'supported', 'accessible', 'beginner'
+    ];
+
+    const INTENSITY_KEYWORDS = [
+      'intense', 'advanced', 'power', 'hot', 'heating',
+      'vigorous', 'dynamic', 'challenging', 'weight loss', 'burn',
+      'sculpt', 'tone', 'strength training', 'high intensity'
+    ];
 
     // Build query for matching content
     let contentQuery = supabaseClient
@@ -90,8 +110,8 @@ Deno.serve(async (req) => {
       contentQuery = contentQuery.contains('pregnancy_statuses', [pregnancyStatus]);
     }
 
-    // Filter by cycle phase (only if not in pregnancy safe mode)
-    if (!isPregnancySafeMode && (pregnancyStatus === 'not_pregnant' || pregnancyStatus === 'trying_to_conceive')) {
+    // Filter by cycle phase (only if not in pregnancy safe mode or in-between phase)
+    if (!isPregnancySafeMode && !isInBetweenPhase && (pregnancyStatus === 'not_pregnant' || pregnancyStatus === 'trying_to_conceive')) {
       contentQuery = contentQuery.contains('cycle_phases', [cyclePhase]);
     }
 
@@ -107,10 +127,12 @@ Deno.serve(async (req) => {
 
     console.log('Found matching content:', allContent?.length || 0);
 
-    // Score content based on dosha match
+    // Score content based on dosha match and in-between phase preferences
     const scoredContent = (allContent || []).map((content) => {
       let score = 0;
       const doshas = content.doshas || [];
+      const tags = content.tags || [];
+      const searchText = `${content.title || ''} ${content.description || ''} ${tags.join(' ')}`.toLowerCase();
 
       // Higher score for primary dosha match
       if (primaryDosha && doshas.includes(primaryDosha)) {
@@ -125,6 +147,53 @@ Deno.serve(async (req) => {
       // Bonus for matching all doshas (universal content)
       if (doshas.length === 3) {
         score += 0.5;
+      }
+
+      // IN-BETWEEN PHASE SCORING
+      if (isInBetweenPhase) {
+        // Boost gentle, stabilizing content
+        for (const keyword of GENTLE_KEYWORDS) {
+          if (searchText.includes(keyword)) {
+            score += 2;
+          }
+        }
+
+        // Strong penalty for intensity/heat content
+        for (const keyword of INTENSITY_KEYWORDS) {
+          if (searchText.includes(keyword)) {
+            score -= 8; // Strong penalty to effectively exclude
+          }
+        }
+
+        // Boost beginner/gentle difficulty
+        if (content.difficulty_level === 'beginner' || content.difficulty_level === 'gentle') {
+          score += 4;
+        }
+
+        // Boost restorative content types
+        if (content.content_type === 'meditation' || searchText.includes('restorative')) {
+          score += 3;
+        }
+
+        // Penalty for advanced difficulty
+        if (content.difficulty_level === 'advanced') {
+          score -= 5;
+        }
+        if (content.difficulty_level === 'intermediate') {
+          score -= 2;
+        }
+
+        // Boost for nervous system support
+        if (searchText.includes('nervous system') || searchText.includes('calming') || searchText.includes('grounding')) {
+          score += 4;
+        }
+
+        // Boost for focus areas if user has selected them
+        for (const area of focusAreas) {
+          if (searchText.includes(area) || tags.includes(area)) {
+            score += 3;
+          }
+        }
       }
 
       return { ...content, score };
@@ -211,6 +280,8 @@ Deno.serve(async (req) => {
           primary_dosha: primaryDosha,
           life_stage: lifeStage,
           pregnancy_safe_mode: isPregnancySafeMode,
+          in_between_phase: isInBetweenPhase,
+          focus_areas: focusAreas,
         },
       }),
       {
