@@ -5,14 +5,16 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+interface QuestionOption {
+  value: string;
+  label: string;
+  dosha: "vata" | "pitta" | "kapha" | "vata-pitta" | "pitta-kapha" | "vata-kapha";
+}
+
 interface Question {
   id: string;
   question: string;
-  options: {
-    value: string;
-    label: string;
-    dosha: "vata" | "pitta" | "kapha";
-  }[];
+  options: QuestionOption[];
 }
 
 const doshaQuestions: Question[] = [
@@ -29,9 +31,11 @@ const doshaQuestions: Question[] = [
     id: "skin",
     question: "How does your skin usually feel?",
     options: [
-      { value: "dry", label: "Dry", dosha: "vata" },
-      { value: "warm", label: "Warm", dosha: "pitta" },
-      { value: "oily", label: "Oily", dosha: "kapha" },
+      { value: "dry", label: "Dry or rough", dosha: "vata" },
+      { value: "warm", label: "Warm or sensitive", dosha: "pitta" },
+      { value: "oily", label: "Oily or smooth", dosha: "kapha" },
+      { value: "combo_dry_oily", label: "Mix of dry and oily areas", dosha: "vata-kapha" },
+      { value: "combo_tzone", label: "Oily T-zone with dry cheeks", dosha: "vata-pitta" },
     ],
   },
   {
@@ -128,7 +132,19 @@ export default function DoshaAssessment({ onComplete, onBack, currentStep = 2, t
       const question = doshaQuestions.find((q) => q.id === questionId);
       const option = question?.options.find((opt) => opt.value === value);
       if (option) {
-        scores[option.dosha]++;
+        // Handle combination doshas - split points between both
+        if (option.dosha === "vata-pitta") {
+          scores.vata += 0.5;
+          scores.pitta += 0.5;
+        } else if (option.dosha === "pitta-kapha") {
+          scores.pitta += 0.5;
+          scores.kapha += 0.5;
+        } else if (option.dosha === "vata-kapha") {
+          scores.vata += 0.5;
+          scores.kapha += 0.5;
+        } else {
+          scores[option.dosha]++;
+        }
       }
     });
 
