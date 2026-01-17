@@ -63,9 +63,20 @@ const NERVOUS_SYSTEM_KEYWORDS = [
 
 export const IN_BETWEEN_PHASES = ['cycle_changes', 'peri_menopause_transition'] as const;
 
+/**
+ * Check if a single life stage is an in-between phase
+ */
 export function isInBetweenPhase(lifeStage: string | null | undefined): boolean {
   if (!lifeStage) return false;
   return IN_BETWEEN_PHASES.includes(lifeStage as typeof IN_BETWEEN_PHASES[number]);
+}
+
+/**
+ * Check if any of the selected life phases are in-between phases
+ */
+export function hasInBetweenLifePhase(lifePhases: string[] | null | undefined): boolean {
+  if (!lifePhases || lifePhases.length === 0) return false;
+  return lifePhases.some(phase => IN_BETWEEN_PHASES.includes(phase as typeof IN_BETWEEN_PHASES[number]));
 }
 
 export function getInBetweenPhaseType(lifeStage: string | null | undefined): 'cycle_changes' | 'peri_menopause_transition' | null {
@@ -75,10 +86,34 @@ export function getInBetweenPhaseType(lifeStage: string | null | undefined): 'cy
   return null;
 }
 
-export function useInBetweenPhaseSupport(lifeStage: string | null | undefined): InBetweenPhaseConfig {
+/**
+ * Get in-between phase type from array of life phases
+ */
+export function getInBetweenPhaseTypeFromArray(lifePhases: string[] | null | undefined): 'cycle_changes' | 'peri_menopause_transition' | null {
+  if (!lifePhases || lifePhases.length === 0) return null;
+  
+  // Check for cycle_changes first
+  if (lifePhases.includes('cycle_changes')) return 'cycle_changes';
+  if (lifePhases.includes('peri_menopause_transition')) return 'peri_menopause_transition';
+  
+  return null;
+}
+
+/**
+ * Hook supporting both single life_stage (legacy) and array life_phases (new)
+ */
+export function useInBetweenPhaseSupport(
+  lifeStage: string | null | undefined, 
+  lifePhases?: string[] | null
+): InBetweenPhaseConfig {
   return useMemo(() => {
-    const inBetween = isInBetweenPhase(lifeStage);
-    const phaseType = getInBetweenPhaseType(lifeStage);
+    // Check both legacy single value and new array
+    const inBetweenFromSingle = isInBetweenPhase(lifeStage);
+    const inBetweenFromArray = hasInBetweenLifePhase(lifePhases);
+    const inBetween = inBetweenFromSingle || inBetweenFromArray;
+    
+    // Get phase type from either source
+    const phaseType = getInBetweenPhaseTypeFromArray(lifePhases) || getInBetweenPhaseType(lifeStage);
     
     if (!inBetween) {
       return {
@@ -123,7 +158,7 @@ export function useInBetweenPhaseSupport(lifeStage: string | null | undefined): 
       supportiveMessage: phaseType ? supportiveMessages[phaseType] : '',
       gentleReminder: phaseType ? gentleReminders[phaseType] : '',
     };
-  }, [lifeStage]);
+  }, [lifeStage, lifePhases]);
 }
 
 /**

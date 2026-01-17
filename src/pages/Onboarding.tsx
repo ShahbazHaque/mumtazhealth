@@ -14,6 +14,7 @@ import DoshaAssessment from "@/components/DoshaAssessment";
 import { Logo } from "@/components/Logo";
 import { FirstTimeQuickCheckIn } from "@/components/FirstTimeQuickCheckIn";
 import { CycleChangesOnboarding } from "@/components/CycleChangesOnboarding";
+import { JourneyPhaseSelector } from "@/components/JourneyPhaseSelector";
 
 type OnboardingStep = 
   | "initial_choice" | "quick_checkin"
@@ -223,6 +224,9 @@ export default function Onboarding() {
   const [showLifeStageHelper, setShowLifeStageHelper] = useState(false);
   const [focusAreas, setFocusAreas] = useState<string[]>([]);
   const [hasError, setHasError] = useState(false);
+  // New multi-select journey phase data
+  const [primaryFocus, setPrimaryFocus] = useState<string[]>([]);
+  const [lifePhases, setLifePhases] = useState<string[]>([]);
 
   const handleDoshaComplete = (primary: string, secondary: string) => {
     setPrimaryDosha(primary);
@@ -262,9 +266,16 @@ export default function Onboarding() {
         else currentTrimester = 3;
       }
 
+      // Determine legacy life_stage from new multi-select for backwards compatibility
+      const derivedLifeStage = lifePhases.length > 0 
+        ? lifePhases[0] // Use first selected life phase as primary
+        : lifeStage; // Fall back to old single-select value
+
       const { error } = await supabase.from("user_wellness_profiles").upsert({
         user_id: user.id,
-        life_stage: lifeStage,
+        life_stage: derivedLifeStage,
+        primary_focus: primaryFocus.length > 0 ? primaryFocus : null,
+        life_phases: lifePhases.length > 0 ? lifePhases : null,
         primary_dosha: primaryDosha,
         secondary_dosha: secondaryDosha,
         spiritual_preference: spiritualPreference,
@@ -294,7 +305,8 @@ export default function Onboarding() {
 
       toast.success("Your wellness profile is complete! Let's start tracking your journey.");
       // Redirect cycle_changes users to Hormonal Transition Tracker
-      if (lifeStage === "cycle_changes") {
+      const hasCycleChanges = lifePhases.includes("cycle_changes") || lifeStage === "cycle_changes";
+      if (hasCycleChanges) {
         navigate("/hormonal-transition");
       } else {
         navigate("/");
@@ -1124,123 +1136,46 @@ export default function Onboarding() {
 
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
-        <TooltipProvider>
-          <Card className="w-full max-w-2xl">
-            <CardHeader>
-              <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
-                Your Life Stage
-              </CardTitle>
-              <CardDescription className="leading-relaxed">
-                Select the stage that best describes your current journey. 
-                Your body may be in transition — that's completely normal.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-              
-              {showLifeStageHelper ? (
-                <LifeStageHelperContent />
-              ) : (
-                <>
-                  <div className="space-y-2">
-                    <Label>Which life stage are you in?</Label>
-                    <RadioGroup value={lifeStage} onValueChange={(value) => {
-                      if (value === "not_sure") {
-                        setShowLifeStageHelper(true);
-                      } else {
-                        setLifeStage(value);
-                        if (value !== "menstrual_cycle") {
-                          setMenstrualCondition("");
-                        }
-                      }
-                    }}>
-                      <div className="space-y-3">
-                        {lifeStages.map((stage) => (
-                          <Tooltip key={stage.value}>
-                            <TooltipTrigger asChild>
-                              <div className={`flex items-start space-x-3 p-4 rounded-lg border transition-colors cursor-help ${
-                                stage.value === "not_sure" 
-                                  ? "border-wellness-lilac/30 bg-wellness-lilac/5 hover:bg-wellness-lilac/10" 
-                                  : "border-border hover:bg-accent/50"
-                              }`}>
-                                <RadioGroupItem value={stage.value} id={stage.value} className="mt-1" />
-                                <div className="flex-1">
-                                  <Label htmlFor={stage.value} className="font-medium cursor-pointer flex items-center gap-2">
-                                    <span className="text-xl">{stage.icon}</span>
-                                    {stage.label}
-                                    {stage.value === "not_sure" && (
-                                      <Sparkles className="h-4 w-4 text-wellness-lilac" />
-                                    )}
-                                    <HelpCircle className="h-3 w-3 text-muted-foreground" />
-                                  </Label>
-                                  <p className="text-sm text-muted-foreground mt-1">{stage.description}</p>
-                                </div>
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-sm p-4">
-                              <p className="text-sm">{stage.tooltip}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        ))}
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  {lifeStage === "menstrual_cycle" && (
-                    <div className="space-y-2 p-4 bg-accent/20 rounded-lg border border-border">
-                      <Label className="text-sm font-medium">Do you have any specific menstrual health conditions? (Optional)</Label>
-                      <RadioGroup value={menstrualCondition} onValueChange={setMenstrualCondition}>
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="none" id="none" />
-                            <Label htmlFor="none" className="cursor-pointer text-sm">None</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="pcos" id="pcos" />
-                            <Label htmlFor="pcos" className="cursor-pointer text-sm">PCOS (Polycystic Ovary Syndrome)</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="endometriosis" id="endometriosis" />
-                            <Label htmlFor="endometriosis" className="cursor-pointer text-sm">Endometriosis</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="pmdd" id="pmdd" />
-                            <Label htmlFor="pmdd" className="cursor-pointer text-sm">PMDD (Premenstrual Dysphoric Disorder)</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="irregular" id="irregular" />
-                            <Label htmlFor="irregular" className="cursor-pointer text-sm">Irregular or Heavy Periods</Label>
-                          </div>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                  )}
-                </>
-              )}
-
-              <div className="flex justify-between pt-4">
-                <Button variant="outline" onClick={() => setStep("welcome")}>
-                  <ArrowLeft className="h-4 w-4 mr-2" /> Back
-                </Button>
-                <Button
-                  onClick={() => {
-                    // Handle different life stage paths
-                    if (lifeStage === 'menstrual_cycle') {
-                      setStep("cycle");
-                    } else if (lifeStage === 'cycle_changes') {
-                      setStep("cycle_changes_focus");
-                    } else {
-                      setStep("dosha");
-                    }
-                  }}
-                  disabled={!lifeStage || showLifeStageHelper}
-                >
-                  Continue
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TooltipProvider>
+        <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <CardHeader>
+            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
+              Where are you in your journey right now?
+            </CardTitle>
+            <CardDescription className="leading-relaxed">
+              You can choose more than one option. Many women experience overlapping phases.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+            
+            <JourneyPhaseSelector
+              onComplete={(selectedPrimaryFocus, selectedLifePhases) => {
+                setPrimaryFocus(selectedPrimaryFocus);
+                setLifePhases(selectedLifePhases);
+                
+                // Set legacy lifeStage for compatibility
+                if (selectedLifePhases.length > 0) {
+                  setLifeStage(selectedLifePhases[0]);
+                }
+                
+                // Determine next step based on selections
+                const hasRegularCycle = selectedLifePhases.includes("regular_cycle");
+                const hasCycleChanges = selectedLifePhases.includes("cycle_changes");
+                
+                if (hasRegularCycle) {
+                  setStep("cycle");
+                } else if (hasCycleChanges) {
+                  setStep("cycle_changes_focus");
+                } else {
+                  setStep("dosha");
+                }
+              }}
+              onBack={() => setStep("welcome")}
+              initialPrimaryFocus={primaryFocus}
+              initialLifePhases={lifePhases}
+            />
+          </CardContent>
+        </Card>
       </div>
     );
   }
