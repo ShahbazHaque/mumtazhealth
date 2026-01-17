@@ -183,54 +183,56 @@ export function FirstTimeQuickCheckIn({ onComplete, onStartFullOnboarding }: Fir
   // Step 1: Choice Screen
   if (step === "choice") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-3 py-6 sm:p-4 bg-background">
-        <div className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="min-h-screen flex items-center justify-center px-4 py-8 sm:p-6 bg-background">
+        <div className="w-full max-w-xl sm:max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
           <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="text-center space-y-4 sm:space-y-6 pb-3 sm:pb-4 pt-8 sm:pt-10 px-4 sm:px-6">
-              <Logo size="xl" className="mx-auto" />
-              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-mumtaz-plum leading-snug sm:leading-tight font-accent px-2 break-words">
-                Welcome to Mumtaz Health
-              </CardTitle>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                How would you like to get started?
-              </p>
+            <CardHeader className="text-center space-y-5 sm:space-y-6 pb-4 sm:pb-6 pt-10 sm:pt-12 px-5 sm:px-8">
+              <Logo size="2xl" className="mx-auto" />
+              <div className="space-y-2 sm:space-y-3">
+                <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-bold text-mumtaz-plum leading-snug font-accent px-2 break-words">
+                  Welcome to Mumtaz Health
+                </CardTitle>
+                <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
+                  How would you like to get started?
+                </p>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4 pb-8 sm:pb-10 px-4 sm:px-6">
+            <CardContent className="space-y-4 sm:space-y-5 pb-8 sm:pb-10 px-5 sm:px-8">
               <Button 
                 onClick={() => setStep("feelings")}
-                className="w-full h-auto min-h-[5rem] py-4 sm:py-6 flex flex-col gap-1.5 sm:gap-2 bg-wellness-sage hover:bg-wellness-sage/90 text-white"
+                className="w-full h-auto min-h-[6rem] sm:min-h-[7rem] py-5 sm:py-6 px-4 sm:px-6 flex flex-col items-center justify-center gap-2 sm:gap-3 bg-wellness-sage hover:bg-wellness-sage/90 text-white rounded-xl overflow-hidden"
                 size="lg"
               >
-                <Heart className="h-6 w-6 sm:h-8 sm:w-8 shrink-0" />
-                <span className="text-base sm:text-lg font-semibold break-words">Quick Check-In</span>
-                <span className="text-xs sm:text-sm opacity-90 font-normal leading-relaxed break-words text-center px-2">
+                <Heart className="h-7 w-7 sm:h-8 sm:w-8 shrink-0" />
+                <span className="text-base sm:text-lg md:text-xl font-semibold">Quick Check-In</span>
+                <span className="text-xs sm:text-sm opacity-90 font-normal leading-relaxed text-center w-full">
                   Tell us how you're feeling for instant, free guidance
                 </span>
               </Button>
 
-              <div className="relative py-1">
+              <div className="relative py-2">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">or</span>
+                  <span className="bg-card px-3 text-muted-foreground font-medium">or</span>
                 </div>
               </div>
 
               <Button 
                 onClick={onStartFullOnboarding}
                 variant="outline"
-                className="w-full h-auto min-h-[5rem] py-4 sm:py-6 flex flex-col gap-1.5 sm:gap-2 border-2 border-wellness-lilac/50 hover:bg-wellness-lilac/10"
+                className="w-full h-auto min-h-[6rem] sm:min-h-[7rem] py-5 sm:py-6 px-4 sm:px-6 flex flex-col items-center justify-center gap-2 sm:gap-3 border-2 border-wellness-lilac/50 hover:bg-wellness-lilac/10 rounded-xl overflow-hidden"
                 size="lg"
               >
-                <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-wellness-lilac shrink-0" />
-                <span className="text-base sm:text-lg font-semibold break-words text-center">Start My Personal Onboarding</span>
-                <span className="text-xs sm:text-sm opacity-70 font-normal leading-relaxed break-words text-center px-2">
+                <Sparkles className="h-7 w-7 sm:h-8 sm:w-8 text-wellness-lilac shrink-0" />
+                <span className="text-base sm:text-lg md:text-xl font-semibold text-center leading-snug">Start My Personal Onboarding</span>
+                <span className="text-xs sm:text-sm opacity-70 font-normal leading-relaxed text-center w-full">
                   Take the full journey to discover your dosha and receive personalized guidance
                 </span>
               </Button>
 
-              <p className="text-center text-xs text-muted-foreground pt-2 sm:pt-4 px-2 leading-relaxed">
+              <p className="text-center text-xs sm:text-sm text-muted-foreground pt-3 sm:pt-4 px-4 leading-relaxed">
                 You can always complete your full onboarding later from the dashboard
               </p>
             </CardContent>
