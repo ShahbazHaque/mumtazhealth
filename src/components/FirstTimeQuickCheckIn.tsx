@@ -183,32 +183,32 @@ export function FirstTimeQuickCheckIn({ onComplete, onStartFullOnboarding }: Fir
   // Step 1: Choice Screen
   if (step === "choice") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="min-h-screen flex items-center justify-center px-3 py-6 sm:p-4 bg-background">
         <div className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm">
-            <CardHeader className="text-center space-y-6 pb-4 pt-10">
+          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm overflow-hidden">
+            <CardHeader className="text-center space-y-4 sm:space-y-6 pb-3 sm:pb-4 pt-8 sm:pt-10 px-4 sm:px-6">
               <Logo size="xl" className="mx-auto" />
-              <CardTitle className="text-2xl md:text-3xl font-bold text-mumtaz-plum leading-tight font-accent">
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-mumtaz-plum leading-snug sm:leading-tight font-accent px-2 break-words">
                 Welcome to Mumtaz Health
               </CardTitle>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 How would you like to get started?
               </p>
             </CardHeader>
-            <CardContent className="space-y-4 pb-10">
+            <CardContent className="space-y-4 pb-8 sm:pb-10 px-4 sm:px-6">
               <Button 
                 onClick={() => setStep("feelings")}
-                className="w-full h-auto py-6 flex flex-col gap-2 bg-wellness-sage hover:bg-wellness-sage/90 text-white"
+                className="w-full h-auto min-h-[5rem] py-4 sm:py-6 flex flex-col gap-1.5 sm:gap-2 bg-wellness-sage hover:bg-wellness-sage/90 text-white"
                 size="lg"
               >
-                <Heart className="h-8 w-8" />
-                <span className="text-lg font-semibold">Quick Check-In</span>
-                <span className="text-sm opacity-90 font-normal">
+                <Heart className="h-6 w-6 sm:h-8 sm:w-8 shrink-0" />
+                <span className="text-base sm:text-lg font-semibold break-words">Quick Check-In</span>
+                <span className="text-xs sm:text-sm opacity-90 font-normal leading-relaxed break-words text-center px-2">
                   Tell us how you're feeling for instant, free guidance
                 </span>
               </Button>
 
-              <div className="relative">
+              <div className="relative py-1">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border"></div>
                 </div>
@@ -220,17 +220,17 @@ export function FirstTimeQuickCheckIn({ onComplete, onStartFullOnboarding }: Fir
               <Button 
                 onClick={onStartFullOnboarding}
                 variant="outline"
-                className="w-full h-auto py-6 flex flex-col gap-2 border-2 border-wellness-lilac/50 hover:bg-wellness-lilac/10"
+                className="w-full h-auto min-h-[5rem] py-4 sm:py-6 flex flex-col gap-1.5 sm:gap-2 border-2 border-wellness-lilac/50 hover:bg-wellness-lilac/10"
                 size="lg"
               >
-                <Sparkles className="h-8 w-8 text-wellness-lilac" />
-                <span className="text-lg font-semibold">Start My Personal Onboarding</span>
-                <span className="text-sm opacity-70 font-normal">
+                <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-wellness-lilac shrink-0" />
+                <span className="text-base sm:text-lg font-semibold break-words text-center">Start My Personal Onboarding</span>
+                <span className="text-xs sm:text-sm opacity-70 font-normal leading-relaxed break-words text-center px-2">
                   Take the full journey to discover your dosha and receive personalized guidance
                 </span>
               </Button>
 
-              <p className="text-center text-xs text-muted-foreground pt-4">
+              <p className="text-center text-xs text-muted-foreground pt-2 sm:pt-4 px-2 leading-relaxed">
                 You can always complete your full onboarding later from the dashboard
               </p>
             </CardContent>
@@ -243,64 +243,64 @@ export function FirstTimeQuickCheckIn({ onComplete, onStartFullOnboarding }: Fir
   // Step 2: Feelings Selection
   if (step === "feelings") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="min-h-screen flex items-center justify-center px-3 py-6 sm:p-4 bg-background">
         <div className="w-full max-w-2xl animate-in fade-in slide-in-from-right-4 duration-500">
-          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm">
-            <CardHeader className="text-center space-y-4 pb-4 pt-8">
+          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm overflow-hidden">
+            <CardHeader className="text-center space-y-3 sm:space-y-4 pb-3 sm:pb-4 pt-6 sm:pt-8 px-4 sm:px-6">
               <div className="flex justify-center">
-                <div className="p-3 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20">
-                  <Heart className="h-8 w-8 text-wellness-lilac" />
+                <div className="p-2.5 sm:p-3 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20">
+                  <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-wellness-lilac" />
                 </div>
               </div>
-              <CardTitle className="text-2xl md:text-3xl font-bold text-mumtaz-plum leading-tight font-accent">
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-mumtaz-plum leading-snug sm:leading-tight font-accent px-2 break-words">
                 How are you feeling today?
               </CardTitle>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Select one or more that resonate with you
               </p>
             </CardHeader>
-            <CardContent className="space-y-6 pb-8">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto pr-2">
+            <CardContent className="space-y-4 sm:space-y-6 pb-6 sm:pb-8 px-3 sm:px-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 max-h-[50vh] sm:max-h-[400px] overflow-y-auto pr-1 sm:pr-2 -mx-1 px-1">
                 {feelingOptions.map((feeling) => {
                   const isSelected = selectedFeelings.includes(feeling.id);
                   return (
                     <button
                       key={feeling.id}
                       onClick={() => toggleFeeling(feeling.id)}
-                      className={`p-3 rounded-xl transition-all duration-200 text-left flex items-center gap-2.5
+                      className={`p-2.5 sm:p-3 rounded-xl transition-all duration-200 text-left flex items-center gap-2 sm:gap-2.5
                         bg-gradient-to-br ${feeling.color}
                         ${isSelected
                           ? "border-2 border-wellness-lilac shadow-lg scale-[1.02]"
                           : "border border-border/50 hover:border-wellness-lilac/50 hover:shadow-md hover:scale-[1.02]"
                         }`}
                     >
-                      <span className="text-xl">{feeling.emoji}</span>
-                      <span className={`text-sm font-medium flex-1 ${isSelected ? "text-foreground" : "text-foreground/80"}`}>
+                      <span className="text-lg sm:text-xl shrink-0">{feeling.emoji}</span>
+                      <span className={`text-xs sm:text-sm font-medium flex-1 leading-tight break-words hyphens-auto ${isSelected ? "text-foreground" : "text-foreground/80"}`}>
                         {feeling.label}
                       </span>
                       {isSelected && (
-                        <Check className="h-4 w-4 text-wellness-lilac flex-shrink-0" />
+                        <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-wellness-lilac shrink-0" />
                       )}
                     </button>
                   );
                 })}
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4">
                 <Button 
                   variant="ghost" 
                   onClick={() => setStep("choice")}
-                  className="flex-1"
+                  className="flex-1 h-10 sm:h-11 text-sm sm:text-base"
                 >
                   Back
                 </Button>
                 <Button 
                   onClick={handleSubmitFeelings}
                   disabled={selectedFeelings.length === 0 || loading}
-                  className="flex-1 gap-2 bg-wellness-sage hover:bg-wellness-sage/90"
+                  className="flex-1 gap-1.5 sm:gap-2 bg-wellness-sage hover:bg-wellness-sage/90 h-10 sm:h-11 text-sm sm:text-base"
                 >
                   {loading ? "Saving..." : "Get Guidance"} 
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 shrink-0" />
                 </Button>
               </div>
             </CardContent>
@@ -317,67 +317,67 @@ export function FirstTimeQuickCheckIn({ onComplete, onStartFullOnboarding }: Fir
     const primaryFeelingData = feelingOptions.find(f => f.id === primaryFeeling);
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="min-h-screen flex items-center justify-center px-3 py-6 sm:p-4 bg-background">
         <div className="w-full max-w-2xl animate-in fade-in slide-in-from-right-4 duration-500">
-          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm">
-            <CardHeader className="text-center space-y-4 pb-4 pt-8">
+          <Card className="border-none shadow-xl bg-card/95 backdrop-blur-sm overflow-hidden">
+            <CardHeader className="text-center space-y-3 sm:space-y-4 pb-3 sm:pb-4 pt-6 sm:pt-8 px-4 sm:px-6">
               <div className="flex justify-center">
-                <div className="p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20 text-4xl">
+                <div className="p-3 sm:p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20 text-3xl sm:text-4xl">
                   {primaryFeelingData?.emoji || "💫"}
                 </div>
               </div>
-              <CardTitle className="text-xl md:text-2xl font-bold text-mumtaz-plum leading-tight font-accent">
+              <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold text-mumtaz-plum leading-snug sm:leading-tight font-accent px-2 break-words">
                 We hear you. Here's some gentle support.
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6 pb-8">
+            <CardContent className="space-y-4 sm:space-y-6 pb-6 sm:pb-8 px-4 sm:px-6">
               {/* Tips */}
-              <div className="space-y-3">
-                <h3 className="font-semibold text-foreground flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-wellness-lilac" />
+              <div className="space-y-2 sm:space-y-3">
+                <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm sm:text-base">
+                  <Heart className="h-4 w-4 text-wellness-lilac shrink-0" />
                   Simple tips for you:
                 </h3>
                 <ul className="space-y-2">
                   {guidance.tips.map((tip, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-muted-foreground">
-                      <span className="text-wellness-sage mt-0.5">•</span>
-                      <span>{tip}</span>
+                    <li key={idx} className="flex items-start gap-2 text-muted-foreground text-sm sm:text-base">
+                      <span className="text-wellness-sage mt-0.5 shrink-0">•</span>
+                      <span className="break-words leading-relaxed">{tip}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Practice Recommendation */}
-              <div className="p-4 rounded-xl bg-gradient-to-br from-wellness-lilac/10 to-wellness-sage/10 border border-wellness-lilac/20">
-                <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-wellness-lilac" />
+              <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-wellness-lilac/10 to-wellness-sage/10 border border-wellness-lilac/20">
+                <h3 className="font-semibold text-foreground mb-1.5 sm:mb-2 flex items-center gap-2 text-sm sm:text-base">
+                  <Sparkles className="h-4 w-4 text-wellness-lilac shrink-0" />
                   Recommended practice:
                 </h3>
-                <p className="text-muted-foreground">{guidance.practice}</p>
+                <p className="text-muted-foreground text-sm sm:text-base break-words leading-relaxed">{guidance.practice}</p>
               </div>
 
               {/* Invitation to deeper onboarding */}
-              <div className="p-4 rounded-xl bg-muted/50 border border-border">
-                <p className="text-sm text-muted-foreground text-center">
+              <div className="p-3 sm:p-4 rounded-xl bg-muted/50 border border-border">
+                <p className="text-xs sm:text-sm text-muted-foreground text-center leading-relaxed">
                   If you'd like deeper guidance, personalised support, or to discover your unique Dosha, 
                   you can complete your onboarding anytime from your dashboard.
                 </p>
               </div>
 
               {/* Actions */}
-              <div className="flex flex-col gap-3 pt-2">
+              <div className="flex flex-col gap-2.5 sm:gap-3 pt-1 sm:pt-2">
                 <Button 
                   onClick={handleGoToDashboard}
-                  className="w-full gap-2 bg-wellness-sage hover:bg-wellness-sage/90"
+                  className="w-full gap-2 bg-wellness-sage hover:bg-wellness-sage/90 h-11 sm:h-12 text-sm sm:text-base"
                   size="lg"
                 >
                   Go to My Dashboard
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 shrink-0" />
                 </Button>
                 <Button 
                   onClick={onStartFullOnboarding}
                   variant="outline"
-                  className="w-full border-wellness-lilac/50 hover:bg-wellness-lilac/10"
+                  className="w-full border-wellness-lilac/50 hover:bg-wellness-lilac/10 h-10 sm:h-11 text-sm sm:text-base"
                 >
                   Complete My Personal Onboarding
                 </Button>
