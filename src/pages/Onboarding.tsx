@@ -15,13 +15,14 @@ import { Logo } from "@/components/Logo";
 import { FirstTimeQuickCheckIn } from "@/components/FirstTimeQuickCheckIn";
 import { CycleChangesOnboarding } from "@/components/CycleChangesOnboarding";
 import { JourneyPhaseSelector } from "@/components/JourneyPhaseSelector";
+import { ConditionsSelector } from "@/components/ConditionsSelector";
 
 type OnboardingStep = 
   | "initial_choice" | "quick_checkin"
   | "intro1" | "intro2" | "intro3" | "intro4" | "intro5" 
   | "intro6" | "intro7" | "intro8" | "intro9" | "intro10" | "intro11"
   | "welcome" | "lifeStage" | "cycle_changes_focus" | "cycle" | "dosha" | "doshaResults" 
-  | "spiritual" | "pregnancy" | "preferences" | "complete";
+  | "conditions" | "spiritual" | "pregnancy" | "preferences" | "complete";
 
 const ProgressIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => (
   <div className="mb-6">
@@ -220,6 +221,8 @@ export default function Onboarding() {
   // New multi-select journey phase data
   const [primaryFocus, setPrimaryFocus] = useState<string[]>([]);
   const [lifePhases, setLifePhases] = useState<string[]>([]);
+  // Holistic support conditions
+  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   // Sign-in prompt state for complete step
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
 
@@ -260,12 +263,13 @@ export default function Onboarding() {
       cycle: 3,
       dosha: 4,
       doshaResults: 5,
-      spiritual: 6,
-      pregnancy: 7,
-      preferences: 8,
-      complete: 9,
+      conditions: 6,
+      spiritual: 7,
+      pregnancy: 8,
+      preferences: 9,
+      complete: 10,
     };
-    return { current: stepMap[step], total: 9 };
+    return { current: stepMap[step], total: 10 };
   };
 
   const handleDoshaComplete = (primary: string, secondary: string) => {
@@ -1572,7 +1576,7 @@ export default function Onboarding() {
               {/* Simplified next step - single clear CTA */}
               <div className="space-y-4 pt-4">
                 <Button 
-                  onClick={() => setStep("spiritual")} 
+                  onClick={() => setStep("conditions")} 
                   className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-2"
                   size="lg"
                 >
@@ -1591,6 +1595,36 @@ export default function Onboarding() {
             </CardContent>
           </Card>
         </TooltipProvider>
+      </div>
+    );
+  }
+
+  // Conditions step - holistic support selection
+  if (step === "conditions") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-2xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
+              Holistic Support
+            </CardTitle>
+            <CardDescription>
+              Would you like tailored guidance for any specific conditions?
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
+            <ConditionsSelector
+              onComplete={(conditions) => {
+                setSelectedConditions(conditions);
+                setStep("spiritual");
+              }}
+              onBack={() => setStep("doshaResults")}
+              onSkip={() => setStep("spiritual")}
+              initialConditions={selectedConditions}
+            />
+          </CardContent>
+        </Card>
       </div>
     );
   }
