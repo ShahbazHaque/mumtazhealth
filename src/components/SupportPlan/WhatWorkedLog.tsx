@@ -167,7 +167,7 @@ export function WhatWorkedLog({ userId, entryDate, lifeStage, practicesTried, on
         <Button 
           onClick={handleSave} 
           disabled={saving || !hasAnySelection}
-          className="w-full bg-wellness-taupe hover:bg-wellness-taupe/90"
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md font-semibold"
         >
           {saving ? 'Saving...' : 'Save My Reflections'}
         </Button>

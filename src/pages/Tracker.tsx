@@ -816,7 +816,7 @@ export default function Tracker() {
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={saveData}
-                  className="flex-1 bg-wellness-taupe hover:bg-wellness-taupe/90"
+                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save
@@ -939,7 +939,7 @@ export default function Tracker() {
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={saveData}
-                  className="flex-1 bg-wellness-taupe hover:bg-wellness-taupe/90"
+                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save
@@ -1102,7 +1102,7 @@ export default function Tracker() {
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={saveData}
-                  className="flex-1 bg-wellness-taupe hover:bg-wellness-taupe/90"
+                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save
@@ -1173,7 +1173,7 @@ export default function Tracker() {
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={saveData}
-                  className="flex-1 bg-wellness-taupe hover:bg-wellness-taupe/90"
+                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save
@@ -1366,7 +1366,7 @@ export default function Tracker() {
           <div className="max-w-2xl mx-auto flex gap-3">
             <Button
               onClick={saveData}
-              className="flex-1 bg-wellness-taupe hover:bg-wellness-taupe/90"
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md font-semibold"
             >
               <Save className="w-4 h-4 mr-2" />
               Save Today's Data
