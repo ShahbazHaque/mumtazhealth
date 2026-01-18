@@ -250,7 +250,19 @@ export default function Auth() {
 
         if (data.user) {
           toast.success("Welcome back!");
-          navigate("/");
+          // Check for return path
+          const returnPath = localStorage.getItem('mumtaz_return_path');
+          const pendingOnboarding = localStorage.getItem('mumtaz_pending_onboarding');
+          
+          if (pendingOnboarding) {
+            // User was in the middle of onboarding - redirect to complete it
+            navigate("/onboarding?step=complete");
+          } else if (returnPath) {
+            localStorage.removeItem('mumtaz_return_path');
+            navigate(returnPath);
+          } else {
+            navigate("/");
+          }
         }
       } else {
         const { error, data } = await supabase.auth.signUp({
@@ -273,7 +285,19 @@ export default function Auth() {
 
         if (data.user) {
           toast.success("Account created! Welcome to Mumtaz Health.");
-          navigate("/");
+          // Check for pending onboarding data
+          const pendingOnboarding = localStorage.getItem('mumtaz_pending_onboarding');
+          const returnPath = localStorage.getItem('mumtaz_return_path');
+          
+          if (pendingOnboarding) {
+            // User completed onboarding before signing up - redirect to save their profile
+            navigate("/onboarding?step=complete");
+          } else if (returnPath) {
+            localStorage.removeItem('mumtaz_return_path');
+            navigate(returnPath);
+          } else {
+            navigate("/");
+          }
         }
       }
     } catch (error) {

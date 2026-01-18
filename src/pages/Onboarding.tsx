@@ -186,9 +186,67 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const skipToFull = searchParams.get('full') === 'true';
-  const [step, setStep] = useState<OnboardingStep>(skipToFull ? "intro1" : "initial_choice");
+  const stepFromUrl = searchParams.get('step');
+  
+  // Determine initial step - check for returning user with pending onboarding
+  const getInitialStep = (): OnboardingStep => {
+    if (stepFromUrl === 'complete') {
+      return "complete";
+    }
+    if (skipToFull) {
+      return "intro1";
+    }
+    return "initial_choice";
+  };
+  
+  const [step, setStep] = useState<OnboardingStep>(getInitialStep());
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
+
+  // Profile data
+  const [lifeStage, setLifeStage] = useState("");
+  const [primaryDosha, setPrimaryDosha] = useState("");
+  const [secondaryDosha, setSecondaryDosha] = useState("");
+  const [spiritualPreference, setSpiritualPreference] = useState("both");
+  const [pregnancyStatus, setPregnancyStatus] = useState("not_pregnant");
+  const [dueDate, setDueDate] = useState("");
+  const [yogaStyle, setYogaStyle] = useState("");
+  const [cyclePhase, setCyclePhase] = useState("");
+  const [energyLevel, setEnergyLevel] = useState("");
+  const [menstrualCondition, setMenstrualCondition] = useState("");
+  const [showLifeStageHelper, setShowLifeStageHelper] = useState(false);
+  const [focusAreas, setFocusAreas] = useState<string[]>([]);
+  const [hasError, setHasError] = useState(false);
+  // New multi-select journey phase data
+  const [primaryFocus, setPrimaryFocus] = useState<string[]>([]);
+  const [lifePhases, setLifePhases] = useState<string[]>([]);
+  // Sign-in prompt state for complete step
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false);
+
+  // Restore pending onboarding data if user just signed in
+  useEffect(() => {
+    const pendingData = localStorage.getItem('mumtaz_pending_onboarding');
+    if (pendingData && stepFromUrl === 'complete') {
+      try {
+        const data = JSON.parse(pendingData);
+        if (data.userName) setUserName(data.userName);
+        if (data.lifeStage) setLifeStage(data.lifeStage);
+        if (data.primaryDosha) setPrimaryDosha(data.primaryDosha);
+        if (data.secondaryDosha) setSecondaryDosha(data.secondaryDosha);
+        if (data.spiritualPreference) setSpiritualPreference(data.spiritualPreference);
+        if (data.pregnancyStatus) setPregnancyStatus(data.pregnancyStatus);
+        if (data.dueDate) setDueDate(data.dueDate);
+        if (data.yogaStyle) setYogaStyle(data.yogaStyle);
+        if (data.focusAreas) setFocusAreas(data.focusAreas);
+        if (data.primaryFocus) setPrimaryFocus(data.primaryFocus);
+        if (data.lifePhases) setLifePhases(data.lifePhases);
+        // Clear the pending data after restoring
+        localStorage.removeItem('mumtaz_pending_onboarding');
+      } catch (e) {
+        console.error("Failed to restore pending onboarding data:", e);
+      }
+    }
+  }, [stepFromUrl]);
 
   const getStepInfo = () => {
     const stepMap: Record<OnboardingStep, number> = {
@@ -209,24 +267,6 @@ export default function Onboarding() {
     };
     return { current: stepMap[step], total: 9 };
   };
-
-  // Profile data
-  const [lifeStage, setLifeStage] = useState("");
-  const [primaryDosha, setPrimaryDosha] = useState("");
-  const [secondaryDosha, setSecondaryDosha] = useState("");
-  const [spiritualPreference, setSpiritualPreference] = useState("both");
-  const [pregnancyStatus, setPregnancyStatus] = useState("not_pregnant");
-  const [dueDate, setDueDate] = useState("");
-  const [yogaStyle, setYogaStyle] = useState("");
-  const [cyclePhase, setCyclePhase] = useState("");
-  const [energyLevel, setEnergyLevel] = useState("");
-  const [menstrualCondition, setMenstrualCondition] = useState("");
-  const [showLifeStageHelper, setShowLifeStageHelper] = useState(false);
-  const [focusAreas, setFocusAreas] = useState<string[]>([]);
-  const [hasError, setHasError] = useState(false);
-  // New multi-select journey phase data
-  const [primaryFocus, setPrimaryFocus] = useState<string[]>([]);
-  const [lifePhases, setLifePhases] = useState<string[]>([]);
 
   const handleDoshaComplete = (primary: string, secondary: string) => {
     setPrimaryDosha(primary);
@@ -1529,13 +1569,24 @@ export default function Onboarding() {
                 </p>
               </div>
 
-              <div className="flex justify-between pt-4">
-                <Button variant="outline" onClick={() => setStep("dosha")}>
-                  Retake Assessment
+              {/* Simplified next step - single clear CTA */}
+              <div className="space-y-4 pt-4">
+                <Button 
+                  onClick={() => setStep("spiritual")} 
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-2"
+                  size="lg"
+                >
+                  <Sparkles className="h-5 w-5" />
+                  Begin My Journey
                 </Button>
-                <Button onClick={() => setStep("spiritual")} className="bg-primary hover:bg-primary/90">
-                  Continue
-                </Button>
+                <div className="text-center">
+                  <button 
+                    onClick={() => setStep("dosha")}
+                    className="text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
+                  >
+                    Retake assessment
+                  </button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -2083,142 +2134,134 @@ export default function Onboarding() {
 
     const currentRecommendations = doshaRecommendations[primaryDosha as keyof typeof doshaRecommendations];
 
+    const handleBeginJourney = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        // Store onboarding data temporarily
+        localStorage.setItem('mumtaz_pending_onboarding', JSON.stringify({
+          userName, lifeStage, primaryDosha, secondaryDosha,
+          spiritualPreference, pregnancyStatus, dueDate, yogaStyle,
+          focusAreas, primaryFocus, lifePhases
+        }));
+        localStorage.setItem('mumtaz_return_path', '/');
+        setShowSignInPrompt(true);
+        return;
+      }
+      saveProfile();
+    };
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-wellness-sage-light">
+        {/* Sign-in prompt dialog */}
+        {showSignInPrompt && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md border-mumtaz-lilac/30 shadow-xl animate-in fade-in zoom-in-95 duration-200">
+              <CardHeader className="text-center space-y-4 pt-8">
+                <div className="flex justify-center">
+                  <div className="p-4 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-wellness-sage/20">
+                    <Heart className="h-10 w-10 text-primary" />
+                  </div>
+                </div>
+                <CardTitle className="text-2xl font-semibold text-foreground">
+                  One Last Step
+                </CardTitle>
+                <CardDescription className="text-base leading-relaxed">
+                  To save your wellness profile and track your journey, please create a free account or sign in.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pb-8">
+                <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                    <p className="text-sm text-foreground leading-relaxed">
+                      Your dosha profile, preferences, and personalized recommendations will be waiting for you.
+                    </p>
+                  </div>
+                </div>
+                
+                <Button
+                  onClick={() => navigate("/auth")}
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-2"
+                  size="lg"
+                >
+                  Create Free Account
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+                
+                <div className="text-center">
+                  <button
+                    onClick={() => navigate("/auth")}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Already have an account? Sign in
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         <Card className="w-full max-w-2xl">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <Sparkles className="w-12 h-12 text-primary" />
             </div>
-            <CardTitle className="text-3xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">Your Wellness Profile</CardTitle>
-            <CardDescription>Here&apos;s what we&apos;ve discovered about your unique constitution</CardDescription>
+            <CardTitle className="text-3xl bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
+              Your Journey Awaits
+            </CardTitle>
+            <CardDescription className="text-base">
+              We've created a personalized wellness path based on your unique constitution
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <ProgressIndicator currentStep={getStepInfo().current} totalSteps={getStepInfo().total} />
-            <div className="space-y-4">
-              <div className="p-4 rounded-lg bg-secondary/50">
-                <h4 className="font-medium text-foreground mb-2">Your Primary Dosha: {primaryDosha}</h4>
-                <p className="text-sm text-muted-foreground">{doshaDescription[primaryDosha as keyof typeof doshaDescription]}</p>
+            {/* Simple summary - not overwhelming */}
+            <div className="grid gap-3">
+              <div className="flex justify-between p-4 rounded-lg bg-gradient-to-r from-wellness-lilac/10 to-wellness-sage/10 border border-wellness-lilac/20">
+                <span className="font-medium text-foreground">Your Dosha</span>
+                <span className="text-foreground capitalize font-semibold">{primaryDosha}{secondaryDosha && secondaryDosha !== primaryDosha ? `-${secondaryDosha}` : ''}</span>
               </div>
-
-              {secondaryDosha && secondaryDosha !== primaryDosha && (
-                <div className="p-4 rounded-lg bg-secondary/30">
-                  <h4 className="font-medium text-foreground mb-2">Secondary Dosha: {secondaryDosha}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    You also have qualities of {secondaryDosha}, which adds depth to your constitution.
-                  </p>
-                </div>
-              )}
-
-              {currentRecommendations && (
-                <>
-                  <div className="p-4 rounded-lg border border-wellness-sage/30 bg-wellness-sage/5">
-                    <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
-                      <Heart className="w-4 h-4" /> Yoga Practices for {primaryDosha}
-                    </h4>
-                    <ul className="space-y-2">
-                      {currentRecommendations.yoga.map((pose, idx) => (
-                        <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                          <span className="text-wellness-sage mt-0.5">•</span>
-                          <span>{pose}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="p-4 rounded-lg border border-wellness-lilac/30 bg-wellness-lilac/5">
-                    <h4 className="font-medium text-foreground mb-3">Ayurvedic Nutrition</h4>
-                    <ul className="space-y-2">
-                      {currentRecommendations.foods.map((food, idx) => (
-                        <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                          <span className="text-wellness-lilac mt-0.5">•</span>
-                          <span>{food}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="p-4 rounded-lg border border-primary/30 bg-primary/5">
-                    <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
-                      <Moon className="w-4 h-4" /> Spiritual Practices
-                    </h4>
-                    {(spiritualPreference === "islamic" || spiritualPreference === "both") && (
-                      <div className="mb-4">
-                        <p className="text-sm font-medium text-foreground mb-2">Islamic Practices:</p>
-                        <ul className="space-y-2">
-                          {currentRecommendations.spiritual.islamic.map((practice, idx) => (
-                            <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                              <span className="text-primary mt-0.5">•</span>
-                              <span>{practice}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {(spiritualPreference === "universal" || spiritualPreference === "both") && (
-                      <div>
-                        <p className="text-sm font-medium text-foreground mb-2">Universal Practices:</p>
-                        <ul className="space-y-2">
-                          {currentRecommendations.spiritual.universal.map((practice, idx) => (
-                            <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                              <span className="text-primary mt-0.5">•</span>
-                              <span>{practice}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-
-              <div className="grid gap-3">
-                <div className="flex justify-between p-3 rounded-lg bg-muted">
-                  <span className="text-sm font-medium">Spiritual Practice</span>
-                  <span className="text-sm text-muted-foreground capitalize">{spiritualPreference.replace("_", " ")}</span>
-                </div>
-                <div className="flex justify-between p-3 rounded-lg bg-muted">
-                  <span className="text-sm font-medium">Journey Stage</span>
-                  <span className="text-sm text-muted-foreground capitalize">{pregnancyStatus.replace("_", " ")}</span>
-                </div>
-                {yogaStyle && (
-                  <div className="flex justify-between p-3 rounded-lg bg-muted">
-                    <span className="text-sm font-medium">Yoga Preference</span>
-                    <span className="text-sm text-muted-foreground capitalize">{yogaStyle}</span>
-                  </div>
-                )}
+              <div className="flex justify-between p-3 rounded-lg bg-muted/50">
+                <span className="text-sm text-muted-foreground">Journey Stage</span>
+                <span className="text-sm text-foreground capitalize">{pregnancyStatus.replace(/_/g, " ")}</span>
+              </div>
+              <div className="flex justify-between p-3 rounded-lg bg-muted/50">
+                <span className="text-sm text-muted-foreground">Movement Style</span>
+                <span className="text-sm text-foreground capitalize">{yogaStyle || "Personalized"}</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
-              <p className="text-sm text-center text-foreground">
-                ✨ Your personalized journey begins now. We'll provide daily guidance tailored to your unique needs.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-lg border border-wellness-lilac/30 bg-wellness-lilac/5">
-              <p className="text-sm text-center font-medium mb-2">Want More Personalized Guidance?</p>
-              <p className="text-xs text-center text-muted-foreground mb-3">
-                Book a one-on-one consultation for deeper insights into your dosha, cycle, and wellness journey
-              </p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full"
-                onClick={() => window.location.href = '/bookings'}
+            {/* Clear, single CTA */}
+            <div className="space-y-4 pt-4">
+              <Button
+                onClick={handleBeginJourney}
+                disabled={loading}
+                className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg gap-2"
+                size="lg"
               >
-                Book Your Consultation
+                {loading ? (
+                  <>Creating Your Profile...</>
+                ) : (
+                  <>
+                    <Heart className="h-5 w-5" />
+                    Begin My Journey
+                  </>
+                )}
               </Button>
+              
+              <p className="text-xs text-center text-muted-foreground">
+                Your information stays private and secure
+              </p>
             </div>
 
-            <Button
-              onClick={saveProfile}
-              disabled={loading}
-              className="w-full"
-              size="lg"
-            >
-              {loading ? "Creating Your Profile..." : "Begin Tracking"}
-            </Button>
+            {/* Optional practitioner CTA - simplified */}
+            <div className="pt-4 border-t border-border">
+              <button 
+                onClick={() => navigate('/bookings')}
+                className="w-full text-center text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
+              >
+                Want personalized guidance? Book a consultation →
+              </button>
+            </div>
           </CardContent>
         </Card>
       </div>
