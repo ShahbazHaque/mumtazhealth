@@ -16,3 +16,9 @@ export type { PregnancyPoseData } from "./PregnancySafePoseCard";
 export { ConnectWithBabyMeditation } from "./ConnectWithBabyMeditation";
 
 export { JourneySafetyReminder } from "./JourneySafetyReminder";
+
+// Holistic support education components
+export { PelvicFloorEducation } from "../PelvicFloorEducation";
+export { EndometriosisEducation } from "../EndometriosisEducation";
+export { PCOSEducation } from "../PCOSEducation";
+export { ArthritisEducation } from "../ArthritisEducation";
