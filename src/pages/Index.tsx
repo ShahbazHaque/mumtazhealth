@@ -613,13 +613,18 @@ const Index = () => {
       <WelcomeEntryDialog open={showEntryDialog} onOpenChange={setShowEntryDialog} />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-wellness-sage-light via-background to-wellness-lilac-light py-20 md:py-32">
+      <section className="relative overflow-hidden bg-gradient-to-br from-wellness-sage-light via-background to-wellness-lilac-light py-16 md:py-28">
         <div className="container mx-auto px-4">
+          {/* Logo at top */}
+          <div className="flex justify-center mb-10 md:mb-14">
+            <Logo size="xl" className="opacity-90" />
+          </div>
+          
           <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
             {/* Left: Copy */}
             <div className="text-center lg:text-left order-2 lg:order-1">
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-                Mumtaz Health: A Safe Space for Your Wellness Journey
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+                A Safe Space for Your Wellness Journey
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
                 Every woman's journey is unique. Built on 30+ years of holistic expertise in Yoga, Ayurveda, and 
