@@ -23,6 +23,7 @@ import { DailyRhythm } from "@/components/DailyRhythm";
 import { BodyChangingEducation } from "@/components/BodyChangingEducation";
 import { AppCompanionDisclaimer } from "@/components/AppCompanionDisclaimer";
 import { SupportPlanModal } from "@/components/SupportPlan";
+import { GentleSignInPrompt } from "@/components/GentleSignInPrompt";
 
 interface DailyPractice {
   id: string;
@@ -132,24 +133,19 @@ export default function Tracker() {
   
   const navigate = useNavigate();
 
+  // Sign-in prompt state
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (!session) {
-        navigate("/auth");
-      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      
-      if (!session) {
-        navigate("/auth");
-      }
     });
 
     return () => subscription.unsubscribe();
@@ -355,7 +351,11 @@ export default function Tracker() {
   };
 
   const saveData = async () => {
-    if (!user) return;
+    if (!user) {
+      // Show gentle sign-in prompt instead of hard redirect
+      setShowSignInPrompt(true);
+      return;
+    }
     
     try {
       // Validate text inputs before saving
@@ -508,6 +508,15 @@ export default function Tracker() {
   return (
     <div className="min-h-screen bg-wellness-beige">
       <Navigation />
+      
+      {/* Gentle sign-in prompt */}
+      <GentleSignInPrompt
+        open={showSignInPrompt}
+        onClose={() => setShowSignInPrompt(false)}
+        feature="track"
+        returnPath="/tracker"
+      />
+      
       <div className="max-w-2xl mx-auto p-4 pb-32 pt-24">
         {/* Header */}
         <Card className="mb-6 bg-wellness-warm border-wellness-taupe/20 shadow-lg">
