@@ -117,13 +117,8 @@ export function MumtazWisdomGuide() {
     }
   }, [open, location.pathname]);
 
-  // Don't render on auth pages to avoid interference with CTAs
-  if (isAuthPage) {
-    return null;
-  }
-
   useEffect(() => {
-    if (open) {
+    if (open && !isAuthPage) {
       fetchUserProfile();
       loadConversations();
       if (!conversationId) {
@@ -140,23 +135,23 @@ export function MumtazWisdomGuide() {
           }
         }, 100);
       }
-    } else {
+    } else if (!open) {
       // Save scroll position when closing
       if (scrollAreaRef.current) {
         localStorage.setItem(STORAGE_KEYS.SCROLL_POSITION, String(scrollAreaRef.current.scrollTop));
       }
     }
-  }, [open]);
+  }, [open, isAuthPage]);
 
   useEffect(() => {
-    if (open && messages.length === 0 && userProfile) {
+    if (open && messages.length === 0 && userProfile && !isAuthPage) {
       const greeting: Message = {
         role: "assistant",
         content: `Hello ${userProfile.username}, I'm here to support you on your wellness journey. How can I help you today?\n\nYou can ask me about yoga, Ayurveda, nutrition, breathwork, or simply check in with yourself. 💜`,
       };
       setMessages([greeting]);
     }
-  }, [open, userProfile, messages.length]);
+  }, [open, userProfile, messages.length, isAuthPage]);
 
   useEffect(() => {
     // Auto-scroll to bottom when messages change
@@ -164,6 +159,11 @@ export function MumtazWisdomGuide() {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, loading]);
+
+  // Don't render on auth pages to avoid interference with CTAs
+  if (isAuthPage) {
+    return null;
+  }
 
   const fetchUserProfile = async () => {
     try {
