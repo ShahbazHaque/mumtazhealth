@@ -319,8 +319,36 @@ export default function Bookings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-wellness-beige">
-        <div className="text-wellness-taupe text-xl">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-b from-wellness-lavender/20 to-background animate-fade-in">
+        <Navigation />
+        <div className="max-w-6xl mx-auto p-4 pt-24 space-y-6">
+          {/* Header skeleton */}
+          <Card className="bg-wellness-warm border-wellness-taupe/20">
+            <CardHeader>
+              <div className="flex items-center gap-4">
+                <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+                <div className="h-8 w-48 bg-muted animate-pulse rounded" />
+              </div>
+            </CardHeader>
+          </Card>
+          
+          {/* Services grid skeleton */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="border-wellness-sage/20">
+                <CardContent className="p-6 space-y-4">
+                  <div className="h-6 w-3/4 bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-full bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-2/3 bg-muted animate-pulse rounded" />
+                  <div className="flex justify-between items-center pt-4">
+                    <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+                    <div className="h-10 w-20 bg-muted animate-pulse rounded" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
