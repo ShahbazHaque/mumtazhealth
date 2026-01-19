@@ -12,6 +12,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Navigation } from "@/components/Navigation";
 import { DoshaLearningJourney } from "@/components/DoshaLearningJourney";
 import { FeelingPatterns } from "@/components/FeelingPatterns";
+import { useGlobalLoading } from "@/hooks/useGlobalLoading";
+import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
 
 interface Insight {
   title: string;
@@ -121,16 +123,15 @@ export default function Insights() {
     }
   };
 
+  // Integrate with global loading indicator
+  useGlobalLoading(loading);
+
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoadingSkeleton variant="simple" />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 animate-fade-in">
       <Navigation />
       <div className="container mx-auto px-4 py-8 pt-24 max-w-6xl">
         <div className="mb-8 flex items-center justify-between">

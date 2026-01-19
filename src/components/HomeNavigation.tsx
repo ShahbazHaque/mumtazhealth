@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { GlobalLoadingIndicator } from "@/components/GlobalLoadingIndicator";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +46,9 @@ export function HomeNavigation({ className, username }: HomeNavigationProps) {
       "fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50",
       className
     )}>
+      {/* Global Loading Indicator */}
+      <GlobalLoadingIndicator />
+      
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link 

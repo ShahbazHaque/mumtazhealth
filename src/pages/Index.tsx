@@ -22,6 +22,7 @@ import { LifeStageCheckInPrompt } from "@/components/LifeStageCheckInPrompt";
 import { WelcomeEntryDialog } from "@/components/WelcomeEntryDialog";
 import { InBetweenPhaseBanner } from "@/components/InBetweenPhaseBanner";
 import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
+import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 
 interface UserProfile {
   username: string;
@@ -193,6 +194,9 @@ const Index = () => {
   const didQuickCheckIn = typeof window !== 'undefined' && localStorage.getItem('mumtaz_quick_checkin_completed') === 'true';
   const showDashboard = wellnessProfile?.onboarding_completed || (userProfile && didQuickCheckIn);
 
+  // Integrate with global loading indicator
+  useGlobalLoading(loading);
+
   // Show loading skeleton while fetching data
   if (loading) {
     return <PageLoadingSkeleton variant="dashboard" />;
@@ -201,7 +205,7 @@ const Index = () => {
   // If user has completed onboarding OR quick check-in, show dashboard
   if (showDashboard) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background animate-fade-in">
         <HomeNavigation username={userProfile?.username} />
         <OnboardingTour run={showTour} onComplete={handleTourComplete} />
         

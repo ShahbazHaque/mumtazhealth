@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Logo } from "@/components/Logo";
+import { GlobalLoadingIndicator } from "@/components/GlobalLoadingIndicator";
 
 interface PageLoadingSkeletonProps {
   variant?: "dashboard" | "tracker" | "content" | "simple";
@@ -12,12 +13,17 @@ export function PageLoadingSkeleton({
 }: PageLoadingSkeletonProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-wellness-lavender/20 via-background to-wellness-sage-light/10 animate-fade-in">
-      {/* Subtle navigation placeholder */}
+      {/* Subtle navigation placeholder with loading indicator */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
+        {/* Loading bar at top of nav */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-accent via-primary to-accent animate-loading-bar" />
+        </div>
+        
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             {showLogo && <Logo size="sm" showText={false} className="opacity-70" />}
-            <Skeleton className="h-5 w-24" />
+            <span className="font-semibold text-foreground/70 text-base sm:text-lg">Mumtaz Health</span>
           </div>
           <div className="hidden sm:flex items-center gap-4">
             <Skeleton className="h-4 w-16" />
