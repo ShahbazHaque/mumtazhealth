@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { VoiceNavigator } from "@/components/VoiceNavigator";
+import { GlobalLoadingIndicator } from "@/components/GlobalLoadingIndicator";
 import { cn } from "@/lib/utils";
 
 interface NavigationProps {
@@ -10,6 +11,9 @@ interface NavigationProps {
 export function Navigation({ className }: NavigationProps) {
   return (
     <nav className={cn("fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border", className)}>
+      {/* Global Loading Indicator */}
+      <GlobalLoadingIndicator />
+      
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link 
           to="/" 

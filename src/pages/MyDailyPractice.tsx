@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
+import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -380,9 +381,12 @@ export default function MyDailyPractice() {
 
   const timeOrder = ["Morning Practice", "Afternoon Practice", "Evening Practice", "Night Practice"];
 
+  // Integrate with global loading indicator
+  useGlobalLoading(loading);
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-wellness-lavender/20 to-background">
+      <div className="min-h-screen bg-gradient-to-b from-wellness-lavender/20 to-background animate-fade-in">
         <Navigation />
         <main className="container mx-auto px-4 py-8 pt-24 max-w-4xl">
           <div className="space-y-6">

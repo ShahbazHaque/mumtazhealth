@@ -151,6 +151,20 @@ export default {
             transform: "scale(1.02)"
           }
         },
+        "loading-bar": {
+          "0%": {
+            transform: "translateX(-100%)",
+            width: "30%"
+          },
+          "50%": {
+            transform: "translateX(50%)",
+            width: "50%"
+          },
+          "100%": {
+            transform: "translateX(200%)",
+            width: "30%"
+          }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -160,6 +174,7 @@ export default {
         "scale-in": "scale-in 0.3s ease-out",
         "shimmer": "shimmer 2s linear infinite",
         "pulse-gentle": "pulse-gentle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "loading-bar": "loading-bar 1.2s ease-in-out infinite",
       },
     },
   },

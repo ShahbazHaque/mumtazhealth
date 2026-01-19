@@ -24,6 +24,7 @@ import { BodyChangingEducation } from "@/components/BodyChangingEducation";
 import { AppCompanionDisclaimer } from "@/components/AppCompanionDisclaimer";
 import { SupportPlanModal } from "@/components/SupportPlan";
 import { GentleSignInPrompt } from "@/components/GentleSignInPrompt";
+import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 
 interface DailyPractice {
   id: string;
@@ -497,6 +498,9 @@ export default function Tracker() {
     });
   };
 
+  // Integrate with global loading indicator
+  useGlobalLoading(loading);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-wellness-lavender/20 to-background animate-fade-in">
@@ -534,7 +538,7 @@ export default function Tracker() {
   }
 
   return (
-    <div className="min-h-screen bg-wellness-beige">
+    <div className="min-h-screen bg-wellness-beige animate-fade-in">
       <Navigation />
       
       {/* Gentle sign-in prompt */}

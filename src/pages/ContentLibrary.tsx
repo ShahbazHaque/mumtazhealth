@@ -75,6 +75,8 @@ import { trackRecentActivity } from "@/components/RecentlyViewed";
 import { usePregnancySafeMode } from "@/hooks/usePregnancySafeMode";
 import { PregnancySafetyIndicator, PregnancySafetyBadge, getContentPregnancySafety } from "@/components/PregnancySafetyIndicator";
 import { TrimesterPoseRecommendations } from "@/components/TrimesterPoseRecommendations";
+import { useGlobalLoading } from "@/hooks/useGlobalLoading";
+
 interface WellnessContent {
   id: string;
   title: string;
@@ -141,6 +143,9 @@ const ContentLibrary = () => {
   
   // Pregnancy safe mode
   const { isPregnancySafeMode, trimester } = usePregnancySafeMode();
+  
+  // Integrate with global loading indicator
+  useGlobalLoading(loading);
   
   // Filters
   const [searchQuery, setSearchQuery] = useState<string>("");

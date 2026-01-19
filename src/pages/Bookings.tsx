@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Calendar, Clock, Users, Check, Filter, X } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { bookingSchema, validateInput } from "@/lib/validation";
+import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 
 interface Service {
   id: string;
@@ -317,6 +318,9 @@ export default function Bookings() {
     };
   };
 
+  // Integrate with global loading indicator
+  useGlobalLoading(loading);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-wellness-lavender/20 to-background animate-fade-in">
@@ -354,7 +358,7 @@ export default function Bookings() {
   }
 
   return (
-    <div className="min-h-screen bg-wellness-beige">
+    <div className="min-h-screen bg-wellness-beige animate-fade-in">
       <Navigation />
       <div className="max-w-6xl mx-auto p-4 pb-8 pt-24">
         {/* Header */}
