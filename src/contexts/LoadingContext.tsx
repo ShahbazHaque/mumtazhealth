@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 interface LoadingContextType {
@@ -12,7 +12,7 @@ const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingCount, setLoadingCount] = useState(0);
+  const loadingCountRef = useRef(0);
   const location = useLocation();
 
   // Auto-trigger loading on route changes
@@ -26,29 +26,34 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   }, [location.pathname]);
 
   const startLoading = useCallback(() => {
-    setLoadingCount(prev => prev + 1);
+    loadingCountRef.current += 1;
     setIsLoading(true);
   }, []);
 
   const stopLoading = useCallback(() => {
-    setLoadingCount(prev => {
-      const newCount = Math.max(0, prev - 1);
-      if (newCount === 0) {
-        setIsLoading(false);
-      }
-      return newCount;
-    });
+    loadingCountRef.current = Math.max(0, loadingCountRef.current - 1);
+    if (loadingCountRef.current === 0) {
+      setIsLoading(false);
+    }
   }, []);
 
   const setLoading = useCallback((loading: boolean) => {
     setIsLoading(loading);
     if (!loading) {
-      setLoadingCount(0);
+      loadingCountRef.current = 0;
     }
   }, []);
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    isLoading,
+    setLoading,
+    startLoading,
+    stopLoading
+  }), [isLoading, setLoading, startLoading, stopLoading]);
+
   return (
-    <LoadingContext.Provider value={{ isLoading, setLoading, startLoading, stopLoading }}>
+    <LoadingContext.Provider value={contextValue}>
       {children}
     </LoadingContext.Provider>
   );
