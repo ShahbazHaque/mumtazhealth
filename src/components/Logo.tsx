@@ -8,11 +8,11 @@ interface LogoProps {
 
 export function Logo({ size = "md", showText = true, className = "" }: LogoProps) {
   const sizeClasses = {
-    sm: "h-8 sm:h-10",
-    md: "h-12 sm:h-14",
-    lg: "h-16 sm:h-20",
-    xl: "h-20 sm:h-24 md:h-28",
-    "2xl": "h-24 sm:h-28 md:h-32",
+    sm: "h-10 sm:h-12",
+    md: "h-14 sm:h-16",
+    lg: "h-20 sm:h-24",
+    xl: "h-24 sm:h-28 md:h-32",
+    "2xl": "h-28 sm:h-32 md:h-40",
   };
 
   const taglineSizes = {

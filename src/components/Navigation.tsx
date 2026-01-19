@@ -13,10 +13,10 @@ export function Navigation({ className }: NavigationProps) {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link 
           to="/" 
-          className="flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:opacity-80"
+          className="flex items-center gap-2.5 transition-all duration-300 hover:scale-105 hover:opacity-80"
         >
           <Logo size="sm" showText={false} />
-          <span className="font-semibold text-foreground hidden sm:inline">Mumtaz Health</span>
+          <span className="font-semibold text-foreground text-base sm:text-lg">Mumtaz Health</span>
         </Link>
         
         {/* Voice Navigator */}
