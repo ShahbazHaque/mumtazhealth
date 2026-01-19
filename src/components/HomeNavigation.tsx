@@ -49,10 +49,10 @@ export function HomeNavigation({ className, username }: HomeNavigationProps) {
         {/* Logo */}
         <Link 
           to="/" 
-          className="flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:opacity-80"
+          className="flex items-center gap-2.5 transition-all duration-300 hover:scale-105 hover:opacity-80"
         >
           <Logo size="sm" showText={false} />
-          <span className="font-semibold text-foreground hidden sm:inline">Mumtaz Health</span>
+          <span className="font-semibold text-foreground text-base sm:text-lg">Mumtaz Health</span>
         </Link>
 
         {/* Desktop Navigation */}

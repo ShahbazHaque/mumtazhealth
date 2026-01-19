@@ -616,8 +616,8 @@ const Index = () => {
       <section className="relative overflow-hidden bg-gradient-to-br from-wellness-sage-light via-background to-wellness-lilac-light py-16 md:py-28">
         <div className="container mx-auto px-4">
           {/* Logo at top */}
-          <div className="flex justify-center mb-10 md:mb-14">
-            <Logo size="xl" className="opacity-90" />
+          <div className="flex justify-center mb-12 md:mb-16">
+            <Logo size="2xl" className="opacity-95" />
           </div>
           
           <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
