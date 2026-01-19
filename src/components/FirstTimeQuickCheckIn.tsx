@@ -126,6 +126,8 @@ export function FirstTimeQuickCheckIn({ onComplete, onStartFullOnboarding }: Fir
   const [selectedFeelings, setSelectedFeelings] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
+  console.log('[FirstTimeQuickCheckIn] Rendering step:', step);
+
   const toggleFeeling = (id: string) => {
     setSelectedFeelings(prev => 
       prev.includes(id) 

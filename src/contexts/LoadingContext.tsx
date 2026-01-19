@@ -17,12 +17,16 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 
   // Auto-trigger loading on route changes
   useEffect(() => {
+    console.log('[LoadingContext] Route changed to:', location.pathname);
     setIsLoading(true);
     const timer = setTimeout(() => {
+      console.log('[LoadingContext] Route transition complete');
       setIsLoading(false);
     }, 300); // Brief loading state for route transitions
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [location.pathname]);
 
   const startLoading = useCallback(() => {

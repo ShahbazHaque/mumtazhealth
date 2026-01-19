@@ -17,8 +17,15 @@ export function WelcomeEntryDialog({ open, onOpenChange }: WelcomeEntryDialogPro
   const navigate = useNavigate();
 
   const handleOptionClick = (path: string) => {
+    console.log('[WelcomeEntryDialog] User selected path:', path);
     onOpenChange(false);
-    navigate(path);
+    
+    // Use setTimeout to ensure dialog closes before navigation
+    // This prevents potential race conditions with the loading context
+    setTimeout(() => {
+      console.log('[WelcomeEntryDialog] Navigating to:', path);
+      navigate(path);
+    }, 50);
   };
 
   const entryOptions = [

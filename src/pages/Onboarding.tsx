@@ -188,19 +188,29 @@ export default function Onboarding() {
   const [searchParams] = useSearchParams();
   const skipToFull = searchParams.get('full') === 'true';
   const stepFromUrl = searchParams.get('step');
+  const modeFromUrl = searchParams.get('mode');
+  
+  console.log('[Onboarding] Mount - URL params:', { skipToFull, stepFromUrl, modeFromUrl });
   
   // Determine initial step - check for returning user with pending onboarding
   const getInitialStep = (): OnboardingStep => {
     if (stepFromUrl === 'complete') {
+      console.log('[Onboarding] Starting at complete step (returning user)');
       return "complete";
     }
     if (skipToFull) {
+      console.log('[Onboarding] Starting at intro1 (full onboarding)');
       return "intro1";
     }
+    console.log('[Onboarding] Starting at initial_choice');
     return "initial_choice";
   };
   
-  const [step, setStep] = useState<OnboardingStep>(getInitialStep());
+  const [step, setStep] = useState<OnboardingStep>(() => {
+    const initialStep = getInitialStep();
+    console.log('[Onboarding] Initial step set to:', initialStep);
+    return initialStep;
+  });
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
 
@@ -362,14 +372,27 @@ export default function Onboarding() {
     }
   };
 
-  const skipToProfile = () => setStep("welcome");
+  const skipToProfile = () => {
+    console.log('[Onboarding] Skipping to welcome/profile step');
+    setStep("welcome");
+  };
+
+  // Log current step for debugging
+  console.log('[Onboarding] Rendering step:', step);
 
   // Initial Choice: Quick Check-In or Full Onboarding
   if (step === "initial_choice" || step === "quick_checkin") {
+    console.log('[Onboarding] Rendering FirstTimeQuickCheckIn');
     return (
       <FirstTimeQuickCheckIn 
-        onComplete={() => navigate("/")}
-        onStartFullOnboarding={() => setStep("intro1")}
+        onComplete={() => {
+          console.log('[Onboarding] Quick check-in complete, navigating to dashboard');
+          navigate("/");
+        }}
+        onStartFullOnboarding={() => {
+          console.log('[Onboarding] Starting full onboarding from quick check-in');
+          setStep("intro1");
+        }}
       />
     );
   }
