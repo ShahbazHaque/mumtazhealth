@@ -7,26 +7,38 @@ import { useLoadingOptional } from '@/contexts/LoadingContext';
  */
 export function useGlobalLoading(isLoading: boolean) {
   const loadingContext = useLoadingOptional();
-  const wasLoading = useRef(false);
+  const wasLoadingRef = useRef(false);
+  const hasCleanedUpRef = useRef(false);
+  
+  // Store stable references to avoid dependency issues
+  const startLoadingRef = useRef(loadingContext?.startLoading);
+  const stopLoadingRef = useRef(loadingContext?.stopLoading);
+  
+  // Update refs when context changes
+  startLoadingRef.current = loadingContext?.startLoading;
+  stopLoadingRef.current = loadingContext?.stopLoading;
 
   useEffect(() => {
-    if (!loadingContext) return;
+    hasCleanedUpRef.current = false;
+    
+    if (!startLoadingRef.current || !stopLoadingRef.current) return;
 
-    if (isLoading && !wasLoading.current) {
-      loadingContext.startLoading();
-      wasLoading.current = true;
-    } else if (!isLoading && wasLoading.current) {
-      loadingContext.stopLoading();
-      wasLoading.current = false;
+    if (isLoading && !wasLoadingRef.current) {
+      startLoadingRef.current();
+      wasLoadingRef.current = true;
+    } else if (!isLoading && wasLoadingRef.current) {
+      stopLoadingRef.current();
+      wasLoadingRef.current = false;
     }
 
     return () => {
-      if (wasLoading.current) {
-        loadingContext.stopLoading();
-        wasLoading.current = false;
+      if (wasLoadingRef.current && !hasCleanedUpRef.current && stopLoadingRef.current) {
+        stopLoadingRef.current();
+        wasLoadingRef.current = false;
+        hasCleanedUpRef.current = true;
       }
     };
-  }, [isLoading, loadingContext]);
+  }, [isLoading]);
 }
 
 export default useGlobalLoading;
