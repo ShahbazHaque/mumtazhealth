@@ -499,8 +499,36 @@ export default function Tracker() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-wellness-beige">
-        <div className="text-wellness-taupe text-xl">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-b from-wellness-lavender/20 to-background animate-fade-in">
+        <Navigation />
+        <div className="max-w-2xl mx-auto p-4 pt-24 space-y-6">
+          {/* Header skeleton */}
+          <Card className="mb-6 bg-wellness-warm border-wellness-taupe/20">
+            <CardHeader className="text-center space-y-4">
+              <div className="h-8 w-64 bg-muted animate-pulse rounded mx-auto" />
+              <div className="flex items-center justify-center gap-4">
+                <div className="h-10 w-40 bg-muted animate-pulse rounded" />
+                <div className="h-9 w-24 bg-muted animate-pulse rounded" />
+              </div>
+            </CardHeader>
+          </Card>
+          
+          {/* Form sections skeleton */}
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="border-wellness-sage/20">
+              <CardHeader>
+                <div className="h-6 w-48 bg-muted animate-pulse rounded" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="h-10 w-full bg-muted animate-pulse rounded" />
+                <div className="h-10 w-full bg-muted animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          ))}
+          
+          {/* Save button skeleton */}
+          <div className="h-12 w-full bg-muted animate-pulse rounded-lg" />
+        </div>
       </div>
     );
   }

@@ -21,6 +21,8 @@ import { ConfidenceMilestones } from "@/components/ConfidenceMilestones";
 import { LifeStageCheckInPrompt } from "@/components/LifeStageCheckInPrompt";
 import { WelcomeEntryDialog } from "@/components/WelcomeEntryDialog";
 import { InBetweenPhaseBanner } from "@/components/InBetweenPhaseBanner";
+import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
+
 interface UserProfile {
   username: string;
 }
@@ -191,8 +193,13 @@ const Index = () => {
   const didQuickCheckIn = typeof window !== 'undefined' && localStorage.getItem('mumtaz_quick_checkin_completed') === 'true';
   const showDashboard = wellnessProfile?.onboarding_completed || (userProfile && didQuickCheckIn);
 
+  // Show loading skeleton while fetching data
+  if (loading) {
+    return <PageLoadingSkeleton variant="dashboard" />;
+  }
+
   // If user has completed onboarding OR quick check-in, show dashboard
-  if (!loading && showDashboard) {
+  if (showDashboard) {
     return (
       <div className="min-h-screen bg-background">
         <HomeNavigation username={userProfile?.username} />
