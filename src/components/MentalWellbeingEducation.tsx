@@ -6,13 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
   ChevronDown, ChevronUp, Heart, Sparkles, Leaf, Wind, Shield, 
   Sun, Cloud, Moon, Feather, Brain, Coffee, Bed, 
-  MessageCircle, PenLine, Check, Flower2
+  MessageCircle, PenLine, Check, Flower2, Star
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { JourneyTimeline, JourneyPhase } from "@/components/journey/JourneyTimeline";
 import { JourneySafetyReminder } from "@/components/journey/JourneySafetyReminder";
 import { AppCompanionDisclaimer } from "@/components/AppCompanionDisclaimer";
+import { EmotionalWhatWorked } from "@/components/EmotionalWhatWorked";
 import { cn } from "@/lib/utils";
 
 // Emotional states users can identify with
@@ -627,6 +628,15 @@ export function MentalWellbeingEducation() {
                   <p className="text-sm text-foreground italic">
                     "You don't have to be strong all the time. Softness is its own kind of strength."
                   </p>
+                </div>
+
+                {/* What Worked Tracker - Integrated */}
+                <div className="pt-3 border-t border-border/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Star className="w-4 h-4 text-wellness-sage" />
+                    <h4 className="text-sm font-medium text-foreground">Track What Helps</h4>
+                  </div>
+                  <EmotionalWhatWorked />
                 </div>
 
                 {/* CTA to Content Library */}
