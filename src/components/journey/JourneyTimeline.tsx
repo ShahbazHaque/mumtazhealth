@@ -13,7 +13,7 @@ export interface JourneyPhase {
 interface JourneyTimelineProps {
   phases: JourneyPhase[];
   currentPhase: string;
-  journeyType: "pregnancy" | "menopause" | "recovery" | "cycle";
+  journeyType: "pregnancy" | "menopause" | "recovery" | "cycle" | "mental";
   className?: string;
 }
 
@@ -196,6 +196,7 @@ export function JourneyTimeline({ phases, currentPhase, journeyType, className }
           {journeyType === "menopause" && "Honour each phase as your body finds its new rhythm."}
           {journeyType === "recovery" && "Healing takes time. Trust your body's wisdom."}
           {journeyType === "cycle" && "Your body moves through natural rhythms. Listen with kindness."}
+          {journeyType === "mental" && "Your feelings are valid. There's no rush to feel different."}
         </p>
       </motion.div>
     </div>

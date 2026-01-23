@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface JourneySafetyReminderProps {
-  journeyType: "pregnancy" | "menopause" | "recovery" | "general";
+  journeyType: "pregnancy" | "menopause" | "recovery" | "general" | "mental";
   showPractitionerCTA?: boolean;
   onPractitionerClick?: () => void;
   variant?: "default" | "compact" | "card";
@@ -15,6 +15,7 @@ const SAFETY_MESSAGES = {
   menopause: "This content offers supportive guidance for your wellbeing journey. It does not replace medical advice. Please consult your healthcare provider for any concerns.",
   recovery: "This content provides gentle support during your recovery. Always follow your medical team's guidance and listen to your body's signals.",
   general: "This app offers supportive, educational guidance only. It does not replace medical advice or qualified practitioner support.",
+  mental: "This app offers supportive, educational guidance and does not replace mental health care or medical advice. If you're struggling, please reach out to a mental health professional.",
 };
 
 const PRACTITIONER_MESSAGES = {
@@ -22,6 +23,7 @@ const PRACTITIONER_MESSAGES = {
   menopause: "For deeper, personalised menopause support, Mumtaz offers one-to-one consultations.",
   recovery: "For personalised recovery guidance, you're welcome to connect with a qualified practitioner.",
   general: "For deeper support, consider connecting with a qualified wellness practitioner.",
+  mental: "For deeper emotional support, you're welcome to connect with Mumtaz for holistic guidance, and please also consider speaking with a mental health professional.",
 };
 
 export function JourneySafetyReminder({ 

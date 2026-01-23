@@ -5,13 +5,14 @@ import { User } from "@supabase/supabase-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Sparkles, TrendingUp, Calendar, Activity, Loader2, AlertCircle, CheckCircle, Info } from "lucide-react";
+import { ArrowLeft, Sparkles, TrendingUp, Calendar, Activity, Loader2, AlertCircle, CheckCircle, Info, Brain } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Navigation } from "@/components/Navigation";
 import { DoshaLearningJourney } from "@/components/DoshaLearningJourney";
 import { FeelingPatterns } from "@/components/FeelingPatterns";
+import { MentalWellbeingEducation } from "@/components/MentalWellbeingEducation";
 import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
 
@@ -275,6 +276,15 @@ export default function Insights() {
             )}
           </div>
         )}
+
+        {/* Mental & Emotional Wellbeing Section */}
+        <div className="mt-8">
+          <div className="mb-4 flex items-center gap-2">
+            <Brain className="w-5 h-5 text-wellness-lilac" />
+            <h2 className="text-lg font-semibold text-foreground">Emotional Support</h2>
+          </div>
+          <MentalWellbeingEducation />
+        </div>
 
         {/* Feeling Patterns Section */}
         <div className="mt-8">

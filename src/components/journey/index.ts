@@ -22,3 +22,4 @@ export { PelvicFloorEducation } from "../PelvicFloorEducation";
 export { EndometriosisEducation } from "../EndometriosisEducation";
 export { PCOSEducation } from "../PCOSEducation";
 export { ArthritisEducation } from "../ArthritisEducation";
+export { MentalWellbeingEducation } from "../MentalWellbeingEducation";
