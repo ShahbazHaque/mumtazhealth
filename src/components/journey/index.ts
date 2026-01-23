@@ -23,3 +23,4 @@ export { EndometriosisEducation } from "../EndometriosisEducation";
 export { PCOSEducation } from "../PCOSEducation";
 export { ArthritisEducation } from "../ArthritisEducation";
 export { MentalWellbeingEducation } from "../MentalWellbeingEducation";
+export { EmotionalWhatWorked } from "../EmotionalWhatWorked";

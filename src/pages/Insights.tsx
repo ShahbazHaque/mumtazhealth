@@ -13,6 +13,7 @@ import { Navigation } from "@/components/Navigation";
 import { DoshaLearningJourney } from "@/components/DoshaLearningJourney";
 import { FeelingPatterns } from "@/components/FeelingPatterns";
 import { MentalWellbeingEducation } from "@/components/MentalWellbeingEducation";
+import { EmotionalWhatWorked } from "@/components/EmotionalWhatWorked";
 import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
 
@@ -284,6 +285,11 @@ export default function Insights() {
             <h2 className="text-lg font-semibold text-foreground">Emotional Support</h2>
           </div>
           <MentalWellbeingEducation />
+        </div>
+
+        {/* What Worked Tracker - Standalone */}
+        <div className="mt-8">
+          <EmotionalWhatWorked />
         </div>
 
         {/* Feeling Patterns Section */}
