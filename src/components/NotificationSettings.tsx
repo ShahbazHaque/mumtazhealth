@@ -66,8 +66,9 @@ export function NotificationSettings() {
           evening_time: data.evening_time.substring(0, 5),
         });
       }
-    } catch (error: any) {
-      console.error("Error fetching preferences:", error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      console.error("Error fetching preferences:", message);
     }
   };
 
@@ -88,17 +89,18 @@ export function NotificationSettings() {
       await requestNotificationPermission();
       const subscription = await subscribeUserToPush();
       await saveSubscription(subscription);
-      
+
       setNotificationsEnabled(true);
       toast({
         title: "Notifications enabled!",
         description: "You'll receive wellness reminders from Mumtaz.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to enable notifications';
       console.error("Notification error:", error);
       toast({
         title: "Failed to enable notifications",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -115,10 +117,11 @@ export function NotificationSettings() {
         title: "Notifications disabled",
         description: "You won't receive push notifications anymore.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to disable notifications';
       toast({
         title: "Failed to disable notifications",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -143,10 +146,11 @@ export function NotificationSettings() {
         title: "Preferences saved!",
         description: "Your notification preferences have been updated.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to save preferences';
       toast({
         title: "Failed to save preferences",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -185,9 +189,9 @@ export function NotificationSettings() {
       // Generate personalized test message
       const userName = profile?.username || "beautiful";
       const dosha = wellnessProfile?.primary_dosha;
-      
+
       let doshaAdvice = "Remember to honor your wellness journey today. I'm here to help, not judge. You are not alone.";
-      
+
       if (dosha) {
         const doshaMessages: Record<string, string> = {
           vata: "Ground yourself with warm, nourishing foods and gentle movement. Your journey is sacred.",
@@ -214,11 +218,12 @@ export function NotificationSettings() {
         title: "Test notification sent!",
         description: "Check your notifications to see how it looks.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to send test notification';
       console.error("Test notification error:", error);
       toast({
         title: "Failed to send test notification",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -326,7 +331,7 @@ export function NotificationSettings() {
                   Disable
                 </Button>
               </div>
-              
+
               <Button
                 onClick={sendTestNotification}
                 disabled={loading}
