@@ -68,7 +68,7 @@ export function MumtazWisdomGuide() {
   const [retryCount, setRetryCount] = useState(0);
   const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(null);
   const [previousRoute, setPreviousRoute] = useState<string | null>(null);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -83,7 +83,7 @@ export function MumtazWisdomGuide() {
     const savedConversationId = localStorage.getItem(STORAGE_KEYS.CONVERSATION_ID);
     const savedMessages = localStorage.getItem(STORAGE_KEYS.MESSAGES);
     const savedPreviousRoute = localStorage.getItem(STORAGE_KEYS.PREVIOUS_ROUTE);
-    
+
     if (savedConversationId) {
       setConversationId(savedConversationId);
     }
@@ -125,7 +125,7 @@ export function MumtazWisdomGuide() {
         const newId = crypto.randomUUID();
         setConversationId(newId);
       }
-      
+
       // Restore scroll position
       const savedScroll = localStorage.getItem(STORAGE_KEYS.SCROLL_POSITION);
       if (savedScroll && scrollAreaRef.current) {
@@ -160,10 +160,6 @@ export function MumtazWisdomGuide() {
     }
   }, [messages, loading]);
 
-  // Don't render on auth pages to avoid interference with CTAs
-  if (isAuthPage) {
-    return null;
-  }
 
   const fetchUserProfile = async () => {
     try {
@@ -184,7 +180,7 @@ export function MumtazWisdomGuide() {
 
       // Cast to any to access new columns that may not be in types yet
       const wp = wellnessProfile as any;
-      
+
       setUserProfile({
         username: profile?.username || "friend",
         primaryDosha: wp?.primary_dosha || undefined,
@@ -275,7 +271,7 @@ export function MumtazWisdomGuide() {
       if (error) throw error;
 
       setConversations((prev) => prev.filter((c) => c.id !== convId));
-      
+
       if (conversationId === convId) {
         setMessages([]);
         const newId = crypto.randomUUID();
@@ -340,13 +336,13 @@ export function MumtazWisdomGuide() {
     }
 
     const userMessage: Message = { role: "user", content: textToSend };
-    
+
     if (!isRetry) {
       setMessages((prev) => [...prev, userMessage]);
       setInput("");
       await saveMessage(userMessage);
     }
-    
+
     setLoading(true);
     setLastFailedMessage(null);
 
@@ -372,7 +368,7 @@ export function MumtazWisdomGuide() {
 
       if (data?.error) {
         console.error("[CHATBOT_API_ERROR] API returned error:", data.error, data.errorCode);
-        
+
         // Check if we should auto-retry (once for transient errors)
         if (!isRetry && retryCount < 1 && data.errorCode === 'INTERNAL_ERROR') {
           console.log("[CHATBOT_API] Auto-retrying after transient error...");
@@ -380,7 +376,7 @@ export function MumtazWisdomGuide() {
           setTimeout(() => sendMessage(textToSend, true), 1500);
           return;
         }
-        
+
         // Show friendly error message
         toast({
           title: "Service Notice",
@@ -396,13 +392,13 @@ export function MumtazWisdomGuide() {
         content: data.reply,
       };
       setMessages((prev) => [...prev, assistantMessage]);
-      
+
       await saveMessage(assistantMessage);
       await loadConversations();
       setRetryCount(0);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[CHATBOT_API_ERROR] Unexpected error:", error);
-      
+
       // Auto-retry once for network errors
       if (!isRetry && retryCount < 1) {
         console.log("[CHATBOT_API] Auto-retrying after network error...");
@@ -410,7 +406,7 @@ export function MumtazWisdomGuide() {
         setTimeout(() => sendMessage(textToSend, true), 1500);
         return;
       }
-      
+
       toast({
         title: "Connection Issue",
         description: "I'm having trouble responding right now. Please try again in a moment.",
@@ -421,6 +417,11 @@ export function MumtazWisdomGuide() {
       setLoading(false);
     }
   }, [input, loading, messages, userProfile, conversationId, retryCount]);
+
+  // Don't render on auth pages to avoid interference with CTAs
+  if (isAuthPage) {
+    return null;
+  }
 
   const handleRetry = () => {
     if (lastFailedMessage) {
@@ -468,7 +469,7 @@ export function MumtazWisdomGuide() {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent 
+      <DialogContent
         className="sm:max-w-2xl p-0 gap-0 animate-scale-in max-h-[90vh] h-[600px] flex flex-col overflow-hidden"
         aria-describedby="chatbot-description"
       >
@@ -530,9 +531,9 @@ export function MumtazWisdomGuide() {
                 </div>
               </div>
             )}
-            
+
             {/* Scrollable messages area */}
-            <div 
+            <div
               ref={scrollAreaRef}
               className="flex-1 overflow-y-auto p-4 min-h-0"
             >
@@ -540,9 +541,8 @@ export function MumtazWisdomGuide() {
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`flex gap-3 ${
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                    className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"
+                      }`}
                   >
                     {message.role === "assistant" && (
                       <Avatar className="h-8 w-8 border border-accent/30 shrink-0">
@@ -553,11 +553,10 @@ export function MumtazWisdomGuide() {
                       </Avatar>
                     )}
                     <div
-                      className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                        message.role === "user"
+                      className={`rounded-lg px-4 py-2 max-w-[80%] ${message.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted"
-                      }`}
+                        }`}
                     >
                       <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                     </div>
@@ -578,7 +577,7 @@ export function MumtazWisdomGuide() {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Retry button for failed messages */}
                 {lastFailedMessage && !loading && (
                   <div className="flex justify-center">
@@ -593,12 +592,12 @@ export function MumtazWisdomGuide() {
                     </Button>
                   </div>
                 )}
-                
+
                 {/* Scroll anchor */}
                 <div ref={messagesEndRef} />
               </div>
             </div>
-            
+
             {/* Fixed input area at bottom */}
             <div className="p-4 border-t bg-background shrink-0 pb-safe space-y-2">
               {/* Back to route & New conversation buttons */}
@@ -624,7 +623,7 @@ export function MumtazWisdomGuide() {
                   New Conversation
                 </Button>
               </div>
-              
+
               {/* Input field */}
               <div className="flex gap-2">
                 <Input

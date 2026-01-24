@@ -60,8 +60,8 @@ export const DailyReminderButton = ({ contentId, contentTitle, userId }: DailyRe
   };
 
   const handleDayToggle = (dayId: number) => {
-    setSelectedDays(prev => 
-      prev.includes(dayId) 
+    setSelectedDays(prev =>
+      prev.includes(dayId)
         ? prev.filter(d => d !== dayId)
         : [...prev, dayId].sort()
     );
@@ -98,7 +98,7 @@ export const DailyReminderButton = ({ contentId, contentTitle, userId }: DailyRe
       setHasReminder(true);
       setIsOpen(false);
       toast.success("Daily reminder set! You'll be reminded to practice.");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving reminder:', error);
       toast.error("Failed to save reminder");
     } finally {
@@ -123,7 +123,7 @@ export const DailyReminderButton = ({ contentId, contentTitle, userId }: DailyRe
       setHasReminder(false);
       setIsOpen(false);
       toast.success("Reminder removed");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error removing reminder:', error);
       toast.error("Failed to remove reminder");
     } finally {
@@ -143,8 +143,8 @@ export const DailyReminderButton = ({ contentId, contentTitle, userId }: DailyRe
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant={hasReminder ? "default" : "outline"} 
+        <Button
+          variant={hasReminder ? "default" : "outline"}
           size="lg"
           className="text-base"
         >
@@ -202,20 +202,19 @@ export const DailyReminderButton = ({ contentId, contentTitle, userId }: DailyRe
                   key={day.id}
                   type="button"
                   onClick={() => handleDayToggle(day.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    selectedDays.includes(day.id)
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedDays.includes(day.id)
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                  }`}
+                    }`}
                 >
                   {day.label}
                 </button>
               ))}
             </div>
             <p className="text-sm text-muted-foreground">
-              {selectedDays.length === 7 
-                ? "Every day" 
-                : selectedDays.length === 0 
+              {selectedDays.length === 7
+                ? "Every day"
+                : selectedDays.length === 0
                   ? "Select at least one day"
                   : `${selectedDays.length} days per week`}
             </p>
@@ -223,18 +222,18 @@ export const DailyReminderButton = ({ contentId, contentTitle, userId }: DailyRe
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <Button 
-            onClick={saveReminder} 
+          <Button
+            onClick={saveReminder}
             disabled={isLoading || selectedDays.length === 0}
             className="flex-1 text-base h-12"
           >
             <Bell className="h-4 w-4 mr-2" />
             {hasReminder ? "Update Reminder" : "Set Reminder"}
           </Button>
-          
+
           {hasReminder && (
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={removeReminder}
               disabled={isLoading}
               className="text-base h-12"

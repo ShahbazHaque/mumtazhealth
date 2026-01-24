@@ -57,10 +57,11 @@ export function ProfilePhotoUpload({ currentAvatarUrl, username, onAvatarUpdate 
       onAvatarUpdate(publicUrl);
       toast({ title: "Avatar uploaded successfully!" });
       setOpen(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Upload failed';
       toast({
         title: "Upload failed",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -74,10 +75,11 @@ export function ProfilePhotoUpload({ currentAvatarUrl, username, onAvatarUpdate 
       onAvatarUpdate(avatarUrl);
       toast({ title: "Avatar updated successfully!" });
       setOpen(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Update failed';
       toast({
         title: "Update failed",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     }
