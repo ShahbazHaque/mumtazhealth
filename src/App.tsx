@@ -8,6 +8,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
 import { lazy, Suspense, useEffect } from "react";
 import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Eagerly loaded pages (critical path)
 import Index from "./pages/Index";
@@ -78,9 +79,11 @@ const App = () => (
               </RouteErrorBoundary>
             } />
             <Route path="/auth" element={
-              <RouteErrorBoundary variant="simple">
-                <Auth />
-              </RouteErrorBoundary>
+              <ProtectedRoute redirectIfAuthenticated redirectTo="/">
+                <RouteErrorBoundary variant="simple">
+                  <Auth />
+                </RouteErrorBoundary>
+              </ProtectedRoute>
             } />
             <Route path="/onboarding" element={
               <RouteErrorBoundary variant="simple">
@@ -88,9 +91,11 @@ const App = () => (
               </RouteErrorBoundary>
             } />
             <Route path="/summary" element={
-              <RouteErrorBoundary variant="simple">
-                <LazyRoute><MonthlySummary /></LazyRoute>
-              </RouteErrorBoundary>
+              <ProtectedRoute>
+                <RouteErrorBoundary variant="simple">
+                  <LazyRoute><MonthlySummary /></LazyRoute>
+                </RouteErrorBoundary>
+              </ProtectedRoute>
             } />
             <Route path="/bookings" element={
               <RouteErrorBoundary variant="simple">
@@ -108,24 +113,32 @@ const App = () => (
               </RouteErrorBoundary>
             } />
             <Route path="/insights" element={
-              <RouteErrorBoundary variant="simple">
-                <LazyRoute><Insights /></LazyRoute>
-              </RouteErrorBoundary>
+              <ProtectedRoute>
+                <RouteErrorBoundary variant="simple">
+                  <LazyRoute><Insights /></LazyRoute>
+                </RouteErrorBoundary>
+              </ProtectedRoute>
             } />
             <Route path="/settings" element={
-              <RouteErrorBoundary variant="simple">
-                <LazyRoute><Settings /></LazyRoute>
-              </RouteErrorBoundary>
+              <ProtectedRoute>
+                <RouteErrorBoundary variant="simple">
+                  <LazyRoute><Settings /></LazyRoute>
+                </RouteErrorBoundary>
+              </ProtectedRoute>
             } />
             <Route path="/condition-tracker" element={
-              <RouteErrorBoundary variant="simple">
-                <LazyRoute><ConditionTracker /></LazyRoute>
-              </RouteErrorBoundary>
+              <ProtectedRoute>
+                <RouteErrorBoundary variant="simple">
+                  <LazyRoute><ConditionTracker /></LazyRoute>
+                </RouteErrorBoundary>
+              </ProtectedRoute>
             } />
             <Route path="/my-daily-practice" element={
-              <RouteErrorBoundary variant="simple">
-                <LazyRoute><MyDailyPractice /></LazyRoute>
-              </RouteErrorBoundary>
+              <ProtectedRoute>
+                <RouteErrorBoundary variant="simple">
+                  <LazyRoute><MyDailyPractice /></LazyRoute>
+                </RouteErrorBoundary>
+              </ProtectedRoute>
             } />
             <Route path="/reset-password" element={
               <RouteErrorBoundary variant="simple">
@@ -133,14 +146,18 @@ const App = () => (
               </RouteErrorBoundary>
             } />
             <Route path="/hormonal-transition" element={
-              <RouteErrorBoundary variant="simple">
-                <LazyRoute><HormonalTransitionTracker /></LazyRoute>
-              </RouteErrorBoundary>
+              <ProtectedRoute>
+                <RouteErrorBoundary variant="simple">
+                  <LazyRoute><HormonalTransitionTracker /></LazyRoute>
+                </RouteErrorBoundary>
+              </ProtectedRoute>
             } />
             <Route path="/admin" element={
-              <RouteErrorBoundary variant="simple">
-                <LazyRoute><Admin /></LazyRoute>
-              </RouteErrorBoundary>
+              <ProtectedRoute>
+                <RouteErrorBoundary variant="simple">
+                  <LazyRoute><Admin /></LazyRoute>
+                </RouteErrorBoundary>
+              </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
