@@ -8,13 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { 
-  ArrowLeft, 
-  Battery, 
-  Brain, 
-  Moon, 
-  Calendar, 
-  Utensils, 
+import {
+  ArrowLeft,
+  Battery,
+  Brain,
+  Moon,
+  Calendar,
+  Utensils,
   Bone,
   HelpCircle,
   TrendingUp,
@@ -25,55 +25,56 @@ import {
   Waves,
   CheckCircle2
 } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-const FOCUS_AREA_CONFIG: Record<string, { icon: any; label: string; color: string; bgColor: string; libraryTag: string }> = {
-  energy: { 
-    icon: Battery, 
-    label: "Energy Changes", 
+const FOCUS_AREA_CONFIG: Record<string, { icon: LucideIcon; label: string; color: string; bgColor: string; libraryTag: string }> = {
+  energy: {
+    icon: Battery,
+    label: "Energy Changes",
     color: "text-amber-600",
     bgColor: "bg-amber-100 dark:bg-amber-900/30",
     libraryTag: "energy"
   },
-  mood: { 
-    icon: Brain, 
-    label: "Mood Shifts", 
+  mood: {
+    icon: Brain,
+    label: "Mood Shifts",
     color: "text-purple-600",
     bgColor: "bg-purple-100 dark:bg-purple-900/30",
     libraryTag: "mood"
   },
-  sleep: { 
-    icon: Moon, 
-    label: "Sleep", 
+  sleep: {
+    icon: Moon,
+    label: "Sleep",
     color: "text-indigo-600",
     bgColor: "bg-indigo-100 dark:bg-indigo-900/30",
     libraryTag: "sleep"
   },
-  cycle: { 
-    icon: Calendar, 
-    label: "Cycle Irregularity", 
+  cycle: {
+    icon: Calendar,
+    label: "Cycle Irregularity",
     color: "text-pink-600",
     bgColor: "bg-pink-100 dark:bg-pink-900/30",
     libraryTag: "cycle"
   },
-  digestion: { 
-    icon: Utensils, 
-    label: "Digestion", 
+  digestion: {
+    icon: Utensils,
+    label: "Digestion",
     color: "text-green-600",
     bgColor: "bg-green-100 dark:bg-green-900/30",
     libraryTag: "digestion"
   },
-  joints: { 
-    icon: Bone, 
-    label: "Joint Discomfort", 
+  joints: {
+    icon: Bone,
+    label: "Joint Discomfort",
     color: "text-orange-600",
     bgColor: "bg-orange-100 dark:bg-orange-900/30",
     libraryTag: "joint-care"
   },
-  not_sure: { 
-    icon: HelpCircle, 
-    label: "Exploring", 
+  not_sure: {
+    icon: HelpCircle,
+    label: "Exploring",
     color: "text-teal-600",
     bgColor: "bg-teal-100 dark:bg-teal-900/30",
     libraryTag: "gentle"
@@ -188,8 +189,8 @@ export default function HormonalTransitionTracker() {
                   <Heart className="w-5 h-5 text-primary" />
                   Your Focus Areas
                 </CardTitle>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => navigate("/settings")}
                   className="text-muted-foreground hover:text-foreground"
@@ -216,9 +217,9 @@ export default function HormonalTransitionTracker() {
                     const config = FOCUS_AREA_CONFIG[areaId];
                     if (!config) return null;
                     const Icon = config.icon;
-                    
+
                     return (
-                      <Link 
+                      <Link
                         key={areaId}
                         to={`/content-library?tag=${config.libraryTag}`}
                         className="block"
@@ -323,7 +324,7 @@ export default function HormonalTransitionTracker() {
           className="text-center py-6"
         >
           <p className="text-sm text-muted-foreground italic max-w-md mx-auto">
-            Your body's wisdom is unfolding. This tracker is here to help you listen, 
+            Your body's wisdom is unfolding. This tracker is here to help you listen,
             understand, and support yourself through whatever comes next.
           </p>
         </motion.div>

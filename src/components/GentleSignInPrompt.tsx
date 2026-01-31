@@ -102,7 +102,7 @@ export function GentleSignInPrompt({ open, onClose, feature = "general", returnP
               Create Free Account
               <ArrowRight className="h-4 w-4" />
             </Button>
-            
+
             <div className="text-center">
               <button
                 onClick={handleSignIn}
@@ -136,12 +136,14 @@ export function GentleSignInPrompt({ open, onClose, feature = "general", returnP
 }
 
 // Utility function to check if user is signed in
+import { SupabaseClient } from "@supabase/supabase-js";
+
 export async function checkAuthAndPrompt(
-  supabase: any,
+  supabaseClient: SupabaseClient,
   setShowPrompt: (show: boolean) => void,
   feature?: "track" | "save" | "personalise" | "general"
 ): Promise<boolean> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) {
     setShowPrompt(true);
     return false;

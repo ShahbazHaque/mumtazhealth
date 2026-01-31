@@ -178,8 +178,17 @@ export function MumtazWisdomGuide() {
         .eq("user_id", user.id)
         .single();
 
-      // Cast to any to access new columns that may not be in types yet
-      const wp = wellnessProfile as any;
+      // Type for wellness profile columns
+      interface WellnessProfileData {
+        primary_dosha?: string;
+        secondary_dosha?: string;
+        life_stage?: string;
+        life_phases?: string[];
+        primary_focus?: string[];
+        current_trimester?: number;
+        spiritual_preference?: string;
+      }
+      const wp = wellnessProfile as WellnessProfileData | null;
 
       setUserProfile({
         username: profile?.username || "friend",
@@ -554,8 +563,8 @@ export function MumtazWisdomGuide() {
                     )}
                     <div
                       className={`rounded-lg px-4 py-2 max-w-[80%] ${message.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted"
                         }`}
                     >
                       <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>

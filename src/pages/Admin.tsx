@@ -27,7 +27,7 @@ interface WellnessEntry {
   cycle_phase: string | null;
   emotional_state: string | null;
   physical_symptoms: string | null;
-  daily_practices: any;
+  daily_practices: Record<string, { status?: boolean }> | null;
 }
 
 interface WellnessContent {
@@ -95,7 +95,7 @@ export default function Admin() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (!session) {
         navigate("/auth");
       }
@@ -105,7 +105,7 @@ export default function Admin() {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      
+
       if (!session) {
         navigate("/auth");
       }
@@ -122,20 +122,20 @@ export default function Admin() {
 
   const checkAdminRole = async () => {
     if (!user) return;
-    
+
     const { data } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .eq('role', 'admin')
       .maybeSingle();
-    
+
     if (!data) {
       toast.error("Access denied. Admin privileges required.");
       navigate("/");
       return;
     }
-    
+
     setIsAdmin(true);
     loadProfiles();
     loadContent();
@@ -146,13 +146,13 @@ export default function Admin() {
       .from('profiles')
       .select('*')
       .order('username');
-    
+
     if (error) {
       console.error('Error loading profiles:', error);
       toast.error('Error loading user profiles');
       return;
     }
-    
+
     setProfiles(data || []);
   };
 
@@ -163,14 +163,14 @@ export default function Admin() {
       .eq('user_id', userId)
       .order('entry_date', { ascending: false })
       .limit(10);
-    
+
     if (error) {
       console.error('Error loading entries:', error);
       toast.error('Error loading wellness entries');
       return;
     }
-    
-    setEntries(data || []);
+
+    setEntries((data || []) as WellnessEntry[]);
   };
 
   const handleUserSelect = (userId: string) => {
@@ -187,13 +187,13 @@ export default function Admin() {
       .from('wellness_content')
       .select('*')
       .order('title');
-    
+
     if (error) {
       console.error('Error loading content:', error);
       toast.error('Error loading wellness content');
       return;
     }
-    
+
     setContentList(data || []);
   };
 
@@ -419,104 +419,104 @@ export default function Admin() {
 
           <TabsContent value="users" className="space-y-6">
 
-        <Card className="border-wellness-taupe/20 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl text-wellness-taupe">User Management</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-wellness-taupe mb-2">
-                Select User
-              </label>
-              <Select value={selectedUserId} onValueChange={handleUserSelect}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a user to view their data" />
-                </SelectTrigger>
-                <SelectContent>
-                  {profiles.map((profile) => (
-                    <SelectItem key={profile.id} value={profile.user_id}>
-                      {profile.username} ({profile.user_id.slice(0, 8)}...)
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {selectedUserId && (
-              <div className="flex items-center gap-3 p-4 bg-wellness-sage/10 rounded-lg border border-wellness-sage/20">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-wellness-taupe">Reset Test User</p>
-                  <p className="text-xs text-wellness-taupe/70 mt-1">
-                    Clear all data and return user to onboarding state
-                  </p>
+            <Card className="border-wellness-taupe/20 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-2xl text-wellness-taupe">User Management</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-wellness-taupe mb-2">
+                    Select User
+                  </label>
+                  <Select value={selectedUserId} onValueChange={handleUserSelect}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a user to view their data" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {profiles.map((profile) => (
+                        <SelectItem key={profile.id} value={profile.user_id}>
+                          {profile.username} ({profile.user_id.slice(0, 8)}...)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <Button
-                  onClick={() => handleResetUser(selectedUserId)}
-                  variant="outline"
-                  className="border-wellness-sage text-wellness-sage hover:bg-wellness-sage/10"
-                >
-                  Reset User
-                </Button>
-              </div>
-            )}
-          </CardContent>
+
+                {selectedUserId && (
+                  <div className="flex items-center gap-3 p-4 bg-wellness-sage/10 rounded-lg border border-wellness-sage/20">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-wellness-taupe">Reset Test User</p>
+                      <p className="text-xs text-wellness-taupe/70 mt-1">
+                        Clear all data and return user to onboarding state
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => handleResetUser(selectedUserId)}
+                      variant="outline"
+                      className="border-wellness-sage text-wellness-sage hover:bg-wellness-sage/10"
+                    >
+                      Reset User
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
             </Card>
 
             {selectedUserId && entries.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-wellness-taupe">Recent Entries (Last 10)</h2>
-            {entries.map((entry) => (
-              <Card key={entry.id} className="border-wellness-taupe/20">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-wellness-taupe" />
-                      {new Date(entry.entry_date).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </CardTitle>
-                    {entry.cycle_phase && (
-                      <span className="px-3 py-1 bg-wellness-pink rounded-full text-sm font-medium">
-                        {entry.cycle_phase}
-                      </span>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {entry.emotional_state && (
-                    <div>
-                      <p className="text-sm font-medium text-wellness-taupe">Emotional State:</p>
-                      <p className="text-sm text-muted-foreground">{entry.emotional_state}</p>
-                    </div>
-                  )}
-                  {entry.physical_symptoms && (
-                    <div>
-                      <p className="text-sm font-medium text-wellness-taupe">Physical Symptoms:</p>
-                      <p className="text-sm text-muted-foreground">{entry.physical_symptoms}</p>
-                    </div>
-                  )}
-                  {entry.daily_practices && Object.keys(entry.daily_practices).length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium text-wellness-taupe mb-2">Daily Practices:</p>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        {Object.entries(entry.daily_practices).map(([key, value]: [string, any]) => (
-                          <div key={key} className="flex items-center gap-2 text-muted-foreground">
-                            <span className={value?.status ? "text-green-600" : "text-gray-400"}>
-                              {value?.status ? "✓" : "○"}
-                            </span>
-                            <span className="capitalize">{key.replace(/_/g, ' ')}</span>
-                          </div>
-                        ))}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold text-wellness-taupe">Recent Entries (Last 10)</h2>
+                {entries.map((entry) => (
+                  <Card key={entry.id} className="border-wellness-taupe/20">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Calendar className="w-5 h-5 text-wellness-taupe" />
+                          {new Date(entry.entry_date).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </CardTitle>
+                        {entry.cycle_phase && (
+                          <span className="px-3 py-1 bg-wellness-pink rounded-full text-sm font-medium">
+                            {entry.cycle_phase}
+                          </span>
+                        )}
                       </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {entry.emotional_state && (
+                        <div>
+                          <p className="text-sm font-medium text-wellness-taupe">Emotional State:</p>
+                          <p className="text-sm text-muted-foreground">{entry.emotional_state}</p>
+                        </div>
+                      )}
+                      {entry.physical_symptoms && (
+                        <div>
+                          <p className="text-sm font-medium text-wellness-taupe">Physical Symptoms:</p>
+                          <p className="text-sm text-muted-foreground">{entry.physical_symptoms}</p>
+                        </div>
+                      )}
+                      {entry.daily_practices && Object.keys(entry.daily_practices).length > 0 && (
+                        <div>
+                          <p className="text-sm font-medium text-wellness-taupe mb-2">Daily Practices:</p>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            {Object.entries(entry.daily_practices).map(([key, value]) => (
+                              <div key={key} className="flex items-center gap-2 text-muted-foreground">
+                                <span className={value?.status ? "text-green-600" : "text-gray-400"}>
+                                  {value?.status ? "✓" : "○"}
+                                </span>
+                                <span className="capitalize">{key.replace(/_/g, ' ')}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             )}
 
             {selectedUserId && entries.length === 0 && (
@@ -578,11 +578,11 @@ export default function Admin() {
                             </div>
                           </div>
                           <div className="flex flex-col gap-2">
-                            <Dialog open={editDialogOpen && selectedContent?.id === content.id} 
-                                    onOpenChange={(open) => {
-                                      setEditDialogOpen(open);
-                                      if (!open) setSelectedContent(null);
-                                    }}>
+                            <Dialog open={editDialogOpen && selectedContent?.id === content.id}
+                              onOpenChange={(open) => {
+                                setEditDialogOpen(open);
+                                if (!open) setSelectedContent(null);
+                              }}>
                               <DialogTrigger asChild>
                                 <Button
                                   variant="outline"
@@ -598,7 +598,7 @@ export default function Admin() {
                                   <DialogTitle>Edit Content: {content.title}</DialogTitle>
                                 </DialogHeader>
                                 <div className="space-y-4 py-4">
-                                <div className="space-y-2">
+                                  <div className="space-y-2">
                                     <Label htmlFor="animation-upload" className="flex items-center gap-2">
                                       Upload Animation
                                       <span className="text-xs text-muted-foreground font-normal">(Available to all tiers)</span>
@@ -668,7 +668,7 @@ export default function Admin() {
                                       defaultValue={content.video_url || ''}
                                       onChange={(e) => {
                                         if (selectedContent) {
-                                          setSelectedContent({...selectedContent, video_url: e.target.value || null});
+                                          setSelectedContent({ ...selectedContent, video_url: e.target.value || null });
                                         }
                                       }}
                                     />
@@ -676,7 +676,7 @@ export default function Admin() {
                                       Enter a direct URL to a video file, or upload above
                                     </p>
                                   </div>
-                                  
+
                                   <div className="space-y-2">
                                     <Label htmlFor="title">Title</Label>
                                     <Input
@@ -684,7 +684,7 @@ export default function Admin() {
                                       defaultValue={content.title}
                                       onChange={(e) => {
                                         if (selectedContent) {
-                                          setSelectedContent({...selectedContent, title: e.target.value});
+                                          setSelectedContent({ ...selectedContent, title: e.target.value });
                                         }
                                       }}
                                     />
@@ -697,7 +697,7 @@ export default function Admin() {
                                       defaultValue={content.description || ''}
                                       onChange={(e) => {
                                         if (selectedContent) {
-                                          setSelectedContent({...selectedContent, description: e.target.value});
+                                          setSelectedContent({ ...selectedContent, description: e.target.value });
                                         }
                                       }}
                                     />
@@ -711,7 +711,7 @@ export default function Admin() {
                                       rows={6}
                                       onChange={(e) => {
                                         if (selectedContent) {
-                                          setSelectedContent({...selectedContent, detailed_guidance: e.target.value});
+                                          setSelectedContent({ ...selectedContent, detailed_guidance: e.target.value });
                                         }
                                       }}
                                     />
@@ -724,7 +724,7 @@ export default function Admin() {
                                         defaultValue={content.tier_requirement}
                                         onValueChange={(value) => {
                                           if (selectedContent) {
-                                            setSelectedContent({...selectedContent, tier_requirement: value});
+                                            setSelectedContent({ ...selectedContent, tier_requirement: value });
                                           }
                                         }}
                                       >
@@ -746,7 +746,7 @@ export default function Admin() {
                                         defaultValue={content.difficulty_level || 'beginner'}
                                         onValueChange={(value) => {
                                           if (selectedContent) {
-                                            setSelectedContent({...selectedContent, difficulty_level: value});
+                                            setSelectedContent({ ...selectedContent, difficulty_level: value });
                                           }
                                         }}
                                       >
@@ -764,8 +764,8 @@ export default function Admin() {
 
                                   {/* Pose Images Section */}
                                   <div className="border-t pt-4">
-                                    <AdminPoseImageUploader 
-                                      contentId={content.id} 
+                                    <AdminPoseImageUploader
+                                      contentId={content.id}
                                       contentTitle={content.title}
                                     />
                                   </div>

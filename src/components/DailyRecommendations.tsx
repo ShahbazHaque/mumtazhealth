@@ -8,12 +8,13 @@ import { Sparkles, RefreshCw, Clock, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Tables } from "@/integrations/supabase/types";
 import { ContentSkeleton } from "@/components/ContentSkeleton";
+import { User } from "@supabase/supabase-js";
 
 type WellnessContent = Tables<"wellness_content">;
 
 export const DailyRecommendations = () => {
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -74,7 +75,7 @@ export const DailyRecommendations = () => {
       queryClient.invalidateQueries({ queryKey: ["daily-recommendations"] });
       toast.success("Daily recommendations generated!");
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error("Error generating recommendations:", error);
       toast.error(error.message || "Failed to generate recommendations");
     },
@@ -189,7 +190,7 @@ export const DailyRecommendations = () => {
                 <p className="text-sm text-muted-foreground line-clamp-3">
                   {content.description}
                 </p>
-                
+
                 {content.duration_minutes && (
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Clock className="h-3 w-3" />
