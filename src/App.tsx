@@ -6,22 +6,27 @@ import { LoadingProvider } from "@/contexts/LoadingContext";
 import { MumtazWisdomGuide } from "@/components/MumtazWisdomGuide";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
+import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
+
+// Eagerly loaded pages (critical path)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Tracker from "./pages/Tracker";
-import Admin from "./pages/Admin";
-import Onboarding from "./pages/Onboarding";
-import MonthlySummary from "./pages/MonthlySummary";
-import Bookings from "./pages/Bookings";
-import ContentLibrary from "./pages/ContentLibrary";
-import Insights from "./pages/Insights";
-import Settings from "./pages/Settings";
-import ConditionTracker from "./pages/ConditionTracker";
-import MyDailyPractice from "./pages/MyDailyPractice";
-import ResetPassword from "./pages/ResetPassword";
-import HormonalTransitionTracker from "./pages/HormonalTransitionTracker";
 import NotFound from "./pages/NotFound";
+
+// Lazy-loaded pages (code-splitting for smaller initial bundle)
+const Tracker = lazy(() => import("./pages/Tracker"));
+const Admin = lazy(() => import("./pages/Admin"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const MonthlySummary = lazy(() => import("./pages/MonthlySummary"));
+const Bookings = lazy(() => import("./pages/Bookings"));
+const ContentLibrary = lazy(() => import("./pages/ContentLibrary"));
+const Insights = lazy(() => import("./pages/Insights"));
+const Settings = lazy(() => import("./pages/Settings"));
+const ConditionTracker = lazy(() => import("./pages/ConditionTracker"));
+const MyDailyPractice = lazy(() => import("./pages/MyDailyPractice"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const HormonalTransitionTracker = lazy(() => import("./pages/HormonalTransitionTracker"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,16 +37,25 @@ const queryClient = new QueryClient({
   },
 });
 
-// Route change logger for debugging
+// Route change logger for debugging (only in development)
 function RouteLogger() {
   const location = useLocation();
-  
+
   useEffect(() => {
-    console.log('[Router] Navigation to:', location.pathname, location.search);
+    if (import.meta.env.DEV) {
+      console.log('[Router] Navigation to:', location.pathname, location.search);
+    }
   }, [location]);
-  
+
   return null;
 }
+
+// Suspense wrapper for lazy-loaded routes
+const LazyRoute = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<PageLoadingSkeleton variant="simple" />}>
+    {children}
+  </Suspense>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -60,7 +74,7 @@ const App = () => (
             } />
             <Route path="/tracker" element={
               <RouteErrorBoundary variant="tracker">
-                <Tracker />
+                <LazyRoute><Tracker /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/auth" element={
@@ -70,62 +84,62 @@ const App = () => (
             } />
             <Route path="/onboarding" element={
               <RouteErrorBoundary variant="simple">
-                <Onboarding />
+                <LazyRoute><Onboarding /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/summary" element={
               <RouteErrorBoundary variant="simple">
-                <MonthlySummary />
+                <LazyRoute><MonthlySummary /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/bookings" element={
               <RouteErrorBoundary variant="simple">
-                <Bookings />
+                <LazyRoute><Bookings /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/content" element={
               <RouteErrorBoundary variant="content">
-                <ContentLibrary />
+                <LazyRoute><ContentLibrary /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/content-library" element={
               <RouteErrorBoundary variant="content">
-                <ContentLibrary />
+                <LazyRoute><ContentLibrary /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/insights" element={
               <RouteErrorBoundary variant="simple">
-                <Insights />
+                <LazyRoute><Insights /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/settings" element={
               <RouteErrorBoundary variant="simple">
-                <Settings />
+                <LazyRoute><Settings /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/condition-tracker" element={
               <RouteErrorBoundary variant="simple">
-                <ConditionTracker />
+                <LazyRoute><ConditionTracker /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/my-daily-practice" element={
               <RouteErrorBoundary variant="simple">
-                <MyDailyPractice />
+                <LazyRoute><MyDailyPractice /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/reset-password" element={
               <RouteErrorBoundary variant="simple">
-                <ResetPassword />
+                <LazyRoute><ResetPassword /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/hormonal-transition" element={
               <RouteErrorBoundary variant="simple">
-                <HormonalTransitionTracker />
+                <LazyRoute><HormonalTransitionTracker /></LazyRoute>
               </RouteErrorBoundary>
             } />
             <Route path="/admin" element={
               <RouteErrorBoundary variant="simple">
-                <Admin />
+                <LazyRoute><Admin /></LazyRoute>
               </RouteErrorBoundary>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
