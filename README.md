@@ -10,11 +10,20 @@ A comprehensive women's wellness platform combining Ayurvedic principles with ev
 - **Condition-Specific Support**: PCOS, endometriosis, PMDD, arthritis tracking
 - **Hormonal Transition Tracker**: Perimenopause and menopause support
 - **Content Library**: Yoga poses, educational resources, guided practices
-- **AI Companion**: Mumtaz Wisdom Guide for personalized support
+- **AI Companion**: Mumtaz Wisdom Guide for personalized support (requires authentication)
 - **Dosha Assessment**: Ayurvedic constitution analysis (vata, pitta, kapha)
 - **Pregnancy Safety Mode**: Filtered yoga poses by trimester
 - **Bookings System**: Appointment scheduling with practitioners
 - **Insights Dashboard**: Data visualization and pattern recognition
+
+### Recent Updates
+
+**February 1, 2026** - Fixed Ask Mumtaz Authentication
+- Added authentication check to chatbot interface
+- Unauthenticated users now see a clear "Sign in to Chat" screen
+- Improved error handling and session validation
+- Better user experience with graceful auth redirects
+- See [CHANGES_APPLIED.md](./CHANGES_APPLIED.md) for full details
 
 ## 🚀 Getting Started
 
@@ -161,9 +170,15 @@ npm run optimize-images
 
 ## 📖 Documentation
 
-- See [CLAUDE.md](./CLAUDE.md) for detailed architecture documentation
-- Check `src/lib/validation.ts` for input validation schemas
-- Review `src/App.tsx` for route definitions and code-splitting strategy
+### Development Docs
+- [CLAUDE.md](./CLAUDE.md) - Architecture, patterns, and development guide
+- [CHANGES_APPLIED.md](./CHANGES_APPLIED.md) - Latest authentication fix details (Feb 1, 2026)
+- [MUMTAZ_CHAT_AUTHENTICATION_ANALYSIS.md](./MUMTAZ_CHAT_AUTHENTICATION_ANALYSIS.md) - Deep dive into chatbot authentication
+
+### Code Reference
+- `src/lib/validation.ts` - Input validation schemas
+- `src/App.tsx` - Route definitions and code-splitting strategy
+- `src/components/MumtazWisdomGuide.tsx` - AI chatbot with authentication
 
 ## 📋 Project Documents
 

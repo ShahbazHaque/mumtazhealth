@@ -6,7 +6,7 @@ import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Sparkles, Send, Loader2, History, Trash2, MessageCircle, Heart, Leaf, Wind, Moon, ArrowLeft, RefreshCw } from "lucide-react";
+import { Sparkles, Send, Loader2, History, Trash2, MessageCircle, Heart, Leaf, Wind, Moon, ArrowLeft, RefreshCw, LogIn, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import mumtazAvatar from "@/assets/mumtaz-avatar.jpeg";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,6 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChat } from "@/contexts/ChatContext";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Message {
   role: "user" | "assistant";
@@ -59,6 +60,7 @@ const STORAGE_KEYS = {
 
 export function MumtazWisdomGuide() {
   const { isOpen: open, openChat, closeChat } = useChat();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -356,6 +358,19 @@ export function MumtazWisdomGuide() {
     setLoading(true);
     setLastFailedMessage(null);
 
+    // Validate session before sending
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        title: "Session Expired",
+        description: "Please sign in again to continue chatting with Mumtaz.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      navigate('/auth', { state: { from: location } });
+      return;
+    }
+
     try {
       const { data, error } = await supabase.functions.invoke("mumtaz-wisdom-guide", {
         body: {
@@ -378,6 +393,18 @@ export function MumtazWisdomGuide() {
 
       if (data?.error) {
         console.error("[CHATBOT_API_ERROR] API returned error:", data.error, data.errorCode);
+
+        // Handle authentication errors specifically
+        if (data.errorCode === 'AUTH_REQUIRED' || data.errorCode === 'SESSION_EXPIRED') {
+          toast({
+            title: "Authentication Required",
+            description: data.error || "Please sign in to continue chatting.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          navigate('/auth', { state: { from: location } });
+          return;
+        }
 
         // Check if we should auto-retry (once for transient errors)
         if (!isRetry && retryCount < 1 && data.errorCode === 'INTERNAL_ERROR') {
@@ -522,6 +549,50 @@ export function MumtazWisdomGuide() {
           </CardHeader>
 
           <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
+            {/* Show sign-in prompt if not authenticated */}
+            {!authLoading && !isAuthenticated ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                <div className="max-w-md space-y-6">
+                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-accent/20 flex items-center justify-center">
+                    <Sparkles className="h-10 w-10 text-accent" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-semibold">Sign in to Chat with Mumtaz</h3>
+                    <p className="text-muted-foreground">
+                      Get personalized wellness guidance tailored to your dosha, life stage,
+                      and wellness journey. Your conversations are saved and personalized just for you.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3 pt-4">
+                    <Button
+                      onClick={() => {
+                        closeChat();
+                        navigate('/auth', { state: { from: location } });
+                      }}
+                      size="lg"
+                      className="bg-gradient-to-r from-wellness-lilac to-accent"
+                    >
+                      <LogIn className="h-5 w-5 mr-2" />
+                      Sign In to Continue
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        closeChat();
+                        navigate('/auth', { state: { from: location, isSignup: true } });
+                      }}
+                    >
+                      Create Free Account
+                    </Button>
+                  </div>
+                  <div className="pt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Free to use • Personalized guidance • Private & secure</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
             {/* Quick Actions */}
             {messages.length <= 1 && (
               <div className="px-4 pt-3 pb-2 border-b bg-muted/30 shrink-0">
@@ -533,7 +604,7 @@ export function MumtazWisdomGuide() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleQuickAction(action)}
-                      disabled={loading}
+                      disabled={loading || !isAuthenticated}
                       className="text-xs h-7 px-2.5 gap-1.5 hover:bg-accent/10"
                     >
                       <action.icon className="h-3 w-3" />
@@ -612,6 +683,9 @@ export function MumtazWisdomGuide() {
 
             {/* Fixed input area at bottom */}
             <div className="p-4 border-t bg-background shrink-0 pb-safe space-y-2">
+              {/* Only show input if authenticated */}
+              {isAuthenticated && (
+                <>
               {/* Back to route & New conversation buttons */}
               <div className="flex gap-2">
                 {previousRoute && previousRoute !== location.pathname && (
@@ -655,7 +729,11 @@ export function MumtazWisdomGuide() {
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
+              </>
+              )}
             </div>
+            </>
+            )}
           </TabsContent>
 
           <TabsContent value="history" className="flex-1 m-0 min-h-0 overflow-hidden">

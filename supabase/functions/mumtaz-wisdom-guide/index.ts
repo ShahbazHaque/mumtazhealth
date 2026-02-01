@@ -100,7 +100,10 @@ serve(async (req) => {
     if (!authHeader) {
       console.error("[CHATBOT_API_ERROR] No authorization header provided");
       return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
+        JSON.stringify({
+          error: 'Please sign in to continue chatting with Mumtaz',
+          errorCode: 'AUTH_REQUIRED'
+        }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -117,7 +120,10 @@ serve(async (req) => {
     if (authError || !user) {
       console.error("[CHATBOT_API_ERROR] Auth verification failed:", authError);
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({
+          error: 'Your session has expired. Please sign in again.',
+          errorCode: 'SESSION_EXPIRED'
+        }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

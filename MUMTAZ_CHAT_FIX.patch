@@ -1,0 +1,318 @@
+# Fix for Ask Mumtaz Authentication Issue
+# Apply these changes to fix the JWT error
+
+## File 1: src/components/MumtazWisdomGuide.tsx
+
+### Change 1: Add useAuth import (Line 15)
+
+BEFORE:
+```typescript
+import { useChat } from "@/contexts/ChatContext";
+```
+
+AFTER:
+```typescript
+import { useChat } from "@/contexts/ChatContext";
+import { useAuth } from "@/hooks/useAuth";
+import { CheckCircle2, AlertCircle, LogIn } from "lucide-react";
+```
+
+### Change 2: Add auth state to component (after Line 60)
+
+BEFORE:
+```typescript
+export function MumtazWisdomGuide() {
+  const { isOpen: open, openChat, closeChat } = useChat();
+```
+
+AFTER:
+```typescript
+export function MumtazWisdomGuide() {
+  const { isOpen: open, openChat, closeChat } = useChat();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+```
+
+### Change 3: Add session validation to sendMessage function (before Line 357)
+
+FIND this line (~357):
+```typescript
+    setLoading(true);
+    setLastFailedMessage(null);
+
+    try {
+```
+
+ADD BEFORE the `try` block:
+```typescript
+    setLoading(true);
+    setLastFailedMessage(null);
+
+    // ✅ Validate session before sending
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        title: "Session Expired",
+        description: "Please sign in again to continue chatting with Mumtaz.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      navigate('/auth', { state: { from: location } });
+      return;
+    }
+
+    try {
+```
+
+### Change 4: Update error handling for auth errors (around Line 374-398)
+
+FIND:
+```typescript
+      if (data?.error) {
+        console.error("[CHATBOT_API_ERROR] API returned error:", data.error, data.errorCode);
+
+        // Check if we should auto-retry (once for transient errors)
+        if (!isRetry && retryCount < 1 && data.errorCode === 'INTERNAL_ERROR') {
+```
+
+REPLACE WITH:
+```typescript
+      if (data?.error) {
+        console.error("[CHATBOT_API_ERROR] API returned error:", data.error, data.errorCode);
+
+        // Handle authentication errors specifically
+        if (data.errorCode === 'AUTH_REQUIRED' || data.errorCode === 'SESSION_EXPIRED') {
+          toast({
+            title: "Authentication Required",
+            description: data.error || "Please sign in to continue chatting.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          navigate('/auth', { state: { from: location } });
+          return;
+        }
+
+        // Check if we should auto-retry (once for transient errors)
+        if (!isRetry && retryCount < 1 && data.errorCode === 'INTERNAL_ERROR') {
+```
+
+### Change 5: Add Sign-In UI (around Line 524, inside TabsContent for "chat")
+
+FIND:
+```typescript
+          <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
+```
+
+ADD RIGHT AFTER:
+```typescript
+          <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
+            {/* ✅ Show sign-in prompt if not authenticated */}
+            {!authLoading && !isAuthenticated ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                <div className="max-w-md space-y-6">
+                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-wellness-lilac/20 to-accent/20 flex items-center justify-center">
+                    <Sparkles className="h-10 w-10 text-accent" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-semibold">Sign in to Chat with Mumtaz</h3>
+                    <p className="text-muted-foreground">
+                      Get personalized wellness guidance tailored to your dosha, life stage,
+                      and wellness journey. Your conversations are saved and personalized just for you.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3 pt-4">
+                    <Button
+                      onClick={() => {
+                        closeChat();
+                        navigate('/auth', { state: { from: location } });
+                      }}
+                      size="lg"
+                      className="bg-gradient-to-r from-wellness-lilac to-accent"
+                    >
+                      <LogIn className="h-5 w-5 mr-2" />
+                      Sign In to Continue
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        closeChat();
+                        navigate('/auth', { state: { from: location, isSignup: true } });
+                      }}
+                    >
+                      Create Free Account
+                    </Button>
+                  </div>
+                  <div className="pt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Free to use • Personalized guidance • Private & secure</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+```
+
+### Change 6: Close the conditional block (find the closing of messages section, before input area ~614)
+
+FIND (around line 613):
+```typescript
+            {/* Fixed input area at bottom */}
+            <div className="p-4 border-t bg-background shrink-0 pb-safe space-y-2">
+```
+
+ADD BEFORE:
+```typescript
+              </>
+            )}
+
+            {/* Fixed input area at bottom */}
+            <div className="p-4 border-t bg-background shrink-0 pb-safe space-y-2">
+```
+
+### Change 7: Disable input when not authenticated (around Line 640-650)
+
+FIND:
+```typescript
+                <Input
+                  placeholder={`Ask Mumtaz for guidance${userProfile?.username ? `, ${userProfile.username}` : ""}...`}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  disabled={loading}
+                  className="flex-1"
+                />
+```
+
+REPLACE WITH:
+```typescript
+                <Input
+                  placeholder={!isAuthenticated ? "Sign in to chat..." : `Ask Mumtaz for guidance${userProfile?.username ? `, ${userProfile.username}` : ""}...`}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  disabled={loading || !isAuthenticated}
+                  className="flex-1"
+                />
+```
+
+FIND:
+```typescript
+                <Button
+                  onClick={() => sendMessage()}
+                  disabled={loading || !input.trim()}
+                  size="icon"
+                  className="bg-gradient-to-r from-wellness-lilac to-accent"
+                >
+```
+
+REPLACE WITH:
+```typescript
+                <Button
+                  onClick={() => sendMessage()}
+                  disabled={loading || !input.trim() || !isAuthenticated}
+                  size="icon"
+                  className="bg-gradient-to-r from-wellness-lilac to-accent"
+                >
+```
+
+---
+
+## File 2: supabase/functions/mumtaz-wisdom-guide/index.ts
+
+### Change 1: Update "no auth header" error message (Line 100-106)
+
+FIND:
+```typescript
+    if (!authHeader) {
+      console.error("[CHATBOT_API_ERROR] No authorization header provided");
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+```
+
+REPLACE WITH:
+```typescript
+    if (!authHeader) {
+      console.error("[CHATBOT_API_ERROR] No authorization header provided");
+      return new Response(
+        JSON.stringify({
+          error: 'Please sign in to continue chatting with Mumtaz',
+          errorCode: 'AUTH_REQUIRED'
+        }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+```
+
+### Change 2: Update "auth verification failed" error (Line 117-123)
+
+FIND:
+```typescript
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error("[CHATBOT_API_ERROR] Auth verification failed:", authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+```
+
+REPLACE WITH:
+```typescript
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error("[CHATBOT_API_ERROR] Auth verification failed:", authError);
+      return new Response(
+        JSON.stringify({
+          error: 'Your session has expired. Please sign in again.',
+          errorCode: 'SESSION_EXPIRED'
+        }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+```
+
+---
+
+## Testing the Fix
+
+After applying these changes:
+
+### Test 1: Unauthenticated User
+1. Log out (or open in incognito mode)
+2. Click "Ask Mumtaz" button
+3. ✅ Should see "Sign in to Chat with Mumtaz" UI
+4. ✅ Input should be disabled
+5. ✅ Clicking "Sign In" should navigate to /auth
+
+### Test 2: Authenticated User
+1. Log in to your account
+2. Click "Ask Mumtaz"
+3. ✅ Should see normal chat interface
+4. ✅ Should see personalized greeting
+5. Send a message
+6. ✅ Should receive response without errors
+
+### Test 3: Session Expiry
+1. Open chat while logged in
+2. In browser DevTools console, run: `localStorage.clear()`
+3. Try to send a message
+4. ✅ Should show "Session expired" error
+5. ✅ Should redirect to /auth
+
+---
+
+## Summary
+
+These changes:
+- ✅ Detect when user is not authenticated
+- ✅ Show clear "Sign in" UI instead of letting user type
+- ✅ Validate session before sending messages
+- ✅ Handle auth errors gracefully
+- ✅ Provide clear error messages
+- ✅ Guide users to sign in when needed
+
+The fix ensures users know they need to be logged in BEFORE they try to chat,
+preventing the frustrating "invalid claim: missing sub claim" error.

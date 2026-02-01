@@ -70,7 +70,9 @@ npx vitest run --watch src/path/to/file.test.tsx
 | `src/integrations/supabase/client.ts` | Supabase client (auto-generated, don't edit) |
 | `src/integrations/supabase/types.ts` | Database types (auto-generated, don't edit) |
 | `src/lib/validation.ts` | Zod validation schemas for all user inputs |
-| `src/components/MumtazWisdomGuide.tsx` | AI chat companion (global, always mounted) |
+| `src/components/MumtazWisdomGuide.tsx` | AI chat companion (requires authentication) |
+| `src/hooks/useAuth.ts` | Authentication state hook |
+| `supabase/functions/mumtaz-wisdom-guide/index.ts` | Edge Function for chatbot (requires ANTHROPIC_API_KEY) |
 
 ### Path Alias
 
@@ -140,3 +142,57 @@ The chatbot uses **Claude Sonnet** for optimal balance of quality, speed, and co
 - `src/pages/` - Route-level page components
 - `src/hooks/` - Custom React hooks
 - `src/assets/poses/` - Yoga pose images
+
+## Recent Changes & Important Notes
+
+### February 1, 2026 - Ask Mumtaz Authentication Fix
+
+**Problem**: Users could open the chatbot without being authenticated, leading to JWT errors when trying to send messages.
+
+**Solution Implemented**:
+1. Added `useAuth()` hook to `MumtazWisdomGuide.tsx`
+2. Created sign-in UI for unauthenticated users
+3. Added session validation before sending messages
+4. Enhanced error handling for auth errors (AUTH_REQUIRED, SESSION_EXPIRED)
+5. Updated Edge Function error messages to be user-friendly
+
+**Files Modified**:
+- `src/components/MumtazWisdomGuide.tsx` - Added auth checks and sign-in UI
+- `supabase/functions/mumtaz-wisdom-guide/index.ts` - Improved error messages
+
+**Testing**:
+- ✅ Unauthenticated users see sign-in screen
+- ✅ Authenticated users can chat normally
+- ✅ Session expiry redirects to login
+- ✅ Clear error messages (no more "missing sub claim")
+
+**Documentation**:
+- [CHANGES_APPLIED.md](./CHANGES_APPLIED.md) - Complete change summary
+- [MUMTAZ_CHAT_AUTHENTICATION_ANALYSIS.md](./MUMTAZ_CHAT_AUTHENTICATION_ANALYSIS.md) - Technical analysis
+
+### Key Learnings
+
+**Authentication Pattern**:
+```typescript
+// Always check auth before protected operations
+const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+// Validate session before API calls
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  navigate('/auth');
+  return;
+}
+```
+
+**Error Code Handling**:
+- `AUTH_REQUIRED` - No auth header provided
+- `SESSION_EXPIRED` - JWT invalid or user not found
+- `INTERNAL_ERROR` - Transient API error (auto-retry)
+- `RATE_LIMIT` - Too many requests
+
+**UX Best Practices**:
+- Show clear sign-in UI instead of letting users try and fail
+- Provide user-friendly error messages, not technical jargon
+- Redirect to login with state preservation for return path
+- Disable inputs when authentication is required
