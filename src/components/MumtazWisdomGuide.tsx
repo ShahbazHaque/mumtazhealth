@@ -58,7 +58,7 @@ const STORAGE_KEYS = {
 };
 
 export function MumtazWisdomGuide() {
-  const { isOpen: open, closeChat } = useChat();
+  const { isOpen: open, openChat, closeChat } = useChat();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -458,9 +458,11 @@ export function MumtazWisdomGuide() {
     }
   };
 
-  // Handle dialog open/close - on mobile, controlled by bottom nav
+  // Handle dialog open/close - syncs with ChatContext
   const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
+    if (newOpen) {
+      openChat();
+    } else {
       closeChat();
     }
   };

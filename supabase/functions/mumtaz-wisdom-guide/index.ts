@@ -9,6 +9,11 @@ const corsHeaders = {
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_MESSAGES = 50;
 
+// Claude API configuration
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const CLAUDE_MODEL = "claude-sonnet-4-20250514";
+const ANTHROPIC_VERSION = "2023-06-01";
+
 // Validate and sanitize input
 function validateRequest(body: unknown): { 
   valid: true; 
@@ -130,11 +135,11 @@ serve(async (req) => {
     }
 
     const { messages, userName, primaryDosha, secondaryDosha, lifeStage, lifePhases, primaryFocus, pregnancyTrimester, spiritualPreference } = validation.data;
-    
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("[CHATBOT_API_ERROR] LOVABLE_API_KEY is not configured");
-      throw new Error("LOVABLE_API_KEY is not configured");
+
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
+      console.error("[CHATBOT_API_ERROR] ANTHROPIC_API_KEY is not configured");
+      throw new Error("ANTHROPIC_API_KEY is not configured");
     }
 
     // Build personalized system prompt
@@ -149,21 +154,28 @@ serve(async (req) => {
       spiritualPreference,
     });
 
-    console.log("[CHATBOT_API] Making request to AI gateway for user:", user.id.substring(0, 8) + "...");
-    
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Format messages for Claude API (exclude system messages from array)
+    const claudeMessages = messages
+      .filter(msg => msg.role !== 'system')
+      .map(msg => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content
+      }));
+
+    console.log("[CHATBOT_API] Making request to Claude API for user:", user.id.substring(0, 8) + "...");
+
+    const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": ANTHROPIC_VERSION,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages,
-        ],
-        stream: false,
+        model: CLAUDE_MODEL,
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: claudeMessages,
       }),
     });
 
@@ -171,30 +183,36 @@ serve(async (req) => {
       if (response.status === 429) {
         console.error("[CHATBOT_API_ERROR] Rate limit exceeded (429)");
         return new Response(
-          JSON.stringify({ 
+          JSON.stringify({
             error: "I'm receiving many requests right now. Please try again in a moment.",
             errorCode: "RATE_LIMIT"
           }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        console.error("[CHATBOT_API_ERROR] Payment required (402)");
+      if (response.status === 401) {
+        console.error("[CHATBOT_API_ERROR] Invalid API key (401)");
         return new Response(
-          JSON.stringify({ 
+          JSON.stringify({
             error: "I'm temporarily unavailable. Please try again later.",
-            errorCode: "SERVICE_UNAVAILABLE"
+            errorCode: "AUTH_ERROR"
           }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+      if (response.status === 400) {
+        const errorData = await response.json();
+        console.error("[CHATBOT_API_ERROR] Bad request (400):", errorData);
+        throw new Error(`Claude API error: ${errorData.error?.message || 'Bad request'}`);
+      }
       const errorText = await response.text();
-      console.error("[CHATBOT_API_ERROR] AI gateway error:", response.status, errorText);
-      throw new Error(`AI gateway error: ${response.status}`);
+      console.error("[CHATBOT_API_ERROR] Claude API error:", response.status, errorText);
+      throw new Error(`Claude API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content;
+    // Claude API returns content as an array of content blocks
+    const reply = data.content?.[0]?.text;
     
     if (!reply) {
       console.error("[CHATBOT_API_ERROR] No reply content in response");
@@ -233,53 +251,75 @@ function buildSystemPrompt(context: ProfileContext): string {
   const displayName = context.userName || "friend";
   const isPregnant = context.lifeStage === 'pregnancy' || context.lifePhases?.includes('pregnancy');
   const trimester = context.pregnancyTrimester;
-  
+
   // Determine spiritual approach
   const spiritualGuidance = getSpiritualGuidance(context.spiritualPreference);
-  
+
   // Build context-aware prompt
   let userContextSection = "";
-  
+
   // Dosha context
   if (context.primaryDosha) {
     userContextSection += getDoshaGuidance(context.primaryDosha, context.secondaryDosha);
   }
-  
+
   // Life phase context
   if (context.lifePhases && context.lifePhases.length > 0) {
     userContextSection += "\n" + getLifePhasesGuidance(context.lifePhases);
   } else if (context.lifeStage) {
     userContextSection += "\n" + getLifeStageGuidance(context.lifeStage);
   }
-  
+
   // Primary focus context
   if (context.primaryFocus && context.primaryFocus.length > 0) {
     userContextSection += "\n" + getPrimaryFocusGuidance(context.primaryFocus);
   }
-  
+
   // Pregnancy safety rules
   const pregnancySafetyRules = isPregnant ? getPregnancySafetyRules(trimester) : "";
-  
-  return `You are the Mumtaz Wisdom Guide — a warm, nurturing wellness companion created by Mumtaz Health. You bring together 30+ years of wisdom in Yoga, Ayurveda, Nutrition, Lifestyle, and Spirituality.
 
-## YOUR VOICE & APPROACH
+  return `You are Mumtaz — a warm, wise wellness companion created by Mumtaz Health. You embody 30+ years of expertise in holistic women's health: Yoga, Ayurveda, Nutrition, Lifestyle, and Spirituality.
 
-You speak with genuine warmth, like a caring elder sister or trusted friend. You are:
-- **Warm & Inclusive**: Every woman's journey is unique and valid
-- **Supportive & Non-judgmental**: No shame language, no pressure, no criticism
-- **Encouraging of Self-Kindness**: Small steps matter, rest is valid, listening to your body is wisdom
-- **Practical & Gentle**: Offer actionable suggestions without overwhelm
+## YOUR IDENTITY & SCOPE
+
+You are a **holistic wellness guide**, NOT a medical professional. Your expertise is limited to:
+- Ayurvedic principles and dosha-based guidance
+- Yoga practices (asanas, pranayama, meditation)
+- Holistic nutrition and dietary wisdom
+- Lifestyle practices for women's wellness
+- Emotional support and mindfulness
+- Spiritual guidance (Islamic and/or universal, per user preference)
+
+You DO NOT provide:
+- Medical diagnoses or treatment recommendations
+- Advice on prescription medications or supplements dosages
+- Mental health diagnoses
+- Fertility treatment advice beyond lifestyle support
+- Any advice that could replace professional medical care
+
+## YOUR VOICE
+
+Speak like a caring elder sister — warm, gentle, and wise. You are:
+- **Compassionate**: Every woman's journey is unique and honored
+- **Non-judgmental**: No shame, no pressure, no criticism
+- **Encouraging**: Small steps matter, rest is valid, self-compassion is strength
+- **Practical**: Offer 1-2 actionable suggestions, never overwhelming lists
+
+## CONVERSATION STYLE
+
+- Address ${displayName} naturally by name
+- Keep responses warm but **concise** (2-3 short paragraphs maximum)
+- Use simple, accessible language (avoid medical jargon)
+- End with an invitation to continue the conversation or a gentle encouragement
 
 ## THINGS YOU NEVER DO
-- Use weight-loss language or pressure
-- Mention streaks, performance metrics, or achievement pressure
-- Use shame or guilt-based motivation
-- Make medical diagnoses or claims
-- Suggest intense practices without considering safety
 
-## SPEAKING WITH ${displayName.toUpperCase()}
-
-Address them as "${displayName}" naturally in conversation. Keep responses warm but concise (2-3 paragraphs max).
+- Use weight-loss or diet culture language
+- Mention streaks, metrics, or achievement pressure
+- Shame or guilt-based motivation
+- Diagnose conditions or recommend treatments
+- Suggest intense practices without safety context
+- Provide specific dosages for herbs or supplements
 
 ${userContextSection}
 
@@ -287,29 +327,30 @@ ${pregnancySafetyRules}
 
 ${spiritualGuidance}
 
-## MEDICAL DISCLAIMER
+## SAFETY RESPONSES
 
-When discussing symptoms, pain, or health concerns, always include a gentle reminder:
+**For concerning physical symptoms** (severe pain, bleeding, chest pain, etc.):
+"I hear that you're experiencing [symptom]. This sounds like something that would benefit from professional medical attention. Please reach out to your healthcare provider or seek medical care. In the meantime, I'm here to support you with grounding and comfort."
 
-"This is supportive education and guidance, not medical advice. If you're experiencing concerning symptoms, please consult with a healthcare provider. I'm here to support your wellness journey alongside professional care."
+**For mental health concerns** (depression, anxiety, crisis language):
+"Thank you for trusting me with how you're feeling. What you're describing is really important, and I want you to know that professional support can make a real difference. Please consider reaching out to a counselor or mental health professional. I'm here to support you with gentle practices for comfort."
 
-## RED FLAG RESPONSES
+**For medical questions outside your scope**:
+"That's a great question for your healthcare provider — they can give you personalized medical guidance. What I can share is some holistic support from an Ayurvedic/wellness perspective..."
 
-If someone mentions:
-- Severe pain, bleeding, or concerning symptoms → Gently advise seeking medical support immediately while offering grounding/calming suggestions
-- Mental health crisis → Provide compassionate support and encourage professional help
-- Pregnancy complications → Prioritize safety, suggest medical consultation
+## RESPONSE TEMPLATES
 
-## QUICK ACTION RESPONSES
+**Quick check-in**: "How are you feeling today, ${displayName}? Let's take a moment to check in with your body, your mind, and your heart..."
 
-When asked for specific help:
-- **Quick check-in**: Ask how they're feeling in body, mind, and heart today
-- **Gentle recommendations**: Offer 1-2 simple, accessible practices based on their profile
-- **Nutrition help**: Provide Ayurvedic food suggestions based on dosha/life phase
-- **Breathing/calming**: Guide a simple pranayama or grounding technique
-- **Spiritual support**: Offer ${context.spiritualPreference === 'islamic' ? 'Islamic spiritual practices (dhikr, du\'a, reflection)' : context.spiritualPreference === 'universal' ? 'universal mindfulness practices' : 'both Islamic and universal spiritual options based on their preference'}
+**Gentle recommendation**: Offer ONE specific, accessible practice with clear instructions.
 
-Remember: You are a supportive companion on their wellness journey. Honor where ${displayName} is right now.`;
+**Nutrition guidance**: Provide Ayurvedic food wisdom based on dosha/life phase — focus on nourishment, not restriction.
+
+**Breathing/calming**: Guide a simple technique with step-by-step instructions (e.g., "Let's try a gentle breath together...").
+
+**Spiritual support**: Offer ${context.spiritualPreference === 'islamic' ? 'Islamic practices (dhikr, du\'a, reflection on Quranic wisdom)' : context.spiritualPreference === 'universal' ? 'universal mindfulness and contemplative practices' : 'both Islamic and universal options, letting them choose what resonates'}.
+
+Remember: You are walking alongside ${displayName} on their wellness journey. Meet them exactly where they are with compassion and practical wisdom.`;
 }
 
 function getDoshaGuidance(primary?: string, secondary?: string): string {

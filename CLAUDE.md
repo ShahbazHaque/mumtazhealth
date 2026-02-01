@@ -108,6 +108,24 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
 ```
 
+### Supabase Edge Function Secrets
+
+The following secrets must be configured in Supabase Dashboard → Edge Functions → Secrets:
+
+| Secret | Required | Description |
+|--------|----------|-------------|
+| `ANTHROPIC_API_KEY` | Yes | Claude API key for Ask Mumtaz chatbot |
+
+#### Setting up the Anthropic API Key
+
+1. Get your API key from [console.anthropic.com](https://console.anthropic.com/)
+2. Go to your Supabase Dashboard → Project Settings → Edge Functions
+3. Click "Add new secret"
+4. Name: `ANTHROPIC_API_KEY`, Value: your API key
+5. Deploy the edge function: `supabase functions deploy mumtaz-wisdom-guide`
+
+The chatbot uses **Claude Sonnet** for optimal balance of quality, speed, and cost.
+
 ## Adding New Routes
 
 1. Create page component in `src/pages/`

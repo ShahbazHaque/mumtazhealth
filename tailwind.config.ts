@@ -77,9 +77,39 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        body: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        // UX Audit: Use Roboto/Open Sans for maximum legibility
+        sans: ['Open Sans', 'Roboto', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        body: ['Open Sans', 'Roboto', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         accent: ['Nunito', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+      },
+      // UX Audit: Accessibility-compliant font size scale (18px base)
+      fontSize: {
+        'xs': ['0.875rem', { lineHeight: '1.5' }],      // 14px - helper text minimum
+        'sm': ['1rem', { lineHeight: '1.5' }],          // 16px - captions
+        'base': ['1.125rem', { lineHeight: '1.6' }],    // 18px - body text (WCAG compliant)
+        'lg': ['1.25rem', { lineHeight: '1.5' }],       // 20px - emphasized text
+        'xl': ['1.375rem', { lineHeight: '1.4' }],      // 22px - H4
+        '2xl': ['1.625rem', { lineHeight: '1.3' }],     // 26px - H3
+        '3xl': ['2rem', { lineHeight: '1.2' }],         // 32px - H2
+        '4xl': ['2.5rem', { lineHeight: '1.1' }],       // 40px - H1
+        '5xl': ['3rem', { lineHeight: '1.1' }],         // 48px - Display
+      },
+      // UX Audit: Touch target spacing (44px minimum)
+      spacing: {
+        'touch': '2.75rem',      // 44px - minimum touch target
+        'touch-lg': '3rem',      // 48px - comfortable touch target
+        'touch-xl': '3.5rem',    // 56px - large touch target (nav items)
+      },
+      // UX Audit: Minimum touch target sizes
+      minHeight: {
+        'touch': '2.75rem',      // 44px
+        'touch-lg': '3rem',      // 48px
+        'input': '3rem',         // 48px for form inputs
+      },
+      minWidth: {
+        'touch': '2.75rem',      // 44px
+        'btn': '7.5rem',         // 120px - primary button minimum
+        'btn-sm': '6.25rem',     // 100px - secondary button minimum
       },
       borderRadius: {
         lg: "var(--radius)",

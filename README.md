@@ -165,6 +165,24 @@ npm run optimize-images
 - Check `src/lib/validation.ts` for input validation schemas
 - Review `src/App.tsx` for route definitions and code-splitting strategy
 
+## 📋 Project Documents
+
+| Document | Description |
+|----------|-------------|
+| [UX Accessibility Audit](./Mumtaz_Health_UX_Accessibility_Audit.docx) | Comprehensive UX accessibility audit and implementation roadmap for elderly user accessibility (WCAG 2.1 AA compliance) |
+| [Development Roadmap 2026](./Mumtaz_Health_Development_Roadmap_2026.docx) | Strategic development roadmap and feature planning |
+| [Review 2026-02-01](./Mumtaz_Health_Review_2026-02-01.docx) | Project review and gap analysis findings |
+
+### UX Design Guidelines
+
+The UX Accessibility Audit establishes the following key design requirements:
+
+- **Typography**: Minimum 18px base font size with Roboto/Open Sans
+- **Touch Targets**: Minimum 44x44 pixels for all interactive elements
+- **Color Contrast**: 4.5:1 minimum ratio for WCAG 2.1 AA compliance
+- **Cognitive Load**: Single-task screens, maximum 3-level navigation depth
+- **Target Demographic**: Middle-aged and elderly women (accommodating "brain fog" and motor skill limitations)
+
 ## 🤝 Contributing
 
 1. Fork the repository
