@@ -266,4 +266,34 @@ All colors MUST be HSL.
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+
+  /* Bottom padding for pages when mobile nav is visible */
+  @media (max-width: 767px) {
+    .mobile-nav-padding {
+      padding-bottom: 80px; /* Height of bottom nav + some breathing room */
+    }
+
+    /* Apply to main content areas automatically */
+    main,
+    .container {
+      padding-bottom: 80px;
+    }
+  }
+
+  /* Accessibility: Larger touch targets */
+  @media (max-width: 767px) {
+    button,
+    [role="button"],
+    a {
+      min-height: 44px;
+    }
+
+    /* Ensure form inputs are easy to tap */
+    input,
+    select,
+    textarea {
+      min-height: 48px;
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+  }
 }

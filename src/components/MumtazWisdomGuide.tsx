@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useChat } from "@/contexts/ChatContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -57,7 +58,7 @@ const STORAGE_KEYS = {
 };
 
 export function MumtazWisdomGuide() {
-  const [open, setOpen] = useState(false);
+  const { isOpen: open, closeChat } = useChat();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -453,31 +454,31 @@ export function MumtazWisdomGuide() {
   const handleBackToRoute = () => {
     if (previousRoute) {
       navigate(previousRoute);
-      setOpen(false);
+      closeChat();
+    }
+  };
+
+  // Handle dialog open/close - on mobile, controlled by bottom nav
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      closeChat();
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {isMobile ? (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      {/* Desktop: Show floating button trigger. Mobile: Hidden (use bottom nav instead) */}
+      {!isMobile && (
+        <DialogTrigger asChild>
           <Button
-            size="icon"
-            className="fixed bottom-24 right-4 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-110 transition-all duration-300 z-40 animate-fade-in"
-            aria-label="Ask Mumtaz a question"
-          >
-            <MessageCircle className="h-6 w-6 text-white" />
-          </Button>
-        ) : (
-          <Button
-            className="fixed bottom-24 right-6 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-105 transition-all duration-300 pl-6 pr-5 py-6 gap-2 z-40 animate-fade-in"
+            className="fixed bottom-8 right-6 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-105 transition-all duration-300 pl-6 pr-5 py-6 gap-2 z-40 animate-fade-in"
             aria-label="Ask Mumtaz a question"
           >
             <Sparkles className="h-5 w-5 text-white" />
-            <span className="text-white font-medium text-sm">Ask me a question</span>
+            <span className="text-white font-medium text-sm">Ask Mumtaz</span>
           </Button>
-        )}
-      </DialogTrigger>
+        </DialogTrigger>
+      )}
       <DialogContent
         className="sm:max-w-2xl p-0 gap-0 animate-scale-in max-h-[90vh] h-[600px] flex flex-col overflow-hidden"
         aria-describedby="chatbot-description"

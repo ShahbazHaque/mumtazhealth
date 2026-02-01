@@ -9,6 +9,9 @@ import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
 import { lazy, Suspense, useEffect } from "react";
 import { PageLoadingSkeleton } from "@/components/PageLoadingSkeleton";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ChatProvider, useChat } from "@/contexts/ChatContext";
+import { BottomNavigation } from "@/components/BottomNavigation";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Eagerly loaded pages (critical path)
 import Index from "./pages/Index";
@@ -58,15 +61,36 @@ const LazyRoute = ({ children }: { children: React.ReactNode }) => (
   </Suspense>
 );
 
+// Routes where bottom navigation should be hidden
+const HIDDEN_NAV_ROUTES = ['/auth', '/onboarding', '/reset-password'];
+
+// Bottom navigation wrapper that checks route and mobile status
+function MobileBottomNav() {
+  const location = useLocation();
+  const isMobile = useIsMobile();
+  const { openChat, isOpen } = useChat();
+
+  // Hide on certain routes
+  const shouldHide = HIDDEN_NAV_ROUTES.some(route =>
+    location.pathname.startsWith(route)
+  );
+
+  if (!isMobile || shouldHide) return null;
+
+  return <BottomNavigation onChatOpen={openChat} isChatOpen={isOpen} />;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ErrorBoundary>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <LoadingProvider>
-          <RouteLogger />
-          <MumtazWisdomGuide />
+      <ChatProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <LoadingProvider>
+            <RouteLogger />
+            <MumtazWisdomGuide />
+            <MobileBottomNav />
           <Routes>
             <Route path="/" element={
               <RouteErrorBoundary variant="dashboard">
@@ -161,9 +185,10 @@ const App = () => (
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </LoadingProvider>
-      </BrowserRouter>
+            </Routes>
+          </LoadingProvider>
+        </BrowserRouter>
+      </ChatProvider>
     </ErrorBoundary>
   </QueryClientProvider>
 );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import { AppCompanionDisclaimer } from "@/components/AppCompanionDisclaimer";
 import { SupportPlanModal } from "@/components/SupportPlan";
 import { GentleSignInPrompt } from "@/components/GentleSignInPrompt";
 import { useGlobalLoading } from "@/hooks/useGlobalLoading";
+import { SimpleCheckIn } from "@/components/SimpleCheckIn";
 
 interface DailyPractice {
   id: string;
@@ -57,6 +58,12 @@ const MENSTRUAL_ADJUSTMENTS = {
 };
 
 export default function Tracker() {
+  const [searchParams] = useSearchParams();
+  const showFullTracker = searchParams.get('mode') === 'full';
+
+  // Simple check-in mode state - default to simple unless ?mode=full
+  const [useSimpleMode, setUseSimpleMode] = useState(!showFullTracker);
+
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -537,10 +544,20 @@ export default function Tracker() {
     );
   }
 
+  // Show simple check-in by default (better for non-technical users)
+  if (useSimpleMode) {
+    return (
+      <SimpleCheckIn
+        onComplete={() => {}}
+        onSwitchToFull={() => setUseSimpleMode(false)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-wellness-beige animate-fade-in">
       <Navigation />
-      
+
       {/* Gentle sign-in prompt */}
       <GentleSignInPrompt
         open={showSignInPrompt}
