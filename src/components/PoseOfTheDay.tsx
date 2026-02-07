@@ -404,6 +404,7 @@ export const PoseOfTheDay = () => {
 
   useEffect(() => {
     fetchUserProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPregnancySafeMode]);
 
   const fetchUserProfile = async () => {

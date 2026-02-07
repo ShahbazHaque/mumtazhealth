@@ -25,6 +25,7 @@ export function ConfidenceJourney() {
 
   useEffect(() => {
     checkUserPreference();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkUserPreference = async () => {

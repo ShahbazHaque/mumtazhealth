@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -128,7 +129,7 @@ const getDoshaMovementTags = (primaryDosha: string | null): string[] => {
 const ContentLibrary = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [userTier, setUserTier] = useState<string>("free");
   const [userMovementPreference, setUserMovementPreference] = useState<string | null>(null);
   const [userPrimaryDosha, setUserPrimaryDosha] = useState<string | null>(null);
@@ -184,7 +185,7 @@ const ContentLibrary = () => {
   const getRecommendedContent = (): Array<WellnessContent & { recommendationReason: string }> => {
     if (!userPrimaryDosha && !userMovementPreference && savedContentIds.size === 0) return [];
     
-    let recommended: Array<WellnessContent & { matchScore: number; recommendationReason: string }> = [];
+    const recommended: Array<WellnessContent & { matchScore: number; recommendationReason: string }> = [];
     
     // Get user's life stage for life phase recommendations
     const userLifeStage = localStorage.getItem('mumtaz_user_life_stage') || '';
@@ -192,7 +193,7 @@ const ContentLibrary = () => {
     // Score and label content based on multiple factors
     content.forEach(item => {
       let matchScore = 0;
-      let reasons: string[] = [];
+      const reasons: string[] = [];
       
       // Check if content matches user's saved content tags (prioritize favorites-based recommendations)
       const savedItems = content.filter(c => savedContentIds.has(c.id));
@@ -368,6 +369,7 @@ const ContentLibrary = () => {
       loadSavedContent();
       loadProgress();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadUserProfile = async () => {
@@ -396,6 +398,7 @@ const ContentLibrary = () => {
 
   useEffect(() => {
     applyFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, searchQuery, selectedCategory, selectedDosha, selectedLifePhase, selectedMobility, selectedConcern, selectedCompletion, completedContentIds, userMovementPreference, userPrimaryDosha, activeQuickFilters]);
 
   const loadContent = async () => {

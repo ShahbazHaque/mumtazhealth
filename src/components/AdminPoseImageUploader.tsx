@@ -43,6 +43,7 @@ export const AdminPoseImageUploader = ({ contentId, contentTitle }: AdminPoseIma
 
   useEffect(() => {
     loadPoseImages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentId]);
 
   const loadPoseImages = async () => {

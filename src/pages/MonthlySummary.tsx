@@ -20,10 +20,10 @@ interface WellnessEntry {
   pain_level: number | null;
   emotional_score: number | null;
   vata_crash: string | null;
-  daily_practices: any;
-  yoga_practice: any;
-  nutrition_log: any;
-  spiritual_practices: any;
+  daily_practices: Record<string, unknown> | null;
+  yoga_practice: Record<string, unknown> | null;
+  nutrition_log: Record<string, unknown> | null;
+  spiritual_practices: Record<string, unknown> | null;
 }
 
 const COLORS = ['#8B7355', '#D4A574', '#E8C4A0', '#F5E6D3', '#C9A68A'];
@@ -60,6 +60,7 @@ export default function MonthlySummary() {
     if (user) {
       loadMonthlyData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, selectedMonth]);
 
   const loadMonthlyData = async () => {
@@ -109,8 +110,8 @@ export default function MonthlySummary() {
     const practices: Record<string, number> = {};
     entries.forEach(entry => {
       if (entry.daily_practices) {
-        Object.entries(entry.daily_practices).forEach(([key, value]: [string, any]) => {
-          if (value?.status) {
+        Object.entries(entry.daily_practices).forEach(([key, value]) => {
+          if (value && typeof value === 'object' && 'status' in value && value.status) {
             practices[key] = (practices[key] || 0) + 1;
           }
         });
@@ -162,7 +163,7 @@ export default function MonthlySummary() {
   };
 
   const getSpiritualStats = () => {
-    let prayerCounts = { fajr: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 };
+    const prayerCounts = { fajr: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 };
     let totalMeditation = 0;
     let meditationDays = 0;
 

@@ -144,6 +144,7 @@ export function MumtazWisdomGuide() {
         localStorage.setItem(STORAGE_KEYS.SCROLL_POSITION, String(scrollAreaRef.current.scrollTop));
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isAuthPage]);
 
   useEffect(() => {
@@ -441,6 +442,7 @@ export function MumtazWisdomGuide() {
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, loading, messages, userProfile, conversationId, retryCount]);
 
   // Don't render on auth pages to avoid interference with CTAs

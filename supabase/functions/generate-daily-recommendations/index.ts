@@ -1,5 +1,20 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
+interface WellnessContent {
+  id: string;
+  title: string;
+  content_type: string;
+  difficulty_level?: string;
+  doshas?: string[];
+  tags?: string[];
+  description?: string;
+  content_url?: string;
+}
+
+interface ScoredContent extends WellnessContent {
+  score: number;
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -203,7 +218,7 @@ Deno.serve(async (req) => {
     const sortedContent = scoredContent.sort((a, b) => b.score - a.score);
 
     // Select recommendations with diversity
-    const recommendations: any[] = [];
+    const recommendations: ScoredContent[] = [];
     const contentTypes = ['yoga', 'meditation', 'nutrition', 'article'];
 
     // Try to get at least one of each type

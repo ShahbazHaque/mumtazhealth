@@ -1,11 +1,30 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import React from "https://esm.sh/react@18.3.1";
 import { render } from "https://esm.sh/@react-email/render@1.0.0";
 import { WeeklySummaryEmail } from "./_templates/weekly-summary.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
+
+interface WellnessEntry {
+  id: string;
+  user_id: string;
+  entry_date: string;
+  yoga_practice?: Record<string, unknown>;
+  nutrition_log?: Record<string, unknown>;
+  spiritual_practices?: Record<string, unknown>;
+  daily_practices?: Record<string, unknown>;
+  emotional_score?: number;
+}
+
+interface DailyReminder {
+  id: string;
+  reminder_time: string;
+  days_of_week: number[];
+  is_active: boolean;
+  wellness_content: { title: string }[] | { title: string } | null;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -38,7 +57,7 @@ const formatDays = (daysOfWeek: number[]) => {
 };
 
 const sendSummaryForUser = async (
-  supabase: any,
+  supabase: SupabaseClient,
   userId: string,
   userEmail: string,
   userName: string
@@ -94,7 +113,7 @@ const sendSummaryForUser = async (
     const upcomingReminders: { title: string; time: string; days: string }[] = [];
     
     if (reminders) {
-      reminders.forEach((reminder: any) => {
+      reminders.forEach((reminder: DailyReminder) => {
         const daysCount = reminder.days_of_week?.length || 0;
         scheduledPractices += daysCount;
         
@@ -107,7 +126,7 @@ const sendSummaryForUser = async (
           });
         } else if (content && typeof content === 'object' && 'title' in content) {
           upcomingReminders.push({
-            title: (content as any).title || "Practice",
+            title: (content as { title: string }).title || "Practice",
             time: formatTime(reminder.reminder_time),
             days: formatDays(reminder.days_of_week || []),
           });
@@ -125,7 +144,7 @@ const sendSummaryForUser = async (
     let moodCount = 0;
     const practicesCount: Record<string, number> = {};
 
-    entries?.forEach((entry: any) => {
+    entries?.forEach((entry: WellnessEntry) => {
       if (entry.yoga_practice && typeof entry.yoga_practice === "object") {
         yogaSessions++;
       }
@@ -134,7 +153,7 @@ const sendSummaryForUser = async (
         mealsLogged += meals;
       }
       if (entry.spiritual_practices && typeof entry.spiritual_practices === "object") {
-        const practices = entry.spiritual_practices as Record<string, any>;
+        const practices = entry.spiritual_practices as Record<string, unknown>;
         if (practices.meditation_duration) {
           meditationMinutes += Number(practices.meditation_duration) || 0;
         }
@@ -144,7 +163,7 @@ const sendSummaryForUser = async (
         moodCount++;
       }
       if (entry.daily_practices && typeof entry.daily_practices === "object") {
-        const practices = entry.daily_practices as Record<string, any>;
+        const practices = entry.daily_practices as Record<string, unknown>;
         Object.keys(practices).forEach((practice) => {
           practicesCount[practice] = (practicesCount[practice] || 0) + 1;
         });
@@ -210,9 +229,9 @@ const sendSummaryForUser = async (
 
     console.log("Weekly summary sent successfully to:", userEmail);
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error sending summary to user:", userId, error);
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
   }
 };
 
@@ -311,9 +330,9 @@ const handler = async (req: Request): Promise<Response> => {
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in send-weekly-summary function:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });

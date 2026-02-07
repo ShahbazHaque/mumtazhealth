@@ -365,8 +365,8 @@ export default function Onboarding() {
       } else {
         navigate("/");
       }
-    } catch (error: any) {
-      toast.error(error.message || "Failed to save profile");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to save profile");
     } finally {
       setLoading(false);
     }

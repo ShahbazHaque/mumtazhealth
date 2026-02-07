@@ -35,6 +35,7 @@ export function ConfidenceMilestones() {
 
   useEffect(() => {
     checkUserAndLoadStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkUserAndLoadStats = async () => {

@@ -46,7 +46,7 @@ interface WellnessEntry {
   emotional_state: string | null;
   pain_level: number | null;
   cycle_phase: string | null;
-  daily_practices: any;
+  daily_practices: Record<string, unknown> | null;
 }
 
 const Index = () => {
@@ -87,6 +87,7 @@ const Index = () => {
     
     // Update last visit
     localStorage.setItem('mumtaz_last_visit', new Date().toISOString());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleTourComplete = () => {
@@ -581,7 +582,7 @@ const Index = () => {
                               <div className="space-y-1">
                                 <p className="text-xs text-muted-foreground">Daily Practices</p>
                                 <p className="text-sm font-medium text-foreground">
-                                  {Object.values(entry.daily_practices).filter((p: any) => p?.status).length} completed
+                                  {Object.values(entry.daily_practices).filter((p) => p && typeof p === 'object' && 'status' in p && p.status).length} completed
                                 </p>
                               </div>
                             )}

@@ -1,6 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+interface PushSubscription {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
+interface PushMessage {
+  title: string;
+  body: string;
+  data?: Record<string, unknown>;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -169,7 +183,7 @@ serve(async (req) => {
   }
 });
 
-async function sendPushNotification(subscription: any, message: any) {
+async function sendPushNotification(subscription: PushSubscription, message: PushMessage) {
   const vapidDetails = {
     subject: "mailto:mumtazhaque07@gmail.com",
     publicKey: VAPID_PUBLIC_KEY,

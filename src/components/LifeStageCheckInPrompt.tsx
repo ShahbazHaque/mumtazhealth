@@ -34,6 +34,7 @@ export function LifeStageCheckInPrompt({ currentStage, onDismiss }: LifeStageChe
 
   useEffect(() => {
     checkIfPromptShouldShow();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStage]);
 
   const checkIfPromptShouldShow = () => {

@@ -42,6 +42,7 @@ export const DailyReminderButton = ({ contentId, contentTitle, userId }: DailyRe
     if (userId && contentId) {
       checkExistingReminder();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, contentId]);
 
   const checkExistingReminder = async () => {

@@ -107,11 +107,11 @@ const handler = async (req: Request): Promise<Response> => {
         ...corsHeaders,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[send-welcome-email] Error:", error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: error instanceof Error ? error.message : "Unknown error",
         details: "Failed to send welcome email. The user account was still created successfully."
       }),
       {

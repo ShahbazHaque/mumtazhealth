@@ -88,7 +88,7 @@ export default function Tracker() {
   const [monthlyReflection, setMonthlyReflection] = useState('');
   
   // Daily practices state
-  const [practices, setPractices] = useState<Record<string, any>>({});
+  const [practices, setPractices] = useState<Record<string, unknown>>({});
   
   // Yoga practice fields
   const [yogaStyle, setYogaStyle] = useState('');
@@ -165,6 +165,7 @@ export default function Tracker() {
       checkOnboarding();
       loadData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, selectedDate]);
 
   const checkOnboarding = async () => {
@@ -257,10 +258,10 @@ export default function Tracker() {
       setVataCrash(data.vata_crash || 'No');
       setTweakPlan(data.tweak_plan || '');
       setMonthlyReflection(data.monthly_reflection || '');
-      setPractices(typeof data.daily_practices === 'object' && data.daily_practices !== null ? data.daily_practices as Record<string, any> : {});
+      setPractices(typeof data.daily_practices === 'object' && data.daily_practices !== null ? data.daily_practices as Record<string, unknown> : {});
       
       // Load pregnancy tracking data
-      const pregnancyData = typeof data.pregnancy_tracking === 'object' && data.pregnancy_tracking !== null ? data.pregnancy_tracking as Record<string, any> : {};
+      const pregnancyData = typeof data.pregnancy_tracking === 'object' && data.pregnancy_tracking !== null ? data.pregnancy_tracking as Record<string, unknown> : {};
       setPregnancyNausea(pregnancyData.nausea || '');
       setPregnancyFatigue(pregnancyData.fatigue || '');
       setPregnancySleep(pregnancyData.sleep || '');
@@ -271,7 +272,7 @@ export default function Tracker() {
       setPregnancyNotes(pregnancyData.notes || '');
       
       // Load postpartum tracking data
-      const postpartumData = typeof data.postpartum_tracking === 'object' && data.postpartum_tracking !== null ? data.postpartum_tracking as Record<string, any> : {};
+      const postpartumData = typeof data.postpartum_tracking === 'object' && data.postpartum_tracking !== null ? data.postpartum_tracking as Record<string, unknown> : {};
       setPostpartumSleep(postpartumData.sleep || '');
       setPostpartumMood(postpartumData.mood || '');
       setPostpartumEnergy(postpartumData.energy || '');
@@ -280,7 +281,7 @@ export default function Tracker() {
       setPostpartumNotes(postpartumData.notes || '');
       
       // Load menopause tracking data
-      const menopauseData = typeof data.menopause_tracking === 'object' && data.menopause_tracking !== null ? data.menopause_tracking as Record<string, any> : {};
+      const menopauseData = typeof data.menopause_tracking === 'object' && data.menopause_tracking !== null ? data.menopause_tracking as Record<string, unknown> : {};
       setMenopauseHotFlashes(menopauseData.hotFlashes || '');
       setMenopauseNightSweats(menopauseData.nightSweats || '');
       setMenopauseMood(menopauseData.mood || '');
@@ -291,17 +292,17 @@ export default function Tracker() {
       setMenopauseDigestion(menopauseData.digestion || '');
       
       // Load yoga practice data
-      const yogaData = typeof data.yoga_practice === 'object' && data.yoga_practice !== null ? data.yoga_practice as Record<string, any> : {};
+      const yogaData = typeof data.yoga_practice === 'object' && data.yoga_practice !== null ? data.yoga_practice as Record<string, unknown> : {};
       setYogaStyle(yogaData.style || '');
       setYogaDuration(yogaData.duration || '');
       setYogaPoses(yogaData.poses || '');
       
       // Load nutrition data
-      const nutritionData = typeof data.nutrition_log === 'object' && data.nutrition_log !== null ? data.nutrition_log as Record<string, any> : {};
+      const nutritionData = typeof data.nutrition_log === 'object' && data.nutrition_log !== null ? data.nutrition_log as Record<string, unknown> : {};
       setMeals(Array.isArray(nutritionData.meals) ? nutritionData.meals : []);
       
       // Load spiritual practices data
-      const spiritualData = typeof data.spiritual_practices === 'object' && data.spiritual_practices !== null ? data.spiritual_practices as Record<string, any> : {};
+      const spiritualData = typeof data.spiritual_practices === 'object' && data.spiritual_practices !== null ? data.spiritual_practices as Record<string, unknown> : {};
       setFajr(spiritualData.fajr || false);
       setDhuhr(spiritualData.dhuhr || false);
       setAsr(spiritualData.asr || false);

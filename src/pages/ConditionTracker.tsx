@@ -89,6 +89,7 @@ export default function ConditionTracker() {
 
   useEffect(() => {
     fetchEntries();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCondition]);
 
   const fetchEntries = async () => {
@@ -108,7 +109,7 @@ export default function ConditionTracker() {
 
       if (error) throw error;
       setEntries((data || []) as SymptomEntry[]);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching entries:", error);
     }
   };
@@ -158,8 +159,8 @@ export default function ConditionTracker() {
       setSelectedSymptoms([]);
       setNotes("");
       fetchEntries();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to log symptoms");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to log symptoms");
     } finally {
       setLoading(false);
     }

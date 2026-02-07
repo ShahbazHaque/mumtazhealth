@@ -92,6 +92,7 @@ export function EmotionalWhatWorked() {
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchRecentLogs = async (uid: string) => {

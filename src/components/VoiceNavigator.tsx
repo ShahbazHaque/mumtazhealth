@@ -215,6 +215,7 @@ export function VoiceNavigator({ className }: VoiceNavigatorProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [voiceModeEnabled, recognition, isListening]);
 
   useEffect(() => {
@@ -255,6 +256,7 @@ export function VoiceNavigator({ className }: VoiceNavigatorProps) {
         recognition.abort();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleVoiceCommand = useCallback((transcript: string) => {
@@ -306,6 +308,7 @@ export function VoiceNavigator({ className }: VoiceNavigatorProps) {
     if (!isLongPress.current && !showHelp) {
       toggleListening();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showHelp]);
 
   const handleMouseLeave = useCallback(() => {

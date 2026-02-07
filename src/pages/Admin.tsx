@@ -118,6 +118,7 @@ export default function Admin() {
     if (user) {
       checkAdminRole();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const checkAdminRole = async () => {

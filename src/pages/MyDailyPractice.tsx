@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 import { Navigation } from "@/components/Navigation";
 import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,7 +117,7 @@ const formatTime = (time: string) => {
 export default function MyDailyPractice() {
   const [reminders, setReminders] = useState<DailyReminder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [editingReminder, setEditingReminder] = useState<DailyReminder | null>(null);
   const [editTime, setEditTime] = useState("");
   const [editDays, setEditDays] = useState<number[]>([]);
@@ -126,6 +127,7 @@ export default function MyDailyPractice() {
 
   useEffect(() => {
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {

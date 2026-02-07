@@ -28,6 +28,7 @@ export default function Settings() {
 
   useEffect(() => {
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfile = async () => {
@@ -85,7 +86,7 @@ export default function Settings() {
         setUsername(profileData.username || "");
         setAvatarUrl(profileData.avatar_url || null);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching profile:", error);
     }
   };
@@ -123,8 +124,8 @@ export default function Settings() {
       setInitialLifePhases(newLifePhases);
       setIsEditingJourney(false);
       toast.success("Journey phase updated successfully");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update journey phase");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to update journey phase");
     } finally {
       setLoading(false);
     }

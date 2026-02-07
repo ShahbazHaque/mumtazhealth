@@ -78,6 +78,7 @@ export default function Bookings() {
       loadServices();
       loadMyBookings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadServices = async () => {
