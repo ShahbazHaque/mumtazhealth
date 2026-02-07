@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import founderPortrait from "@/assets/founder-portrait.jpeg";
+import founderPortrait from "@/assets/founder-portrait-enhanced.png";
 import { Logo } from "@/components/Logo";
 import { HomeNavigation } from "@/components/HomeNavigation";
 import { OnboardingTour } from "@/components/OnboardingTour";

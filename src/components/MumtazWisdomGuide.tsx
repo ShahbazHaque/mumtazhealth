@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sparkles, Send, Loader2, History, Trash2, MessageCircle, Heart, Leaf, Wind, Moon, ArrowLeft, RefreshCw, LogIn, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import mumtazAvatar from "@/assets/mumtaz-avatar.jpeg";
+import roseAvatar from "@/assets/rose-avatar.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -363,7 +363,7 @@ export function MumtazWisdomGuide() {
     if (!session) {
       toast({
         title: "Session Expired",
-        description: "Please sign in again to continue chatting with Mumtaz.",
+        description: "Please sign in again to continue chatting with Rose.",
         variant: "destructive",
       });
       setLoading(false);
@@ -501,10 +501,10 @@ export function MumtazWisdomGuide() {
         <DialogTrigger asChild>
           <Button
             className="fixed bottom-8 right-6 rounded-full shadow-lg bg-gradient-to-br from-wellness-lilac to-accent hover:scale-105 transition-all duration-300 pl-6 pr-5 py-6 gap-2 z-40 animate-fade-in"
-            aria-label="Ask Mumtaz a question"
+            aria-label="Ask Rose a question"
           >
             <Sparkles className="h-5 w-5 text-white" />
-            <span className="text-white font-medium text-sm">Ask Mumtaz</span>
+            <span className="text-white font-medium text-sm">Ask Rose</span>
           </Button>
         </DialogTrigger>
       )}
@@ -513,7 +513,7 @@ export function MumtazWisdomGuide() {
         aria-describedby="chatbot-description"
       >
         <VisuallyHidden>
-          <DialogTitle>Mumtaz Wisdom Guide</DialogTitle>
+          <DialogTitle>Rose</DialogTitle>
           <DialogDescription id="chatbot-description">
             Your personal wellness companion chatbot
           </DialogDescription>
@@ -523,14 +523,14 @@ export function MumtazWisdomGuide() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12 border-2 border-accent">
-                  <AvatarImage src={mumtazAvatar} />
+                  <AvatarImage src={roseAvatar} />
                   <AvatarFallback className="bg-accent/20 text-accent">
                     <Sparkles className="h-6 w-6" />
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <CardTitle className="text-lg bg-gradient-to-r from-wellness-lilac to-wellness-sage bg-clip-text text-transparent">
-                    Mumtaz Wisdom Guide
+                    Rose
                   </CardTitle>
                   <p className="text-xs text-muted-foreground">Your personal wellness companion</p>
                 </div>
@@ -557,7 +557,7 @@ export function MumtazWisdomGuide() {
                     <Sparkles className="h-10 w-10 text-accent" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-2xl font-semibold">Sign in to Chat with Mumtaz</h3>
+                    <h3 className="text-2xl font-semibold">Sign in to Chat with Rose</h3>
                     <p className="text-muted-foreground">
                       Get personalized wellness guidance tailored to your dosha, life stage,
                       and wellness journey. Your conversations are saved and personalized just for you.
@@ -629,7 +629,7 @@ export function MumtazWisdomGuide() {
                   >
                     {message.role === "assistant" && (
                       <Avatar className="h-8 w-8 border border-accent/30 shrink-0">
-                        <AvatarImage src={mumtazAvatar} />
+                        <AvatarImage src={roseAvatar} />
                         <AvatarFallback className="bg-accent/20">
                           <Sparkles className="h-4 w-4 text-accent" />
                         </AvatarFallback>
@@ -713,7 +713,7 @@ export function MumtazWisdomGuide() {
               {/* Input field */}
               <div className="flex gap-2">
                 <Input
-                  placeholder={`Ask Mumtaz for guidance${userProfile?.username ? `, ${userProfile.username}` : ""}...`}
+                  placeholder={`Ask Rose for guidance${userProfile?.username ? `, ${userProfile.username}` : ""}...`}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}

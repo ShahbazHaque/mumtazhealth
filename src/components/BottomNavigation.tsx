@@ -27,8 +27,8 @@ const NAV_ITEMS = [
     href: "/content-library",
   },
   {
-    id: "mumtaz",
-    label: "Mumtaz",
+    id: "rose",
+    label: "Rose",
     icon: MessageCircle,
     href: null, // Opens chat instead of navigating
   },
