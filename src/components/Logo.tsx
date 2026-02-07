@@ -41,12 +41,12 @@ export function Logo({ size = "md", showText = true, className = "", to = "/" }:
     <Link to={to} className={`flex flex-col items-center gap-1.5 sm:gap-2 ${className}`}>
       <img
         src={logo}
-        alt="Mumtaz Health - Empowering Your Journey"
+        alt="Mumtaz Health - Empowering Your Health Journey"
         className={`${sizeClasses[size]} w-auto object-contain`}
       />
       {size !== "sm" && (
         <p className={`${taglineSizes[size]} text-muted-foreground font-accent italic`}>
-          Empowering Your Journey
+          Empowering Your Health Journey
         </p>
       )}
     </Link>
