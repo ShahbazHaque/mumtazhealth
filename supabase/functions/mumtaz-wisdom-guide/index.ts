@@ -95,38 +95,8 @@ serve(async (req) => {
   }
 
   try {
-    // Authentication check - require valid auth token
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      console.error("[CHATBOT_API_ERROR] No authorization header provided");
-      return new Response(
-        JSON.stringify({
-          error: 'Please sign in to continue chatting with Mumtaz',
-          errorCode: 'AUTH_REQUIRED'
-        }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Verify the user is authenticated
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-    
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      console.error("[CHATBOT_API_ERROR] Auth verification failed:", authError);
-      return new Response(
-        JSON.stringify({
-          error: 'Your session has expired. Please sign in again.',
-          errorCode: 'SESSION_EXPIRED'
-        }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // No authentication required - open to all users
+    console.log("[CHATBOT_API] Processing request (no auth required)");
 
     // Validate request body
     const body = await req.json();
@@ -168,7 +138,7 @@ serve(async (req) => {
         content: msg.content
       }));
 
-    console.log("[CHATBOT_API] Making request to Claude API for user:", user.id.substring(0, 8) + "...");
+    console.log("[CHATBOT_API] Making request to Claude API...");
 
     const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
